@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hin.ge — Stop managing tasks. Start finishing goals.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #faf8f4;
+    --ink: #0f0e0c;
+    --ink-muted: #3a3830;
+    --ink-faint: #7a7060;
+    --gold: #c8922a;
+    --gold-light: #f0d9a8;
+    --gold-faint: #faf0dc;
+    --teal: #1a7a65;
+    --teal-light: #e0f2ec;
+    --border: rgba(15,14,12,0.10);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-logo span { color: var(--gold); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-cta {
+    background: var(--ink) !important;
+    color: var(--cream) !important;
+    padding: 8px 18px !important;
+    border-radius: 6px;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    transition: opacity 0.15s !important;
+  }
+
+  .nav-cta:hover { opacity: 0.85 !important; }
+
+  /* ─── HERO ─── */
+  .hero {
+    padding: 140px 2rem 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(38px, 5vw, 58px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink-muted);
+    line-height: 1.65;
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    color: var(--ink-muted);
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .btn-secondary:hover {
+    color: var(--ink);
+    border-color: var(--ink-muted);
+  }
+
+  .hero-proof {
+    margin-top: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+
+  .proof-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+  }
+
+  /* ─── PHONE MOCKUP ─── */
+  .phone-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .phone {
+    width: 280px;
+    background: var(--ink);
+    border-radius: 36px;
+    padding: 12px;
+    box-shadow: 0 40px 80px rgba(15,14,12,0.25), 0 8px 24px rgba(15,14,12,0.12);
+    position: relative;
+  }
+
+  .phone-notch {
+    width: 80px;
+    height: 24px;
+    background: var(--ink);
+    border-radius: 0 0 16px 16px;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .phone-screen {
+    background: var(--cream);
+    border-radius: 28px;
+    overflow: hidden;
+    min-height: 520px;
+    padding: 0;
+    position: relative;
+  }
+
+  .screen-header {
+    padding: 20px 20px 16px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .screen-date {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+
+  .screen-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .screen-body { padding: 16px 20px; }
+
+  .goal-card {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    color: var(--cream);
+  }
+
+  .goal-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(250,248,244,0.5);
+    margin-bottom: 6px;
+  }
+
+  .goal-text {
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--cream);
+    margin-bottom: 14px;
+  }
+
+  .progress-bar-wrap {
+    height: 3px;
+    background: rgba(250,248,244,0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 50%;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    color: rgba(250,248,244,0.45);
+    text-align: right;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .task-item:last-child { border-bottom: none; }
+
+  .task-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .task-check.done {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+
+  .task-check.done::after {
+    content: '';
+    width: 8px;
+    height: 5px;
+    border-left: 1.5px solid white;
+    border-bottom: 1.5px solid white;
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+
+  .task-text {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .task-text.done {
+    text-decoration: line-through;
+    color: var(--ink-faint);
+  }
+
+  .screen-footer {
+    padding: 12px 20px 20px;
+  }
+
+  .countdown {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .countdown::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .end-day-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--gold-faint);
+    border: 1px solid var(--gold-light);
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: #8a5c10;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  /* ─── ACCENT CARDS floating around phone ─── */
+  .float-card {
+    position: absolute;
+    background: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 20px rgba(15,14,12,0.10);
+    border: 0.5px solid var(--border);
+  }
+
+  .float-streak {
+    top: 40px;
+    right: -60px;
+    font-size: 11px;
+  }
+
+  .float-streak-num {
+    font-family: var(--serif);
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+
+  .float-streak-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .float-quality {
+    bottom: 80px;
+    left: -70px;
+    font-size: 11px;
+  }
+
+  .float-quality-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+  }
+
+  .quality-bar {
+    height: 3px;
+    background: var(--teal-light);
+    border-radius: 2px;
+    overflow: hidden;
+    width: 48px;
+  }
+
+  .quality-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 2px;
+  }
+
+  .float-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+
+  /* ─── SECTION: HOW IT WORKS ─── */
+  section { padding: 80px 2rem; }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-sub {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--ink-muted);
+    text-align: center;
+    max-width: 540px;
+    margin: 0 auto 4rem;
+    line-height: 1.65;
+  }
+
+  /* ─── THREE STEPS ─── */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .step-card {
+    background: var(--cream);
+    padding: 2.5rem 2rem;
+    position: relative;
+  }
+
+  .step-num {
+    font-family: var(--serif);
+    font-size: 48px;
+    line-height: 1;
+    color: var(--gold-light);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  .step-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--ink-muted);
+    line-height: 1.65;
+  }
+
+  .step-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: var(--teal-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-top: 1.25rem;
+  }
+
+  /* ─── PHILOSOPHY STRIP ─── */
+  .philosophy {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 80px 2rem;
+  }
+
+  .philosophy-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .philosophy-quote {
+    font-family: var(--serif);
+    font-size: clamp(24px, 4vw, 42px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+
+  .philosophy-quote em { color: var(--gold); font-style: italic; }
+
+  .philosophy-attr {
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(250,248,244,0.45);
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── PRICING ─── */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .pricing-card {
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    background: white;
+  }
+
+  .pricing-card.featured {
+    border: 1.5px solid var(--ink);
+    position: relative;
+  }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--cream);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.75rem;
+  }
+
+  .plan-price {
+    font-family: var(--serif);
+    font-size: 38px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .plan-price sup {
+    font-family: var(--sans);
+    font-size: 18px;
+    vertical-align: top;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  .plan-price-note {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-bottom: 1.5rem;
+  }
+
+  .plan-divider {
+    height: 0.5px;
+    background: var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .plan-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .plan-features li {
+    font-size: 13px;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    color: var(--teal);
+    font-weight: 500;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .plan-features li.locked {
+    color: var(--ink-faint);
+    text-decoration: line-through;
+  }
+
+  .plan-features li.locked::before {
+    content: '—';
+    color: var(--border);
+  }
+
+  .plan-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: opacity 0.15s;
+  }
+
+  .plan-btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+  }
+
+  .plan-btn-filled {
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--cream);
+  }
+
+  .plan-btn:hover { opacity: 0.75; }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    background: var(--gold-faint);
+    border-top: 0.5px solid var(--gold-light);
+    border-bottom: 0.5px solid var(--gold-light);
+    padding: 80px 2rem;
+    text-align: center;
+  }
+
+  .cta-section h2 { margin-bottom: 1rem; }
+
+  .cta-section .section-sub { margin-bottom: 2.5rem; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 2.5rem 2rem;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .footer-logo span { color: var(--gold); }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .footer-links a:hover { color: var(--ink); }
+
+  /* ─── STATS ROW ─── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 5rem;
+  }
+
+  .stat-cell {
+    padding: 2rem 2.5rem;
+    border-right: 0.5px solid var(--border);
+    text-align: center;
+  }
+
+  .stat-cell:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 42px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-num span { color: var(--gold); }
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--ink-faint);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding: 100px 1.5rem 60px;
+      gap: 3rem;
+    }
+
+    .phone-wrap { order: -1; }
+    .float-streak, .float-quality { display: none; }
+    .steps-grid, .pricing-grid, .stats-row { grid-template-columns: 1fr; }
+    .steps-grid { background: transparent; gap: 1rem; }
+    .step-card { border: 0.5px solid var(--border); border-radius: 12px; }
+    .stat-cell { border-right: none; border-bottom: 0.5px solid var(--border); }
+    .stat-cell:last-child { border-bottom: none; }
+    nav { padding: 0 1.25rem; }
+    .nav-links { display: none; }
+    .footer-inner { flex-direction: column; gap: 1.25rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Hin<span>.</span>ge</a>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#">Sign in</a></li>
+    <li><a href="#" class="nav-cta">Get started — free</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section style="padding: 0;">
+  <div class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">One goal. One day. No noise.</p>
+      <h1>Stop managing<br>tasks. Start<br><em>finishing</em> goals.</h1>
+      <p class="hero-sub">Hin.ge enforces a hard 3-slot limit — one main goal, two support tasks. Everything resets at midnight. No carry-over. No excuses.</p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">
+          Start for free
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#how" class="btn-secondary">See how it works</a>
+      </div>
+      <div class="hero-proof">
+        <span class="proof-dot"></span>
+        <span>No credit card required &nbsp;·&nbsp; Works in your browser today</span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="screen-header">
+            <div class="screen-date">Thursday, March 26</div>
+            <div class="screen-title">Today hinges on one thing.</div>
+          </div>
+          <div class="screen-body">
+            <div class="goal-card">
+              <div class="goal-label">Main goal</div>
+              <div class="goal-text">Ship auth refactor to staging</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-fill"></div>
+              </div>
+              <div class="progress-label">50%</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check done"></div>
+              <div class="task-text done">Write migration script for session tokens</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check"></div>
+              <div class="task-text">Get sign-off from Maya on the rollback plan</div>
+            </div>
+          </div>
+          <div class="screen-footer">
+            <div class="countdown">3h 22m until end of day</div>
+            <div class="end-day-btn">End my day →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating accent cards -->
+      <div class="float-card float-streak">
+        <div class="float-label">Current streak</div>
+        <div class="float-streak-num">🔥 12</div>
+        <div class="float-streak-label">Days</div>
+      </div>
+      <div class="float-card float-quality">
+        <div class="float-label">Goal quality</div>
+        <div class="float-quality-row">
+          Specific
+          <div class="quality-bar"><div class="quality-fill" style="width:91%"></div></div>
+          <span style="font-size:11px;color:var(--teal);font-weight:500;">91%</span>
+        </div>
+        <div class="float-quality-row">
+          Vague
+          <div class="quality-bar"><div class="quality-fill" style="width:44%;background:var(--gold);"></div></div>
+          <span style="font-size:11px;color:var(--gold);font-weight:500;">44%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="how" style="padding-top: 40px; padding-bottom: 80px;">
+  <div class="section-inner">
+    <div class="stats-row">
+      <div class="stat-cell">
+        <div class="stat-num">3<span>.</span></div>
+        <div class="stat-label">Maximum tasks per day. Always.</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">2<span>×</span></div>
+        <div class="stat-label">Higher hit rate with specific goals</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num">0<span>.</span></div>
+        <div class="stat-label">Auto-carry-overs. Ever.</div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <p class="section-eyebrow">The 3-screen loop</p>
+    <h2>One ritual. Three minutes.</h2>
+    <p class="section-sub">Every day is the same structure — morning setup, active work, end-of-day snapshot. Simplicity is the product.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-num">01</span>
+        <div class="step-title">Morning setup</div>
+        <p class="step-desc">Define your one win. Add two tasks that directly scaffold it. The app flags vague goals in real-time before you commit.</p>
+        <span class="step-tag">60-second ritual</span>
+      </div>
+      <div class="step-card" style="background: var(--ink); color: var(--cream);">
+        <span class="step-num" style="color: rgba(250,248,244,0.15);">02</span>
+        <div class="step-title" style="color: var(--cream);">Active day</div>
+        <p class="step-desc" style="color: rgba(250,248,244,0.6);">Your goal sits front and center. Check off support tasks. Log interruptions in the overflow — they're never graded.</p>
+        <span class="step-tag" style="background: rgba(26,122,101,0.2); color: var(--teal-light);">Zero noise</span>
+      </div>
+      <div class="step-card">
+        <span class="step-num">03</span>
+        <div class="step-title">End-of-day snapshot</div>
+        <p class="step-desc">Binary verdict — win or miss. Your streak, personal best, and weekly hit rate. Share the milestone if you earned it.</p>
+        <span class="step-tag">No partial credit</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY -->
+<section class="philosophy">
+  <div class="philosophy-inner">
+    <p class="philosophy-quote">"If the deadline bends,<br><em>it was never a deadline.</em>"</p>
+    <p class="philosophy-attr">— The one rule behind everything in Hin.ge</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <p class="section-eyebrow">Pricing</p>
+    <h2>Simple. Honest.</h2>
+    <p class="section-sub">The daily ritual is free forever. Pro unlocks the history, the streaks, and the data that make the ritual matter.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <p class="plan-name">Free</p>
+        <div class="plan-price">$<span>0</span></div>
+        <p class="plan-price-note">Forever. No card.</p>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Full 3-screen daily loop</li>
+          <li>Goal quality check at setup</li>
+          <li>Overflow log</li>
+          <li>Current streak counter</li>
+          <li>7-day week view</li>
+          <li>Win/miss verdict daily</li>
+          <li class="locked">History beyond 7 days</li>
+          <li class="locked">Streak freeze (1/month)</li>
+          <li class="locked">Focus rank + insights</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Get started</a>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="featured-badge">Most popular</div>
+        <p class="plan-name">Pro</p>
+        <div class="plan-price"><sup>$</sup>4<span style="font-family:var(--sans);font-size:18px;color:var(--ink-faint)">/mo</span></div>
+        <p class="plan-price-note">$39/yr — save 20%</p>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Everything in Free</li>
+          <li>Full history + heatmap</li>
+          <li>Personal best — visible forever</li>
+          <li>Streak freeze (1/month)</li>
+          <li>Focus rank + goal quality score</li>
+          <li>Pattern insights</li>
+          <li>Milestone share cards</li>
+          <li>Home screen widget</li>
+          <li>Smart notifications</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-filled">Start 7-day trial</a>
+      </div>
+
+      <div class="pricing-card">
+        <p class="plan-name">Team</p>
+        <div class="plan-price"><sup>$</sup>8<span style="font-family:var(--sans);font-size:18px;color:var(--ink-faint)">/seat</span></div>
+        <p class="plan-price-note">$72/yr per seat · min 2 seats</p>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Everything in Pro</li>
+          <li>Shared team goal</li>
+          <li>Manager read-only dashboard</li>
+          <li>Team hit rate view</li>
+          <li>Slack / Teams integration</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="plan-btn plan-btn-outline">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Today still counts.</h2>
+  <p class="section-sub">Set your one goal. The rest is noise.</p>
+  <a href="#" class="btn-primary" style="display: inline-flex;">
+    Open Hin.ge — it's free
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <a class="footer-logo" href="#">Hin<span>.</span>ge</a>
+    <ul class="footer-links">
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Twitter/X</a></li>
+    </ul>
+    <p style="font-size:12px;color:var(--ink-faint);">© 2025 Hin.ge</p>
+  </div>
+</footer>
+
+</body>
+</html>

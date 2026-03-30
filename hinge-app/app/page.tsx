@@ -1,0 +1,330 @@
+import Link from 'next/link'
+
+export default function LandingPage() {
+  return (
+    <div className="bg-cream text-[var(--lk-ink)] font-sans min-h-screen">
+      {/* NAV */}
+      <nav className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-8 bg-[rgba(250,248,244,0.92)] backdrop-blur-md border-b border-[var(--lk-border)]">
+        <a href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
+          Hin<span className="text-gold">.</span>ge
+        </a>
+        <ul className="flex items-center gap-8 list-none">
+          <li>
+            <a href="#how-it-works" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
+              How it works
+            </a>
+          </li>
+          <li>
+            <a href="#pricing" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
+              Pricing
+            </a>
+          </li>
+          <li>
+            <Link
+              href="/today"
+              className="text-[13px] font-medium bg-[var(--lk-ink)] text-cream px-[18px] py-2 rounded-[6px] no-underline hover:opacity-85 transition-opacity"
+            >
+              Start free →
+            </Link>
+          </li>
+        </ul>
+      </nav>
+
+      {/* HERO */}
+      <div className="pt-[140px] pb-[80px] px-8 max-w-[1100px] mx-auto grid grid-cols-2 gap-16 items-center">
+        {/* Left copy */}
+        <div>
+          <p className="text-[12px] font-medium tracking-[0.12em] uppercase text-gold mb-5">
+            Daily focus, finally
+          </p>
+          <h1 className="font-serif text-[clamp(38px,5vw,58px)] leading-[1.08] tracking-[-0.02em] text-[var(--lk-ink)] mb-6">
+            Stop managing tasks.<br />
+            Start finishing <em className="italic text-gold">goals.</em>
+          </h1>
+          <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.65] max-w-[420px] mb-10">
+            One goal per day. Two support tasks that scaffold it. A hard 3-slot limit
+            the app refuses to break. The day hinges on one thing.
+          </p>
+          <div className="flex items-center gap-4 flex-wrap">
+            <Link
+              href="/setup"
+              className="inline-flex items-center gap-2 bg-[var(--lk-ink)] text-cream px-7 py-[14px] rounded-[8px] text-[15px] font-medium no-underline hover:opacity-85 transition-opacity"
+            >
+              Start for free
+              <span>→</span>
+            </Link>
+            <a
+              href="#how-it-works"
+              className="inline-flex items-center gap-2 text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] no-underline border-b border-[var(--lk-border)] pb-px transition-colors"
+            >
+              See how it works ↓
+            </a>
+          </div>
+          <div className="mt-10 flex items-center gap-4 text-[13px] text-[var(--lk-faint)]">
+            <span className="w-[6px] h-[6px] rounded-full bg-teal flex-shrink-0" />
+            Free forever · No card required · 60-second setup
+          </div>
+        </div>
+
+        {/* Phone mockup */}
+        <div className="flex justify-center items-center relative">
+          <div className="w-[280px] bg-[var(--lk-ink)] rounded-[36px] p-3 shadow-[0_40px_80px_rgba(15,14,12,0.25),0_8px_24px_rgba(15,14,12,0.12)] relative">
+            <div className="w-[80px] h-[24px] bg-[var(--lk-ink)] rounded-b-[16px] mx-auto mb-2 relative z-10" />
+            <div className="bg-cream rounded-[28px] overflow-hidden min-h-[520px]">
+              {/* Screen header */}
+              <div className="p-5 pb-4 border-b border-[var(--lk-border)]">
+                <p className="text-[11px] font-medium tracking-[0.08em] uppercase text-[var(--lk-faint)] mb-1">
+                  Monday, Mar 31
+                </p>
+                <p className="font-serif text-[17px] text-[var(--lk-ink)] leading-tight">
+                  Today&apos;s focus
+                </p>
+              </div>
+              {/* Screen body */}
+              <div className="p-5">
+                <div className="bg-[var(--lk-ink)] rounded-[16px] p-4 mb-3 text-cream">
+                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-[rgba(250,248,244,0.5)] mb-1.5">
+                    Main goal
+                  </p>
+                  <p className="font-serif text-[15px] leading-[1.35] text-cream mb-3.5">
+                    Ship auth refactor to staging
+                  </p>
+                  <div className="h-[3px] bg-[rgba(250,248,244,0.15)] rounded-full overflow-hidden mb-1.5">
+                    <div className="h-full w-1/2 bg-gold rounded-full" />
+                  </div>
+                  <p className="text-[10px] text-right text-[rgba(250,248,244,0.45)]">50%</p>
+                </div>
+                {/* Tasks */}
+                <div className="divide-y divide-[var(--lk-border)]">
+                  <div className="flex items-start gap-2.5 py-2.5">
+                    <div className="w-[18px] h-[18px] rounded-full bg-teal border-teal border flex-shrink-0 mt-0.5 flex items-center justify-center">
+                      <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                        <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <p className="text-[13px] text-[var(--lk-faint)] line-through leading-snug">
+                      Write tests for token refresh
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2.5 py-2.5">
+                    <div className="w-[18px] h-[18px] rounded-full border border-[var(--lk-border)] flex-shrink-0 mt-0.5" />
+                    <p className="text-[13px] text-[var(--lk-muted)] leading-snug">Get PR reviewed by Alex</p>
+                  </div>
+                </div>
+              </div>
+              {/* Screen footer */}
+              <div className="px-5 pb-5">
+                <p className="text-[11px] text-[var(--lk-faint)] flex items-center gap-1.5 mb-2.5">
+                  <span className="w-[5px] h-[5px] rounded-full bg-gold inline-block" />
+                  4h 22m remaining · ends 6:00 PM
+                </p>
+                <button className="w-full py-3 bg-[var(--gold-faint)] border border-[var(--gold-light)] rounded-[10px] text-[13px] font-medium text-[#8a5c10]">
+                  End my day →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Float cards */}
+          <div className="absolute top-10 -right-14 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
+            <p className="font-serif text-[26px] text-[var(--lk-ink)] leading-none mb-0.5">8</p>
+            <p className="text-[10px] font-medium tracking-[0.06em] uppercase text-[var(--lk-faint)]">Day streak 🔥</p>
+          </div>
+          <div className="absolute bottom-20 -left-16 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
+            <p className="text-[10px] font-medium tracking-[0.07em] uppercase text-gold mb-1">Goal quality</p>
+            <div className="flex items-center gap-1.5 text-[11px] text-[var(--lk-muted)] mt-1">
+              <span>Specific</span>
+              <div className="h-[3px] w-12 bg-teal-light rounded-full overflow-hidden">
+                <div className="h-full w-[91%] bg-teal rounded-full" />
+              </div>
+              <span className="text-teal font-medium">91%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" className="py-20 px-8 bg-white">
+        <div className="max-w-[1100px] mx-auto">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
+            The 60-second ritual
+          </p>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] text-center mb-4">
+            Three screens. One outcome.
+          </h2>
+          <p className="text-[16px] font-light text-[var(--lk-muted)] text-center max-w-[540px] mx-auto mb-16 leading-[1.65]">
+            Morning setup takes 60 seconds. The rest of your day is just executing.
+          </p>
+
+          <div className="grid grid-cols-3 gap-0.5 bg-[var(--lk-border)] rounded-[16px] overflow-hidden">
+            {[
+              {
+                num: '01',
+                title: 'Morning setup',
+                sub: '60 seconds',
+                desc: 'Name the one thing that makes today a win. Add two tasks that directly scaffold it. The app scores your goal quality in real time.',
+                accent: 'text-gold',
+              },
+              {
+                num: '02',
+                title: 'Active day',
+                sub: 'Full focus',
+                desc: 'Your goal stays front and center all day. Check off support tasks, log interruptions without guilt. One countdown. One outcome.',
+                accent: 'text-teal-bright',
+              },
+              {
+                num: '03',
+                title: 'End-of-day snapshot',
+                sub: 'Binary verdict',
+                desc: 'Hit or miss — no partial credit. Streak updates, share card unlocks. Resets at midnight. Tomorrow is a blank slate.',
+                accent: 'text-[var(--lk-ink)]',
+              },
+            ].map((step) => (
+              <div key={step.num} className="bg-white p-8">
+                <p className="font-mono text-[11px] text-[var(--lk-faint)] mb-5">{step.num}</p>
+                <h3 className="font-serif text-[22px] text-[var(--lk-ink)] mb-1">{step.title}</h3>
+                <p className={`text-[12px] font-medium uppercase tracking-wider mb-4 ${step.accent}`}>
+                  {step.sub}
+                </p>
+                <p className="text-[14px] text-[var(--lk-muted)] leading-[1.65]">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* THE CONSTRAINT */}
+      <section className="py-20 px-8">
+        <div className="max-w-[680px] mx-auto text-center">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold mb-4">
+            The philosophy
+          </p>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] mb-6">
+            The app refuses a 4th task.
+          </h2>
+          <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.75] mb-10">
+            Not because it can&apos;t — because it won&apos;t. The constraint is the product.
+            Three slots forces the question you&apos;ve been avoiding: <em className="italic">what actually matters today?</em>
+          </p>
+          <blockquote className="border-l-4 border-gold pl-5 text-left bg-[var(--gold-faint)] rounded-r-[12px] py-4 pr-5">
+            <p className="text-[14px] text-[var(--lk-muted)] leading-[1.75] italic">
+              &ldquo;The support tasks are not a to-do list. They are the scaffolding
+              that makes your main goal reachable today.&rdquo;
+            </p>
+          </blockquote>
+        </div>
+      </section>
+
+      {/* PRICING */}
+      <section id="pricing" className="py-20 px-8 bg-white">
+        <div className="max-w-[1100px] mx-auto">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
+            Pricing
+          </p>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] text-center mb-4">
+            Free until the habit sticks.
+          </h2>
+          <p className="text-[16px] font-light text-[var(--lk-muted)] text-center max-w-[480px] mx-auto mb-16 leading-[1.65]">
+            The core ritual is free forever. No card. No trial. No limits on daily use.
+          </p>
+
+          <div className="grid grid-cols-2 gap-6 max-w-[720px] mx-auto">
+            {/* Free */}
+            <div className="border border-[var(--lk-border)] rounded-[16px] p-8">
+              <p className="text-[11px] font-medium tracking-wider uppercase text-[var(--lk-faint)] mb-3">Free</p>
+              <p className="font-serif text-[36px] text-[var(--lk-ink)] leading-none mb-1">$0</p>
+              <p className="text-[13px] text-[var(--lk-faint)] mb-6">Forever. No card required.</p>
+              <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
+                {[
+                  'Full 3-screen daily loop',
+                  'Goal quality check',
+                  'Overflow log',
+                  'Current streak counter',
+                  '7-day week view',
+                  'Win / miss verdict',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-teal mt-0.5">✓</span> {f}
+                  </li>
+                ))}
+                {[
+                  'History beyond 7 days',
+                  'Personal best',
+                  'Streak freeze',
+                  'Share cards',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2 opacity-40 line-through">
+                    <span className="mt-0.5">—</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/setup"
+                className="mt-8 block text-center py-3 rounded-[8px] border border-[var(--lk-border)] text-[14px] font-medium text-[var(--lk-muted)] no-underline hover:border-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors"
+              >
+                Start free
+              </Link>
+            </div>
+
+            {/* Pro */}
+            <div className="border-2 border-[var(--lk-ink)] rounded-[16px] p-8 relative">
+              <span className="absolute top-4 right-4 text-[11px] font-semibold bg-gold text-white px-2.5 py-0.5 rounded-full">
+                Most popular
+              </span>
+              <p className="text-[11px] font-medium tracking-wider uppercase text-gold mb-3">Pro</p>
+              <div className="flex items-baseline gap-1.5 mb-1">
+                <p className="font-serif text-[36px] text-[var(--lk-ink)] leading-none">$4</p>
+                <p className="text-[14px] text-[var(--lk-faint)]">/mo</p>
+              </div>
+              <p className="text-[13px] text-[var(--lk-faint)] mb-6">$39/yr — save 20%</p>
+              <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
+                {[
+                  'Everything in Free',
+                  'Full history + heatmap',
+                  'Personal best revealed',
+                  '1 streak freeze per month',
+                  'Pattern insights',
+                  'Milestone share cards',
+                  'Focus rank + quality score',
+                  'Smart notifications',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-gold mt-0.5">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/setup"
+                className="mt-8 block text-center py-3 rounded-[8px] bg-[var(--lk-ink)] text-cream text-[14px] font-medium no-underline hover:opacity-85 transition-opacity"
+              >
+                Start free, upgrade anytime
+              </Link>
+            </div>
+          </div>
+
+          <p className="text-[13px] text-center text-[var(--lk-faint)] mt-8">
+            Never shown an upgrade prompt in your first 3 days. The paywall appears naturally when you need it.
+          </p>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-12 px-8 border-t border-[var(--lk-border)]">
+        <div className="max-w-[1100px] mx-auto flex items-center justify-between">
+          <p className="font-serif text-[18px] text-[var(--lk-ink)]">
+            Hin<span className="text-gold">.</span>ge
+          </p>
+          <p className="text-[13px] text-[var(--lk-faint)]">
+            Stop managing tasks. Start finishing goals.
+          </p>
+          <Link
+            href="/today"
+            className="text-[13px] font-medium text-[var(--lk-ink)] no-underline hover:text-gold transition-colors"
+          >
+            Open app →
+          </Link>
+        </div>
+      </footer>
+    </div>
+  )
+}

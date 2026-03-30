@@ -1,0 +1,2 @@
+# Claude local settings (keep MEMORY, launch, project context — skip local overrides)
+.claude/settings.local.json

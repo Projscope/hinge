@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark app theme tokens */
+  --bg: #0e0d0b;
+  --bg2: #161510;
+  --bg3: #1e1c18;
+  --bg4: #252320;
+  --ink: #f5f2ec;
+  --ink2: #c8c4b8;
+  --ink3: #7a7670;
+  --ink4: #3a3830;
+  --gold: #c8922a;
+  --gold-l: #f5e4c0;
+  --gold-d: #8a6118;
+  --gold-dim: rgba(200, 146, 42, 0.15);
+  --teal: #1a7a65;
+  --teal-l: #d4f0ea;
+  --teal-bright: #22a085;
+  --red: #c0392b;
+  --red-dim: rgba(192, 57, 43, 0.15);
+  --amber: #d97706;
+  --border: rgba(245, 242, 236, 0.07);
+  --border2: rgba(245, 242, 236, 0.12);
+
+  /* Light / landing theme tokens */
+  --cream: #faf8f4;
+  --lk-ink: #0f0e0c;
+  --lk-muted: #3a3830;
+  --lk-faint: #7a7060;
+  --lk-border: rgba(15, 14, 12, 0.10);
+  --gold-light: #f0d9a8;
+  --gold-faint: #faf0dc;
+  --teal-light: #e0f2ec;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar for dark app */
+  .app-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+  .app-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .app-scroll::-webkit-scrollbar-thumb {
+    background: var(--ink4);
+    border-radius: 99px;
+  }
+}
+
+@layer components {
+  /* Progress bar fill transition */
+  .prog-fill {
+    transition: width 0.5s ease;
+  }
+
+  /* Blur paywall */
+  .blur-locked {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }
+}

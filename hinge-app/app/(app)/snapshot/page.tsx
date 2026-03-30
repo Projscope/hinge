@@ -1,0 +1,116 @@
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useAppStore } from '@/lib/store'
+import ShareCard from '@/components/snapshot/ShareCard'
+import Pill from '@/components/ui/Pill'
+import Button from '@/components/ui/Button'
+import Card from '@/components/ui/Card'
+import Toast from '@/components/ui/Toast'
+import { useState, useCallback } from 'react'
+
+export default function SnapshotPage() {
+  const router = useRouter()
+  const { today, streaks, endDay, hydrated } = useAppStore()
+  const [toast, setToast] = useState<string | null>(null)
+  const dismiss = useCallback(() => setToast(null), [])
+
+  if (!hydrated) return null
+
+  if (!today) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20">
+        <p className="font-serif text-[24px] text-ink mb-3">Nothing to snapshot yet.</p>
+        <p className="text-ink-3 text-[14px] mb-6">Set a goal first, then come back to end your day.</p>
+        <Button onClick={() => router.push('/setup')}>Start morning setup →</Button>
+      </div>
+    )
+  }
+
+  const bothDone = today.task1Done && today.task2Done
+  const alreadyEnded = today.completed
+
+  function handleEnd(completed: boolean) {
+    endDay(completed)
+    router.push('/today')
+  }
+
+  const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="px-8 pt-7 mb-5 flex items-start justify-between">
+        <div>
+          <h1 className="font-serif text-[26px] text-ink leading-tight">End-of-day snapshot</h1>
+          <p className="text-[12px] text-ink-3 mt-0.5">{dateLabel}</p>
+        </div>
+        <Pill variant={bothDone ? 'teal' : 'neutral'}>
+          {bothDone ? 'Goal achieved' : 'In progress'}
+        </Pill>
+      </div>
+
+      <div className="px-8 pb-8 max-w-[560px]">
+        {/* Verdict */}
+        {alreadyEnded ? (
+          <div className="text-center py-7 mb-5">
+            <p className="text-[42px] mb-2.5">{today.completed ? '🎯' : '😔'}</p>
+            <p className="font-serif text-[28px] text-ink mb-1">
+              {today.completed ? 'Goal achieved' : 'Missed today'}
+            </p>
+            <p className="text-[13px] text-ink-3">
+              {today.completed
+                ? 'You nailed today\'s focus · streak continues'
+                : 'Fresh start — today still counts'}
+            </p>
+          </div>
+        ) : (
+          <div className="text-center py-7 mb-5">
+            <p className="text-[42px] mb-2.5">
+              {bothDone ? '🎯' : today.task1Done || today.task2Done ? '⚡' : '⏳'}
+            </p>
+            <p className="font-serif text-[24px] text-ink mb-4">
+              Did you hit your goal today?
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button onClick={() => handleEnd(true)}>
+                Yes — goal achieved ✓
+              </Button>
+              <Button variant="ghost" onClick={() => handleEnd(false)}>
+                No — missed today
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Goal recap */}
+        <Card className="mb-4">
+          <p className="text-[10px] uppercase tracking-[0.1em] text-ink-3 font-medium mb-2.5">Today&apos;s goal</p>
+          <p className="font-serif text-[17px] text-ink mb-3">{today.mainGoal}</p>
+          <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
+            <p className={`text-[13px] flex items-center gap-2 ${today.task1Done ? 'text-teal-bright' : 'text-ink-3'}`}>
+              {today.task1Done ? '✓' : '○'} {today.task1Text}
+            </p>
+            <p className={`text-[13px] flex items-center gap-2 ${today.task2Done ? 'text-teal-bright' : 'text-ink-3'}`}>
+              {today.task2Done ? '✓' : '○'} {today.task2Text}
+            </p>
+          </div>
+        </Card>
+
+        {/* Streak share card */}
+        <ShareCard
+          streakCount={streaks.current}
+          onShare={(target) => setToast(`${target} — share coming soon!`)}
+        />
+
+        {/* Reset note */}
+        <p className="text-center text-[12px] text-ink-3 leading-[1.8] mt-5">
+          Resets at midnight · Tomorrow is a blank slate<br />
+          <span className="text-[11px] text-ink-4">Set your goal in the morning — not tonight.</span>
+        </p>
+      </div>
+
+      {toast && <Toast message={toast} onDone={dismiss} />}
+    </div>
+  )
+}

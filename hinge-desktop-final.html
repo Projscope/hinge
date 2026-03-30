@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hin.ge — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0e0d0b;
+  --bg2:#161510;
+  --bg3:#1e1c18;
+  --bg4:#252320;
+  --ink:#f5f2ec;
+  --ink2:#c8c4b8;
+  --ink3:#7a7670;
+  --ink4:#3a3830;
+  --gold:#c8922a;
+  --gold-l:#f5e4c0;
+  --gold-d:#8a6118;
+  --gold-dim:rgba(200,146,42,0.15);
+  --teal:#1a7a65;
+  --teal-l:#d4f0ea;
+  --teal-bright:#22a085;
+  --red:#c0392b;
+  --red-dim:rgba(192,57,43,0.15);
+  --amber:#d97706;
+  --border:rgba(245,242,236,0.07);
+  --border2:rgba(245,242,236,0.12);
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--ink4);border-radius:99px;}
+
+/* BROWSER CHROME */
+.chrome{width:100%;height:100vh;display:flex;flex-direction:column;}
+.titlebar{height:34px;background:#1a1915;display:flex;align-items:center;padding:0 14px;gap:8px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tb-dots{display:flex;gap:5px;}
+.tb-dot{width:11px;height:11px;border-radius:50%;}
+.tb-dot.r{background:#e05b5b;}.tb-dot.y{background:#e0b85b;}.tb-dot.g{background:#5be07d;}
+.tb-url{flex:1;background:rgba(255,255,255,0.04);border-radius:6px;padding:3px 12px;font-size:11px;color:var(--ink3);max-width:340px;margin:0 auto;font-family:var(--mono);}
+
+/* APP LAYOUT */
+.app{display:grid;grid-template-columns:220px 1fr 290px;height:calc(100vh - 34px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sidebar-top{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+.logo{font-family:var(--serif);font-size:22px;color:var(--ink);letter-spacing:-0.01em;}
+.logo em{color:var(--gold);font-style:normal;}
+.logo-tag{font-size:11px;color:var(--ink3);margin-top:2px;}
+
+.sidebar-section{padding:14px 0 6px;}
+.ss-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);font-weight:500;padding:0 20px;margin-bottom:4px;}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:13px;color:var(--ink3);cursor:pointer;transition:all .15s;border-left:2px solid transparent;user-select:none;}
+.nav-item:hover{color:var(--ink2);background:rgba(255,255,255,0.03);}
+.nav-item.active{color:var(--ink);background:rgba(200,146,42,0.08);border-left-color:var(--gold);}
+.nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+
+.sidebar-spacer{flex:1;}
+
+.rank-widget{margin:12px 14px;background:var(--gold-dim);border:1px solid rgba(200,146,42,0.2);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .18s;}
+.rank-widget:hover{background:rgba(200,146,42,0.2);}
+.rw-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:rgba(200,146,42,0.6);font-weight:500;margin-bottom:3px;}
+.rw-rank{font-family:var(--serif);font-size:17px;color:var(--gold);}
+.rw-sub{font-size:10px;color:var(--ink3);margin-top:2px;}
+.rw-bar{height:2px;background:rgba(255,255,255,0.08);border-radius:99px;margin-top:8px;overflow:hidden;}
+.rw-fill{height:100%;background:var(--gold);border-radius:99px;width:65%;}
+
+.sidebar-upgrade{margin:8px 14px 14px;background:var(--gold);border-radius:10px;padding:10px 14px;cursor:pointer;transition:opacity .15s;}
+.sidebar-upgrade:hover{opacity:.9;}
+.su-l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:rgba(0,0,0,0.5);font-weight:600;margin-bottom:1px;}
+.su-t{font-size:11px;color:#000;font-weight:600;}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg);border-right:1px solid var(--border);}
+.screen{display:none;animation:fadeUp .2s ease forwards;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* PAGE HEADER */
+.page-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;}
+.ph-title{font-family:var(--serif);font-size:26px;color:var(--ink);line-height:1.2;}
+.ph-sub{font-size:12px;color:var(--ink3);margin-top:3px;}
+.px{padding:0 32px 32px;}
+
+/* GOAL HERO */
+.goal-hero{background:var(--bg3);border:1px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden;}
+.goal-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(200,146,42,0.08),transparent 70%);}
+.gh-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);font-weight:600;margin-bottom:10px;}
+.gh-goal{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1.3;margin-bottom:18px;position:relative;z-index:1;}
+.gh-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.time-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(200,146,42,0.12);color:var(--gold);font-size:11px;font-weight:500;padding:4px 11px;border-radius:99px;border:1px solid rgba(200,146,42,0.18);}
+.prog-row{display:flex;align-items:center;gap:10px;flex:1;min-width:160px;}
+.prog-track{flex:1;height:3px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .5s;}
+.prog-pct{font-size:11px;font-weight:500;color:var(--gold);white-space:nowrap;}
+
+/* SECTION TITLE */
+.stitle{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);font-weight:500;margin-bottom:10px;}
+
+/* TASK CARD */
+.task-card{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .18s;}
+.task-card:hover{border-color:var(--border2);background:var(--bg4);}
+.task-card.done{opacity:0.5;}
+.tc-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink4);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;}
+.tc-check.done{background:var(--teal-bright);border-color:var(--teal-bright);color:#fff;}
+.tc-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);font-weight:500;margin-bottom:3px;}
+.tc-text{font-size:14px;color:var(--ink);line-height:1.4;}
+.tc-text.done{text-decoration:line-through;color:var(--ink3);}
+.tc-tag{margin-left:auto;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;white-space:nowrap;align-self:flex-start;margin-top:2px;}
+.tag-done{background:rgba(26,122,101,0.2);color:var(--teal-bright);}
+.tag-next{background:var(--gold-dim);color:var(--gold);}
+
+/* OVERFLOW */
+.overflow-log{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:18px;}
+.ol-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ol-title{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);font-weight:500;}
+.ol-note{font-size:10px;color:var(--ink4);font-style:italic;}
+.ol-item{font-size:12px;color:var(--ink3);padding:5px 0;border-bottom:1px solid var(--border);}
+.ol-item:last-child{border-bottom:none;color:var(--ink4);font-style:italic;font-size:11px;}
+
+/* SETUP */
+.step-row{display:flex;gap:14px;margin-bottom:24px;}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--gold);color:#000;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:3px;}
+.step-num.done{background:var(--teal-bright);color:#fff;}
+.step-num.pending{background:var(--bg4);color:var(--ink3);border:1px solid var(--border2);}
+.step-label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);font-weight:500;margin-bottom:4px;}
+.step-q{font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:4px;line-height:1.3;}
+.step-hint{font-size:12px;color:var(--ink3);margin-bottom:12px;line-height:1.5;}
+.goal-input{width:100%;padding:13px 16px;font-size:15px;font-family:var(--sans);color:var(--ink);background:var(--bg4);border:1.5px solid var(--border2);border-radius:12px;outline:none;transition:border-color .2s;resize:none;}
+.goal-input:focus{border-color:var(--gold);}
+.goal-input.ok{border-color:var(--teal-bright);}
+.q-bar{height:3px;background:rgba(255,255,255,0.07);border-radius:99px;margin-top:6px;overflow:hidden;}
+.q-fill{height:100%;border-radius:99px;transition:width .4s,background .4s;}
+.q-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 10px;border-radius:99px;margin-top:7px;}
+.qc-ok{background:rgba(26,122,101,0.2);color:var(--teal-bright);}
+.qc-warn{background:rgba(217,119,6,0.2);color:var(--amber);}
+.connector{width:2px;height:18px;background:var(--border2);margin-left:14px;}
+
+/* SNAPSHOT */
+.eod-center{text-align:center;padding:28px 0 22px;}
+.eod-icon{font-size:42px;margin-bottom:10px;}
+.eod-title{font-family:var(--serif);font-size:28px;color:var(--ink);margin-bottom:4px;}
+.eod-sub{font-size:13px;color:var(--ink3);}
+
+/* BARS */
+.bars-row{display:flex;align-items:flex-end;gap:8px;height:80px;margin-bottom:8px;}
+.bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
+.bar-inner{width:100%;border-radius:4px 4px 0 0;cursor:pointer;position:relative;}
+.bar-inner:hover::after{content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--ink2);white-space:nowrap;}
+.bar-lbl{font-size:10px;color:var(--ink3);}
+
+/* HEATMAP */
+.heat-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.hd{height:16px;border-radius:3px;background:rgba(255,255,255,0.05);cursor:pointer;transition:transform .15s;}
+.hd:hover{transform:scale(1.2);}
+.hd.h1{background:rgba(200,146,42,0.2);}
+.hd.h2{background:rgba(200,146,42,0.45);}
+.hd.h3{background:var(--gold);}
+.hd.miss{background:rgba(192,57,43,0.35);border:1px solid rgba(192,57,43,0.2);}
+.hd.today{background:rgba(34,160,133,0.5);border:1px solid rgba(34,160,133,0.3);}
+
+/* STATS */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.stat-n{font-family:var(--serif);font-size:22px;color:var(--ink);line-height:1;}
+.stat-l{font-size:9px;color:var(--ink3);margin-top:3px;}
+.stat-locked{position:relative;overflow:hidden;}
+.stat-locked .stat-n{filter:blur(5px);}
+.lock-ol{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(14,13,11,0.75);border-radius:10px;font-size:10px;font-weight:500;color:var(--gold);}
+
+/* WEEK DOTS */
+.week-row{display:flex;justify-content:space-between;margin-bottom:5px;}
+.wd{text-align:center;}
+.wdot{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,0.06);margin:0 auto 3px;transition:background .2s;}
+.wdot.hit{background:var(--gold);}
+.wdot.today{background:var(--teal-bright);}
+.wdot.miss{background:rgba(192,57,43,0.3);border:1px solid rgba(192,57,43,0.2);}
+.wlabel{font-size:9px;color:var(--ink4);}
+.wlabel.today{color:var(--teal-bright);font-weight:500;}
+
+/* QUALITY */
+.qg-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.qg-row:last-child{margin-bottom:0;}
+.qg-label{font-size:10px;color:var(--ink3);min-width:80px;}
+.qg-track{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+.qg-fill{height:100%;border-radius:99px;}
+.qg-val{font-size:11px;font-weight:500;min-width:32px;text-align:right;}
+
+/* RANK LADDER */
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--border);background:var(--bg3);transition:all .15s;}
+.rank-row:first-child{border-radius:10px 10px 0 0;}
+.rank-row:last-child{border-radius:0 0 10px 10px;}
+.rank-row+.rank-row{border-top:none;}
+.rank-row.current{background:var(--gold-dim);border-color:rgba(200,146,42,0.3);}
+.rr-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0;}
+.rr-name{font-size:13px;font-weight:500;color:var(--ink);min-width:90px;}
+.rr-range{font-size:11px;color:var(--ink3);flex:1;}
+.rr-badge{font-size:9px;font-weight:500;padding:2px 8px;border-radius:99px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(200,146,42,0.2);}
+
+/* SHARE CARD */
+.share-card{background:linear-gradient(135deg,#1a1915,#252320);border:1px solid rgba(200,146,42,0.2);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+.share-card::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(200,146,42,0.15),transparent 70%);}
+.sc-tag{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(200,146,42,0.4);margin-bottom:6px;font-family:var(--mono);}
+.sc-num{font-family:var(--serif);font-size:28px;color:var(--gold);line-height:1;}
+.sc-dots{display:flex;gap:4px;margin-top:10px;}
+.sc-dot{width:7px;height:7px;border-radius:50%;}
+.sc-dot.hit{background:var(--gold);}
+.sc-dot.empty{background:rgba(255,255,255,0.1);}
+.sc-share{display:flex;gap:5px;margin-top:12px;}
+.sc-btn{flex:1;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:6px 4px;text-align:center;font-size:10px;color:var(--ink3);cursor:pointer;transition:all .15s;font-family:var(--sans);}
+.sc-btn:hover{background:rgba(255,255,255,0.1);color:var(--ink);}
+
+/* HISTORY BLUR */
+.blur-wall{position:relative;}
+.blur-content{filter:blur(4px);pointer-events:none;user-select:none;}
+.blur-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(14,13,11,0.75);border-radius:12px;padding:14px;text-align:center;}
+.bo-icon{font-size:18px;margin-bottom:5px;}
+.bo-text{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:8px;line-height:1.4;}
+.bo-btn{background:var(--gold);color:#000;border:none;border-radius:8px;padding:7px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+
+/* CARD BLOCKS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:12px;}
+.card.gold-border{border-color:rgba(200,146,42,0.3);background:var(--gold-dim);}
+
+/* PILL */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 9px;border-radius:99px;}
+.pill-gold{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(200,146,42,0.2);}
+.pill-teal{background:rgba(26,122,101,0.2);color:var(--teal-bright);}
+.pill-red{background:var(--red-dim);color:#e26b5e;}
+.pill-neutral{background:rgba(255,255,255,0.05);color:var(--ink3);border:1px solid var(--border);}
+
+/* BTN */
+.btn{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;font-family:var(--sans);cursor:pointer;border:none;transition:all .15s;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--gold);color:#000;}
+.btn-primary:hover{opacity:.9;}
+.btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--ink3);color:var(--ink);}
+
+/* RIGHT PANEL */
+.right{background:var(--bg2);overflow-y:auto;padding:24px 20px;}
+.rp-section{margin-bottom:20px;}
+.rp-label{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink4);font-weight:500;margin-bottom:10px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* TOAST */
+@keyframes tIn{from{transform:translateX(-50%) translateY(20px);opacity:0;}to{transform:translateX(-50%) translateY(0);opacity:1;}}
+@keyframes tOut{to{opacity:0;}}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--border2);color:var(--ink);padding:10px 20px;border-radius:99px;font-size:12px;font-weight:500;z-index:999;white-space:nowrap;animation:tIn .22s ease forwards;pointer-events:none;}
+.toast.out{animation:tOut .25s ease forwards;}
+
+/* CONFETTI */
+@keyframes cDrop{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(90px) rotate(720deg);}}
+.conf{position:fixed;pointer-events:none;animation:cDrop 1s ease forwards;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="titlebar">
+    <div class="tb-dots">
+      <div class="tb-dot r"></div><div class="tb-dot y"></div><div class="tb-dot g"></div>
+    </div>
+    <div class="tb-url">hin.ge/today</div>
+  </div>
+
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="logo">Hin<em>.</em>ge</div>
+        <div class="logo-tag">Stop managing. Start finishing.</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="ss-label">Daily</div>
+        <div class="nav-item active" onclick="nav('today')" id="nav-today">
+          <span class="nav-icon">⚡</span> Today
+        </div>
+        <div class="nav-item" onclick="nav('setup')" id="nav-setup">
+          <span class="nav-icon">🌅</span> Morning setup
+        </div>
+        <div class="nav-item" onclick="nav('snapshot')" id="nav-snapshot">
+          <span class="nav-icon">📊</span> Snapshot
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="ss-label">Progress</div>
+        <div class="nav-item" onclick="nav('history')" id="nav-history">
+          <span class="nav-icon">📅</span> History
+        </div>
+        <div class="nav-item" onclick="nav('insights')" id="nav-insights">
+          <span class="nav-icon">📈</span> Insights
+        </div>
+        <div class="nav-item" onclick="nav('milestones')" id="nav-milestones">
+          <span class="nav-icon">🏅</span> Milestones
+        </div>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="rank-widget" onclick="nav('insights')">
+        <div class="rw-label">Focus rank</div>
+        <div class="rw-rank">Focused ⚡</div>
+        <div class="rw-sub">87% hit rate · 30-day avg</div>
+        <div class="rw-bar"><div class="rw-fill"></div></div>
+      </div>
+
+      <div class="sidebar-upgrade" onclick="toast('Pro — $4/mo · unlock history, insights & share cards')">
+        <div class="su-l">Free plan</div>
+        <div class="su-t">Upgrade to Pro →</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- TODAY -->
+      <div class="screen active" id="screen-today">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">Today</div>
+            <div class="ph-sub">Thursday, March 26 · <span style="color:var(--gold);">6 hours 14 minutes left</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+            <span class="pill pill-teal">● Active</span>
+            <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;" onclick="nav('snapshot')">End my day →</button>
+          </div>
+        </div>
+        <div class="px">
+
+          <div class="goal-hero">
+            <div class="gh-eyebrow">Today's main goal</div>
+            <div class="gh-goal">Ship the auth refactor to staging</div>
+            <div class="gh-meta">
+              <span class="time-pill">⏱ 5h 14m remaining</span>
+              <div class="prog-row">
+                <div class="prog-track"><div class="prog-fill" id="prog-bar" style="width:50%;"></div></div>
+                <span class="prog-pct" id="prog-pct">50%</span>
+              </div>
+              <span style="font-size:11px;color:var(--ink3);">ends 6:00 PM</span>
+            </div>
+          </div>
+
+          <div class="stitle">Support tasks</div>
+
+          <div class="task-card done">
+            <div class="tc-check done">✓</div>
+            <div style="flex:1;">
+              <div class="tc-label">Support task 1 · unblocks goal</div>
+              <div class="tc-text done">Write tests for token refresh logic</div>
+            </div>
+            <span class="tc-tag tag-done">Done ✓</span>
+          </div>
+
+          <div class="task-card" id="t2-card" onclick="toggleTask()">
+            <div class="tc-check" id="t2-check"></div>
+            <div style="flex:1;">
+              <div class="tc-label">Support task 2 · involves another person</div>
+              <div class="tc-text" id="t2-text">Get PR reviewed by Alex</div>
+            </div>
+            <span class="tc-tag tag-next" id="t2-tag">Next up</span>
+          </div>
+
+          <div class="overflow-log">
+            <div class="ol-head">
+              <span class="ol-title">Happened today</span>
+              <span class="ol-note">Logged · not graded · won't carry over</span>
+            </div>
+            <div class="ol-item">📞 Joined incident call — 30 min</div>
+            <div class="ol-item">✉ Replied to 4 Slack threads</div>
+            <div class="ol-item">📋 Reviewed Anna's pull request</div>
+            <div class="ol-item">+ Add to log</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SETUP -->
+      <div class="screen" id="screen-setup">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">Good morning, <em style="font-style:italic;color:var(--gold);">Slava.</em></div>
+            <div class="ph-sub">60 seconds. Sets the tone for everything.</div>
+          </div>
+          <span class="time-pill">🌅 8:47 AM</span>
+        </div>
+        <div class="px">
+
+          <div class="step-row">
+            <div class="step-num done">✓</div>
+            <div style="flex:1;">
+              <div class="step-label">Step 1 of 3</div>
+              <div class="step-q">What's the one thing that makes today a win?</div>
+              <div class="step-hint">Be specific — what exactly will be done, and where?</div>
+              <textarea class="goal-input ok" rows="2" id="goal-field" oninput="checkQ(this.value)">Ship auth refactor to staging</textarea>
+              <div class="q-bar"><div class="q-fill" id="q-fill" style="width:85%;background:var(--teal-bright);"></div></div>
+              <div class="q-chip qc-ok" id="q-chip">✓ Specific — clear output and destination</div>
+            </div>
+          </div>
+
+          <div class="connector"></div>
+
+          <div class="step-row">
+            <div class="step-num done">✓</div>
+            <div style="flex:1;">
+              <div class="step-label">Step 2 of 3</div>
+              <div class="step-q">What needs to happen first?</div>
+              <div class="step-hint">A blocker, dependency, or first concrete action.</div>
+              <textarea class="goal-input ok" rows="2">Write tests for token refresh logic</textarea>
+              <div class="q-chip qc-ok" style="margin-top:7px;">✓ Directly unblocks your goal</div>
+            </div>
+          </div>
+
+          <div class="connector"></div>
+
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <div style="flex:1;">
+              <div class="step-label">Step 3 of 3</div>
+              <div class="step-q">What else needs to fall into place?</div>
+              <div class="step-hint">A person, a decision, a dependency.</div>
+              <textarea class="goal-input" rows="2" placeholder="e.g. Get PR reviewed by Alex..."></textarea>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:22px;">
+            <button class="btn btn-primary" onclick="nav('today')">Start my day →</button>
+            <button class="btn btn-ghost">Save draft</button>
+          </div>
+
+          <div style="margin-top:20px;border-left:3px solid var(--gold);padding:10px 14px;background:var(--gold-dim);border-radius:0 10px 10px 0;font-size:12px;color:var(--gold-l);line-height:1.7;">
+            "The support tasks are not a to-do list. They are the scaffolding that makes your main goal reachable today."
+          </div>
+        </div>
+      </div>
+
+      <!-- SNAPSHOT -->
+      <div class="screen" id="screen-snapshot">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">End-of-day snapshot</div>
+            <div class="ph-sub">Thursday, March 26</div>
+          </div>
+          <span class="pill pill-teal">Goal achieved</span>
+        </div>
+        <div class="px">
+
+          <div class="eod-center">
+            <div class="eod-icon">🎯</div>
+            <div class="eod-title">Goal achieved</div>
+            <div class="eod-sub">You nailed today's focus · streak continues</div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px;">
+            <div class="stitle">Today's goal</div>
+            <div style="font-family:var(--serif);font-size:17px;color:var(--ink);margin-bottom:12px;">Ship the auth refactor to staging</div>
+            <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:7px;">
+              <div style="font-size:13px;color:var(--teal-bright);display:flex;align-items:center;gap:8px;">✓ Write tests for token refresh logic</div>
+              <div style="font-size:13px;color:var(--teal-bright);display:flex;align-items:center;gap:8px;">✓ Get PR reviewed by Alex</div>
+            </div>
+          </div>
+
+          <div class="share-card" style="margin-bottom:18px;">
+            <div class="sc-tag">Hin.ge</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <div class="sc-num">8</div>
+              <div style="font-size:14px;color:var(--ink2);font-weight:500;">day streak 🔥</div>
+            </div>
+            <div class="sc-dots">
+              <div class="sc-dot hit"></div><div class="sc-dot hit"></div><div class="sc-dot hit"></div>
+              <div class="sc-dot hit"></div><div class="sc-dot empty"></div><div class="sc-dot empty"></div>
+            </div>
+            <div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;margin-bottom:8px;">Next milestone: Day 30</div>
+            <div class="sc-share">
+              <button class="sc-btn" onclick="toast('Shared to X!')">𝕏 Share</button>
+              <button class="sc-btn" onclick="toast('Opening LinkedIn...')">in Post</button>
+              <button class="sc-btn" onclick="toast('Sent to Slack!')">💬 Slack</button>
+              <button class="sc-btn" onclick="toast('Link copied!')">🔗 Copy</button>
+            </div>
+          </div>
+
+          <div style="text-align:center;font-size:12px;color:var(--ink3);line-height:1.8;">
+            Resets at midnight · Tomorrow is a blank slate<br>
+            <span style="font-size:11px;color:var(--ink4);">Set your goal in the morning — not tonight.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="screen" id="screen-history">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">History</div>
+            <div class="ph-sub">Every goal you've set, and whether you hit it</div>
+          </div>
+          <span class="pill pill-neutral">7 days free</span>
+        </div>
+        <div class="px">
+
+          <div class="stitle">This week — free</div>
+          <div class="card" style="padding:12px 16px;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div><div style="font-size:11px;color:var(--ink3);margin-bottom:3px;">Thursday, Mar 26</div><div style="font-size:14px;font-weight:500;">Ship auth refactor to staging</div></div>
+              <span class="pill pill-teal">Hit ✓</span>
+            </div>
+          </div>
+          <div class="card" style="padding:12px 16px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div><div style="font-size:11px;color:var(--ink3);margin-bottom:3px;">Wednesday, Mar 25</div><div style="font-size:14px;font-weight:500;">Finish Q1 architecture review doc</div></div>
+              <span class="pill pill-teal">Hit ✓</span>
+            </div>
+          </div>
+
+          <div class="stitle">Beyond 7 days — Pro</div>
+          <div class="blur-wall">
+            <div class="blur-content">
+              <div class="card" style="padding:12px 16px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:var(--ink3);margin-bottom:3px;">Tuesday, Mar 17</div><div style="font-size:14px;font-weight:500;">██████ ████ ██ ████████</div></div><span class="pill pill-red">Missed</span></div></div>
+              <div class="card" style="padding:12px 16px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:var(--ink3);margin-bottom:3px;">Monday, Mar 16</div><div style="font-size:14px;font-weight:500;">████ ███████ ██████ ██</div></div><span class="pill pill-teal">Hit ✓</span></div></div>
+              <div class="card" style="padding:12px 16px;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:var(--ink3);margin-bottom:3px;">Friday, Mar 13</div><div style="font-size:14px;font-weight:500;">██████ ██ ████ ████████</div></div><span class="pill pill-teal">Hit ✓</span></div></div>
+            </div>
+            <div class="blur-overlay">
+              <div class="bo-icon">🔒</div>
+              <div class="bo-text">Your full history is waiting.<br>Upgrade to see every goal you've set.</div>
+              <button class="bo-btn" onclick="toast('Upgrade flow coming soon!')">Unlock with Pro — $4/mo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div class="screen" id="screen-insights">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">Your patterns</div>
+            <div class="ph-sub">What the data says about how you work</div>
+          </div>
+          <span class="pill pill-neutral">30-day window</span>
+        </div>
+        <div class="px">
+
+          <!-- Rank hero -->
+          <div class="card gold-border" style="padding:22px 24px;margin-bottom:16px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(200,146,42,0.08),transparent 70%);"></div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px;font-weight:500;">Current rank</div>
+            <div style="font-family:var(--serif);font-size:30px;color:var(--gold);margin-bottom:4px;">Focused ⚡</div>
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:16px;">87% hit rate · 3% away from Sharp 🔪</div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink4);margin-bottom:4px;"><span>Focused</span><span>Sharp →</span></div>
+              <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;"><div style="height:100%;width:65%;background:var(--gold);border-radius:99px;"></div></div>
+            </div>
+          </div>
+
+          <!-- Rank ladder -->
+          <div class="stitle">The ladder</div>
+          <div style="border-radius:12px;overflow:hidden;margin-bottom:20px;">
+            <div class="rank-row"><div class="rr-icon">🌫️</div><div class="rr-name">Drifting</div><div class="rr-range">Under 50% hit rate</div></div>
+            <div class="rank-row"><div class="rr-icon">🎯</div><div class="rr-name">Intentional</div><div class="rr-range">50–70% hit rate</div></div>
+            <div class="rank-row current"><div class="rr-icon">⚡</div><div class="rr-name" style="color:var(--gold);">Focused</div><div class="rr-range" style="color:var(--gold);">70–89% · consistent execution</div><div class="rr-badge">You are here</div></div>
+            <div class="rank-row"><div class="rr-icon">🔪</div><div class="rr-name">Sharp</div><div class="rr-range">90–97% hit rate</div></div>
+            <div class="rank-row"><div class="rr-icon">🏔️</div><div class="rr-name">Summit</div><div class="rr-range">98%+ with 30+ day streak</div></div>
+          </div>
+
+          <!-- Goal quality -->
+          <div class="stitle">Goal quality score</div>
+          <div class="card" style="padding:16px 18px;">
+            <div class="qg-row">
+              <div class="qg-label">Avg clarity</div>
+              <div class="qg-track"><div class="qg-fill" style="width:78%;background:var(--gold);"></div></div>
+              <div class="qg-val" style="color:var(--gold);">78%</div>
+            </div>
+            <div class="qg-row">
+              <div class="qg-label">Specific goals</div>
+              <div class="qg-track"><div class="qg-fill" style="width:91%;background:var(--teal-bright);"></div></div>
+              <div class="qg-val" style="color:var(--teal-bright);">91% hit</div>
+            </div>
+            <div class="qg-row">
+              <div class="qg-label">Vague goals</div>
+              <div class="qg-track"><div class="qg-fill" style="width:44%;background:rgba(192,57,43,0.7);"></div></div>
+              <div class="qg-val" style="color:#e26b5e;">44% hit</div>
+            </div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.6;">
+              Specific goals hit <strong style="color:var(--ink);">2.1×</strong> more often. The quality check at setup is working.
+            </div>
+          </div>
+
+          <!-- Hit rate by day -->
+          <div class="stitle" style="margin-top:4px;">Hit rate by day of week</div>
+          <div class="card" style="padding:16px 18px;">
+            <div class="bars-row">
+              <div class="bar-w"><div class="bar-inner" data-val="72%" style="height:72%;background:var(--gold);opacity:.6;"></div><div class="bar-lbl">M</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="55%" style="height:55%;background:rgba(200,146,42,0.4);"></div><div class="bar-lbl">T</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="89%" style="height:89%;background:var(--teal-bright);opacity:.7;"></div><div class="bar-lbl">W</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="91%" style="height:91%;background:var(--teal-bright);"></div><div class="bar-lbl">T</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="40%" style="height:40%;background:rgba(192,57,43,0.6);"></div><div class="bar-lbl">F</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="20%" style="height:20%;background:rgba(255,255,255,0.1);"></div><div class="bar-lbl">S</div></div>
+              <div class="bar-w"><div class="bar-inner" data-val="15%" style="height:15%;background:rgba(255,255,255,0.1);"></div><div class="bar-lbl">S</div></div>
+            </div>
+            <div style="font-size:11px;color:var(--ink3);margin-top:4px;">Wed & Thu are your power days. Fridays struggle at 40%.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- MILESTONES -->
+      <div class="screen" id="screen-milestones">
+        <div class="page-header">
+          <div>
+            <div class="ph-title">Milestones</div>
+            <div class="ph-sub">Proof the habit stuck · tap any earned badge</div>
+          </div>
+        </div>
+        <div class="px">
+
+          <div class="stitle">Earned</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;">
+            <div onclick="celebrate(this,'🌱','First win')" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:13px;cursor:pointer;transition:all .18s;position:relative;" onmouseover="this.style.borderColor='rgba(200,146,42,0.5)';this.style.background='var(--gold-dim)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--bg3)'">
+              <div style="position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--teal-bright);border-radius:50%;"></div>
+              <div style="font-size:26px;margin-bottom:7px;">🌱</div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">First win</div>
+              <div style="font-size:9px;color:var(--ink3);">Day 1 ✓</div>
+            </div>
+            <div onclick="celebrate(this,'🔥','Week one')" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:13px;cursor:pointer;transition:all .18s;position:relative;" onmouseover="this.style.borderColor='rgba(200,146,42,0.5)';this.style.background='var(--gold-dim)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--bg3)'">
+              <div style="position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--teal-bright);border-radius:50%;"></div>
+              <div style="font-size:26px;margin-bottom:7px;">🔥</div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Week one</div>
+              <div style="font-size:9px;color:var(--ink3);">7 days ✓</div>
+            </div>
+            <div onclick="celebrate(this,'⚡','On a roll')" style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:13px;cursor:pointer;transition:all .18s;position:relative;" onmouseover="this.style.borderColor='rgba(200,146,42,0.5)';this.style.background='var(--gold-dim)'" onmouseout="this.style.borderColor='var(--border2)';this.style.background='var(--bg3)'">
+              <div style="position:absolute;top:8px;right:8px;width:8px;height:8px;background:var(--teal-bright);border-radius:50%;"></div>
+              <div style="font-size:26px;margin-bottom:7px;">⚡</div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">On a roll</div>
+              <div style="font-size:9px;color:var(--ink3);">14 days ✓</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;opacity:0.3;filter:grayscale(1);">
+              <div style="font-size:26px;margin-bottom:7px;">🎯</div>
+              <div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Month one</div>
+              <div style="font-size:9px;color:var(--ink3);">30 days</div>
+            </div>
+          </div>
+
+          <div class="stitle">Locked</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;opacity:0.25;filter:grayscale(1);"><div style="font-size:26px;margin-bottom:7px;">💯</div><div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Century</div><div style="font-size:9px;color:var(--ink3);">100 days</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;opacity:0.25;filter:grayscale(1);"><div style="font-size:26px;margin-bottom:7px;">🏔️</div><div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Summit</div><div style="font-size:9px;color:var(--ink3);">365 days</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;opacity:0.25;filter:grayscale(1);"><div style="font-size:26px;margin-bottom:7px;">🔪</div><div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Sharp</div><div style="font-size:9px;color:var(--ink3);">10 specific goals</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;padding:16px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:13px;opacity:0.25;filter:grayscale(1);"><div style="font-size:26px;margin-bottom:7px;">🤝</div><div style="font-size:11px;font-weight:500;color:var(--ink);margin-bottom:2px;">Teamwork</div><div style="font-size:9px;color:var(--ink3);">5 collab tasks</div></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside class="right">
+
+      <div class="rp-section">
+        <div class="rp-label">This week</div>
+        <div class="week-row">
+          <div class="wd"><div class="wdot hit"></div><div class="wlabel">M</div></div>
+          <div class="wd"><div class="wdot hit"></div><div class="wlabel">T</div></div>
+          <div class="wd"><div class="wdot hit"></div><div class="wlabel">W</div></div>
+          <div class="wd"><div class="wdot miss"></div><div class="wlabel">T</div></div>
+          <div class="wd"><div class="wdot today"></div><div class="wlabel today">F</div></div>
+          <div class="wd"><div class="wdot"></div><div class="wlabel">S</div></div>
+          <div class="wd"><div class="wdot"></div><div class="wlabel">S</div></div>
+        </div>
+        <div style="font-size:10px;color:var(--ink3);text-align:center;margin-top:4px;">4 of 5 · 80% this week</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rp-section">
+        <div class="rp-label">Stats</div>
+        <div class="stat-grid" style="margin-bottom:8px;">
+          <div class="stat"><div class="stat-n">8</div><div class="stat-l">Streak 🔥</div></div>
+          <div class="stat"><div class="stat-n">87%</div><div class="stat-l">Hit rate</div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-n">24</div><div class="stat-l">This month</div></div>
+          <div class="stat stat-locked">
+            <div class="stat-n">23</div>
+            <div class="stat-l">Personal best</div>
+            <div class="lock-ol">🔒 Pro</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rp-section">
+        <div class="rp-label">Focus rank</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;cursor:pointer;transition:border-color .15s;" onclick="nav('insights')" onmouseover="this.style.borderColor='rgba(200,146,42,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;">
+            <div style="font-family:var(--serif);font-size:16px;color:var(--ink);">Focused ⚡</div>
+            <span class="pill pill-gold">87%</span>
+          </div>
+          <div style="font-size:10px;color:var(--ink3);margin-bottom:7px;">3% away from Sharp 🔪</div>
+          <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;"><div style="height:100%;width:65%;background:var(--gold);border-radius:99px;"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ink4);margin-top:3px;"><span>Focused</span><span>Sharp</span></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rp-section">
+        <div class="rp-label">Goal quality</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;">
+          <div class="qg-row">
+            <div class="qg-label" style="font-size:10px;color:var(--ink3);min-width:70px;">Avg clarity</div>
+            <div class="qg-track"><div class="qg-fill" style="width:78%;background:var(--gold);"></div></div>
+            <div class="qg-val" style="color:var(--gold);">78%</div>
+          </div>
+          <div class="qg-row">
+            <div class="qg-label" style="font-size:10px;color:var(--ink3);min-width:70px;">Specific</div>
+            <div class="qg-track"><div class="qg-fill" style="width:91%;background:var(--teal-bright);"></div></div>
+            <div class="qg-val" style="color:var(--teal-bright);">91%</div>
+          </div>
+          <div class="qg-row">
+            <div class="qg-label" style="font-size:10px;color:var(--ink3);min-width:70px;">Vague</div>
+            <div class="qg-track"><div class="qg-fill" style="width:44%;background:rgba(192,57,43,0.7);"></div></div>
+            <div class="qg-val" style="color:#e26b5e;">44%</div>
+          </div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5;">Specific goals hit <strong style="color:var(--ink);">2×</strong> more often.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rp-section">
+        <div class="rp-label">March</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px;">
+          <div style="font-size:8px;color:var(--ink4);text-align:center;">M</div><div style="font-size:8px;color:var(--ink4);text-align:center;">T</div><div style="font-size:8px;color:var(--ink4);text-align:center;">W</div><div style="font-size:8px;color:var(--ink4);text-align:center;">T</div><div style="font-size:8px;color:var(--ink4);text-align:center;">F</div><div style="font-size:8px;color:var(--ink4);text-align:center;">S</div><div style="font-size:8px;color:var(--ink4);text-align:center;">S</div>
+        </div>
+        <div class="heat-grid" style="margin-bottom:5px;">
+          <div class="hd"></div><div class="hd"></div><div class="hd"></div><div class="hd"></div><div class="hd h1"></div><div class="hd"></div><div class="hd"></div>
+          <div class="hd h2"></div><div class="hd h3"></div><div class="hd h3"></div><div class="hd h3"></div><div class="hd h3"></div><div class="hd"></div><div class="hd"></div>
+          <div class="hd h3"></div><div class="hd h3"></div><div class="hd h3"></div><div class="hd miss"></div><div class="hd h3"></div><div class="hd"></div><div class="hd"></div>
+          <div class="hd h3"></div><div class="hd h3"></div><div class="hd h3"></div><div class="hd miss"></div><div class="hd today"></div><div class="hd"></div><div class="hd"></div>
+        </div>
+        <div style="font-size:10px;color:var(--ink4);">One miss in a sea of gold.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="rp-section">
+        <div class="rp-label">Day 8 milestone</div>
+        <div class="share-card">
+          <div class="sc-tag">Hin.ge</div>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <div class="sc-num">8</div>
+            <div style="font-size:11px;color:var(--ink2);font-weight:500;">day streak 🔥</div>
+          </div>
+          <div class="sc-dots">
+            <div class="sc-dot hit"></div><div class="sc-dot hit"></div><div class="sc-dot hit"></div>
+            <div class="sc-dot hit"></div><div class="sc-dot empty"></div><div class="sc-dot empty"></div>
+          </div>
+          <div style="font-size:9px;color:rgba(255,255,255,.2);margin-top:8px;margin-bottom:8px;">Next: Day 30</div>
+          <div class="sc-share">
+            <button class="sc-btn" onclick="toast('Shared to X!')">𝕏</button>
+            <button class="sc-btn" onclick="toast('LinkedIn...')">in</button>
+            <button class="sc-btn" onclick="toast('Copied!')">🔗</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<script>
+let t2done = false;
+
+function nav(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const s = document.getElementById('screen-' + id);
+  const n = document.getElementById('nav-' + id);
+  if (s) s.classList.add('active');
+  if (n) n.classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function toggleTask() {
+  t2done = !t2done;
+  const c = document.getElementById('t2-check');
+  const t = document.getElementById('t2-text');
+  const tg = document.getElementById('t2-tag');
+  const card = document.getElementById('t2-card');
+  const bar = document.getElementById('prog-bar');
+  const pct = document.getElementById('prog-pct');
+  c.className = 'tc-check' + (t2done ? ' done' : '');
+  c.textContent = t2done ? '✓' : '';
+  t.className = 'tc-text' + (t2done ? ' done' : '');
+  card.className = 'task-card' + (t2done ? ' done' : '');
+  tg.className = 'tc-tag ' + (t2done ? 'tag-done' : 'tag-next');
+  tg.textContent = t2done ? 'Done ✓' : 'Next up';
+  bar.style.width = t2done ? '100%' : '50%';
+  pct.textContent = t2done ? '100%' : '50%';
+}
+
+function checkQ(val) {
+  const fill = document.getElementById('q-fill');
+  const chip = document.getElementById('q-chip');
+  if (val.length < 10) {
+    fill.style.width = '18%'; fill.style.background = 'rgba(192,57,43,0.7)';
+    chip.className = 'q-chip qc-warn'; chip.textContent = '⚠ Too vague — what exactly will be done?';
+  } else if (val.length < 25) {
+    fill.style.width = '52%'; fill.style.background = 'rgba(217,119,6,0.8)';
+    chip.className = 'q-chip qc-warn'; chip.textContent = '⚠ Getting there — add a destination or output';
+  } else {
+    fill.style.width = '85%'; fill.style.background = 'var(--teal-bright)';
+    chip.className = 'q-chip qc-ok'; chip.textContent = '✓ Specific — clear output and destination';
+  }
+}
+
+let toastTimer;
+function toast(msg) {
+  const ex = document.querySelector('.toast');
+  if (ex) ex.remove();
+  clearTimeout(toastTimer);
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  toastTimer = setTimeout(() => {
+    t.classList.add('out');
+    setTimeout(() => t.remove(), 280);
+  }, 2200);
+}
+
+function celebrate(el, icon, name) {
+  const colors = ['#c8922a', '#22a085', '#d97706', '#f5e4c0', '#1a7a65'];
+  const rect = el.getBoundingClientRect();
+  for (let i = 0; i < 26; i++) {
+    const p = document.createElement('div');
+    p.className = 'conf';
+    const sz = 4 + Math.random() * 7;
+    p.style.cssText = `left:${rect.left + rect.width / 2 + (Math.random() - .5) * 120}px;top:${rect.top + 10}px;width:${sz}px;height:${sz}px;background:${colors[Math.floor(Math.random() * colors.length)]};border-radius:${Math.random() > .5 ? '50%' : '2px'};animation-delay:${Math.random() * .25}s;animation-duration:${.7 + Math.random() * .5}s;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1600);
+  }
+  toast(icon + ' ' + name + ' — tap to share your milestone!');
+}
+</script>
+</body>
+</html>
