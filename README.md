@@ -1,5 +1,13 @@
 # Hin.ge
 
+<img width="1792" height="1028" alt="image" src="https://github.com/user-attachments/assets/8172f283-857b-4aea-ae34-023dd8b89255" />
+<br/>
+<br/>
+<img width="1796" height="1024" alt="image" src="https://github.com/user-attachments/assets/4ec66524-2f5e-43c2-9d5b-d0bbd0a1bc7b" />
+
+
+
+
 > Stop managing tasks. Start finishing goals.
 
 One goal per day. Two support tasks that scaffold it. A hard 3-slot limit the app refuses to break. The day hinges on one thing.
