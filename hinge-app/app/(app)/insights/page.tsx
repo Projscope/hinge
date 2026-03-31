@@ -61,10 +61,13 @@ export default function InsightsPage() {
   const dayInsight = bestAndWorstDays(dayBars)
 
   // ── Goal quality split ───────────────────────────────────────────────────
-  const scoredGoals = window30.map((g) => ({
-    ...g,
-    qualityScore: scoreGoalQuality(g.mainGoal).score,
-  }))
+  // Guard against null mainGoal values from the DB
+  const scoredGoals = window30
+    .filter((g) => g.mainGoal && g.mainGoal.trim().length > 0)
+    .map((g) => ({
+      ...g,
+      qualityScore: scoreGoalQuality(g.mainGoal).score,
+    }))
 
   const specificGoals = scoredGoals.filter((g) => g.qualityScore >= 70)
   const vagueGoals    = scoredGoals.filter((g) => g.qualityScore < 35)
@@ -79,11 +82,16 @@ export default function InsightsPage() {
     ? Math.round(vagueGoals.filter((g) => g.completed).length / vagueGoals.length * 100)
     : 0
 
-  const multiplier = vagueHitRate > 0
+  // Only show multiplier comparison when both groups have meaningful sample sizes
+  const MIN_QUALITY_SAMPLES = 3
+  const hasQualityComparison = specificGoals.length >= MIN_QUALITY_SAMPLES && vagueGoals.length >= MIN_QUALITY_SAMPLES
+  const multiplier = hasQualityComparison && vagueHitRate > 0
     ? (specificHitRate / vagueHitRate).toFixed(1)
-    : specificHitRate > 0 ? '∞' : '—'
+    : null
 
   const hasEnoughData = window30.length >= 3
+  // Goal quality needs its own threshold — enough scored goals to be meaningful
+  const hasQualityData = scoredGoals.length >= MIN_QUALITY_SAMPLES
 
   return (
     <div>
@@ -168,26 +176,38 @@ export default function InsightsPage() {
         {/* Goal quality */}
         <SectionTitle>Goal quality score</SectionTitle>
         <Card className="px-4 py-4 mb-4">
-          {[
-            { label: 'Avg clarity',    pct: avgClarity,      color: 'bg-gold',                      textColor: 'text-gold' },
-            { label: 'Specific goals', pct: specificHitRate, color: 'bg-teal-bright',               textColor: 'text-teal-bright', suffix: 'hit' },
-            { label: 'Vague goals',    pct: vagueHitRate,    color: 'bg-[rgba(192,57,43,0.7)]',     textColor: 'text-[#e26b5e]',   suffix: 'hit' },
-          ].map(({ label, pct, color, textColor, suffix }) => (
-            <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0">
-              <span className="text-[10px] text-ink-3 min-w-[80px]">{label}</span>
-              <div className="flex-1 h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
-                <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
-              </div>
-              <span className={`text-[11px] font-medium min-w-[40px] text-right ${textColor}`}>
-                {pct}%{suffix ? ` ${suffix}` : ''}
-              </span>
-            </div>
-          ))}
-          <p className="text-[11px] text-ink-3 mt-2.5 pt-2.5 border-t border-[var(--border)] leading-relaxed">
-            {specificGoals.length > 0 && vagueGoals.length > 0
-              ? <>Specific goals hit <strong className="text-ink">{multiplier}×</strong> more often. The quality check at setup is working.</>
-              : 'Not enough data yet to compare specific vs vague goal hit rates.'}
-          </p>
+          {!hasQualityData ? (
+            <p className="text-[12px] text-ink-3 text-center py-2 leading-relaxed">
+              Complete at least {MIN_QUALITY_SAMPLES} days to see goal quality patterns.
+              <br />
+              <span className="text-ink">{scoredGoals.length}</span> of {MIN_QUALITY_SAMPLES} needed.
+            </p>
+          ) : (
+            <>
+              {[
+                { label: 'Avg clarity',    pct: avgClarity,      color: 'bg-gold',                   textColor: 'text-gold',         title: 'Average quality score of your goals' },
+                { label: 'Specific → hit', pct: specificHitRate, color: 'bg-teal-bright',            textColor: 'text-teal-bright',  title: `${specificGoals.length} specific goals` },
+                { label: 'Vague → hit',    pct: vagueHitRate,    color: 'bg-[rgba(192,57,43,0.7)]',  textColor: 'text-[#e26b5e]',    title: `${vagueGoals.length} vague goals` },
+              ].map(({ label, pct, color, textColor, title }) => (
+                <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0" title={title}>
+                  <span className="text-[10px] text-ink-3 min-w-[84px]">{label}</span>
+                  <div className="flex-1 h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
+                    <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className={`text-[11px] font-medium min-w-[32px] text-right ${textColor}`}>
+                    {pct}%
+                  </span>
+                </div>
+              ))}
+              <p className="text-[11px] text-ink-3 mt-2.5 pt-2.5 border-t border-[var(--border)] leading-relaxed">
+                {multiplier
+                  ? <>Specific goals hit <strong className="text-ink">{multiplier}×</strong> more often. The quality check at setup is working.</>
+                  : vagueGoals.length === 0
+                    ? `All ${scoredGoals.length} goals are specific — keep it up.`
+                    : `Need ${MIN_QUALITY_SAMPLES} of each type to compare specific vs vague hit rates.`}
+              </p>
+            </>
+          )}
         </Card>
 
         {/* Hit rate by day */}
