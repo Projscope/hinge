@@ -1,2 +1,9 @@
 # Claude local settings (keep MEMORY, launch, project context — skip local overrides)
 .claude/settings.local.json
+
+# Environment variables — never commit
+hinge-app/.env.local
+hinge-app/.env*.local
+
+# Supabase CLI temp files
+supabase/.temp/
