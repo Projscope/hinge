@@ -36,7 +36,7 @@ Hin.ge is a daily focus app built around a single constraint: you get one main g
 ### 1. Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Go to **SQL Editor** and run the two migration files in order:
+2. Run migrations via the migration runner (see below) or paste both files into the **SQL Editor** manually:
    - `supabase/migrations/001_initial_schema.sql`
    - `supabase/migrations/002_end_day_function.sql`
 3. In **Authentication > URL Configuration**, add your local and production URLs to the redirect allow-list (e.g. `http://localhost:3000/**`)
@@ -52,7 +52,18 @@ Fill in your values from the Supabase dashboard (**Settings > API**):
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Only needed to run migrations via scripts/migrate.mjs
+SUPABASE_ACCESS_TOKEN=your-personal-access-token   # app.supabase.com/account/tokens
 ```
+
+#### Running migrations programmatically
+
+```bash
+node scripts/migrate.mjs
+```
+
+This uses the Supabase Management API with your `SUPABASE_ACCESS_TOKEN` to execute both SQL files against the remote database.
 
 ### 3. Run the app
 
@@ -104,8 +115,18 @@ hinge-app/
     snapshot/
       ShareCard.tsx           # Milestone share card
   lib/
-    store.ts                  # App state — localStorage persistence + actions
+    store.ts                  # App state — Supabase-backed, same hook interface
     types.ts                  # Shared types, FOCUS_RANKS, AREA_TAGS
+    goalQuality.ts            # Goal quality scoring (action verbs, vague word penalties)
+    supabase/
+      client.ts               # Browser Supabase client
+      server.ts               # Server Supabase client (cookie-based session)
+supabase/
+  migrations/
+    001_initial_schema.sql    # Tables, RLS policies, auto-create profile trigger
+    002_end_day_function.sql  # Atomic end_day RPC (goal verdict + streak in one tx)
+scripts/
+  migrate.mjs                 # Migration runner (uses SUPABASE_DB_URL)
 ```
 
 ---
@@ -142,6 +163,24 @@ Pro: $4/mo · $39/yr.
 
 ---
 
+## Goal quality scoring
+
+A goal is scored 0–100 at setup time (`lib/goalQuality.ts`):
+
+| Signal | Points | Condition |
+|---|---|---|
+| Word count | +25 | Sweet spot: 5–15 words |
+| Action verb | +30 | Contains: `ship`, `fix`, `deploy`, `write`, `finish`, etc. |
+| Outcome word | +25 | Contains: `to`, `for`, `staging`, `client`, `deadline`, etc. |
+| Specificity | +15 | Has a number or proper noun |
+| Vague words | −10 each | Contains: `stuff`, `work`, `things`, `try`, `maybe`, etc. |
+
+- **≥ 70** → "✓ Specific"
+- **35–69** → "~ Getting there"
+- **< 35** → "⚠ Too vague"
+
+---
+
 ## Focus ranks
 
 Hit rate is calculated over your last 30 days.
@@ -168,7 +207,7 @@ Hit rate is calculated over your last 30 days.
 - [x] Insights screen — hit rate, day-of-week chart, goal quality breakdown, focus rank ladder
 - [x] Milestones screen — earned/locked badges tied to streak and goal quality
 - [x] App shell — sidebar (desktop), right stats panel (desktop), bottom tab nav (mobile)
-- [x] Local state persistence via `localStorage` with midnight auto-reset
+- [x] State persistence via Supabase (replaced localStorage)
 - [x] Streak tracking — current streak, personal best, missed-day reset
 - [x] Free vs. Pro gating (UI-only — no payment integration yet)
 - [x] Mobile-responsive layout — bottom nav, single-column pages, responsive landing
