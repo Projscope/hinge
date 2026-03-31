@@ -17,12 +17,36 @@ Hin.ge is a daily focus app built around a single constraint: you get one main g
 - **Framework:** Next.js 15 (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v3 with a custom dark palette
-- **State:** `localStorage` via a custom `useAppStore` React hook — no backend, no auth
+- **Backend:** Supabase (Postgres, Auth, RLS)
+- **Auth:** Magic link (email OTP) via Supabase Auth
 - **Fonts:** DM Serif Display, DM Sans, DM Mono (Google Fonts)
 
 ---
 
 ## Getting started
+
+### 1. Supabase project
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Go to **SQL Editor** and run the two migration files in order:
+   - `supabase/migrations/001_initial_schema.sql`
+   - `supabase/migrations/002_end_day_function.sql`
+3. In **Authentication > URL Configuration**, add your local and production URLs to the redirect allow-list (e.g. `http://localhost:3000/**`)
+
+### 2. Environment variables
+
+```bash
+cp hinge-app/.env.local.example hinge-app/.env.local
+```
+
+Fill in your values from the Supabase dashboard (**Settings > API**):
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+### 3. Run the app
 
 ```bash
 cd hinge-app
@@ -30,7 +54,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Unauthenticated visits to `/today`, `/setup`, etc. redirect automatically to `/login`.
 
 ### Other commands
 
@@ -140,6 +164,8 @@ Hit rate is calculated over your last 30 days.
 - [x] Streak tracking — current streak, personal best, missed-day reset
 - [x] Free vs. Pro gating (UI-only — no payment integration yet)
 - [x] Mobile-responsive layout — bottom nav, single-column pages, responsive landing
+- [x] Supabase backend — Postgres schema, RLS, magic-link auth, session middleware
+- [x] `end_day` atomic RPC — streak + goal verdict in a single DB transaction
 
 ### In progress
 
@@ -148,7 +174,6 @@ Hit rate is calculated over your last 30 days.
 
 ### Planned
 
-- [ ] Backend + auth (user accounts, data sync across devices)
 - [ ] Payment integration (Stripe) for Pro plan
 - [ ] Push / email notifications — morning reminder, end-of-day nudge
 - [ ] Streak freeze — consume one freeze instead of losing streak

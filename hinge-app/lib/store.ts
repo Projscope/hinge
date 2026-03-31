@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createClient } from './supabase/client'
 import type { AppState, DailyGoal, OverflowItem, Streaks } from './types'
 
-const STORAGE_KEY = 'hinge_state'
-const TODAY_KEY = 'hinge_today'
+// ── helpers ──────────────────────────────────────────────────────────────────
 
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10)
@@ -25,121 +25,214 @@ function defaultState(): AppState {
   }
 }
 
-function loadState(): AppState {
-  if (typeof window === 'undefined') return defaultState()
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? { ...defaultState(), ...JSON.parse(raw) } : defaultState()
-  } catch {
-    return defaultState()
+// Map snake_case DB rows → camelCase TypeScript types
+function mapGoal(row: Record<string, unknown>): DailyGoal {
+  return {
+    id: row.id as string,
+    date: row.date as string,
+    mainGoal: row.main_goal as string,
+    areaTag: row.area_tag as DailyGoal['areaTag'],
+    task1Text: row.task1_text as string,
+    task1Done: row.task1_done as boolean,
+    task2Text: row.task2_text as string,
+    task2Done: row.task2_done as boolean,
+    endTime: row.end_time as string,
+    completed: row.completed as boolean,
+    createdAt: row.created_at as string,
   }
 }
 
-function saveState(state: AppState): void {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch {
-    // quota exceeded — silently fail
+function mapOverflow(row: Record<string, unknown>): OverflowItem {
+  return {
+    id: row.id as string,
+    dailyGoalId: row.daily_goal_id as string,
+    text: row.text as string,
+    createdAt: row.created_at as string,
   }
 }
 
-// Midnight reset: if lastActiveDate is yesterday or earlier and today has no goal, reset
-function applyMidnightReset(state: AppState): AppState {
-  const today = todayDate()
-  const hasGoalToday = state.today?.date === today
-
-  if (!hasGoalToday && state.today && state.today.date !== today) {
-    // Mark previous goal as missed (if not completed) and reset streak
-    const missedGoal = { ...state.today }
-    const newStreaks = { ...state.streaks }
-
-    if (!missedGoal.completed) {
-      newStreaks.current = 0
-    }
-
-    return {
-      ...state,
-      today: null,
-      streaks: newStreaks,
-      history: [missedGoal, ...state.history],
-    }
+function mapStreaks(row: Record<string, unknown> | null | undefined): Streaks {
+  if (!row) return defaultStreaks()
+  return {
+    current: (row.current as number) ?? 0,
+    personalBest: (row.personal_best as number) ?? 0,
+    lastActiveDate: (row.last_active_date as string) ?? null,
   }
-
-  return state
 }
+
+// ── hook ──────────────────────────────────────────────────────────────────────
 
 export function useAppStore() {
   const [state, setState] = useState<AppState>(defaultState)
   const [hydrated, setHydrated] = useState(false)
+  const supabase = createClient()
 
+  // ── initial load ────────────────────────────────────────────────────────────
   useEffect(() => {
-    const loaded = loadState()
-    const reset = applyMidnightReset(loaded)
-    setState(reset)
-    if (reset !== loaded) saveState(reset)
-    setHydrated(true)
+    async function load() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        setHydrated(true)
+        return
+      }
+
+      const today = todayDate()
+
+      // Fire all reads in parallel
+      const [profileRes, goalRes, historyRes, streaksRes] = await Promise.all([
+        supabase.from('profiles').select('plan, freeze_used_this_month').eq('id', user.id).single(),
+        supabase.from('daily_goals').select('*').eq('user_id', user.id).eq('date', today).maybeSingle(),
+        supabase.from('daily_goals').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
+        supabase.from('streaks').select('*').eq('user_id', user.id).maybeSingle(),
+      ])
+
+      const todayGoal = goalRes.data ? mapGoal(goalRes.data) : null
+
+      // Load overflow items for today's goal (if it exists)
+      let overflow: OverflowItem[] = []
+      if (todayGoal) {
+        const { data: overflowRows } = await supabase
+          .from('overflow_items')
+          .select('*')
+          .eq('daily_goal_id', todayGoal.id)
+          .order('created_at', { ascending: false })
+        overflow = (overflowRows ?? []).map(mapOverflow)
+      }
+
+      // Midnight reset: if there's a goal from a previous day still in `today`
+      // and it wasn't completed, it was a miss. Archive it and reset streak.
+      // (The server-side check: today's query returns null for past dates, so
+      // this just means today is clean. Streak reset is handled by end_day RPC.)
+
+      setState({
+        plan: (profileRes.data?.plan as AppState['plan']) ?? 'free',
+        today: todayGoal,
+        streaks: mapStreaks(streaksRes.data),
+        history: (historyRes.data ?? []).map(mapGoal),
+        overflow,
+        freezeUsedThisMonth: profileRes.data?.freeze_used_this_month ?? false,
+      })
+      setHydrated(true)
+    }
+
+    load()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const update = useCallback((updater: (s: AppState) => AppState) => {
-    setState((prev) => {
-      const next = updater(prev)
-      saveState(next)
-      return next
-    })
-  }, [])
-
-  // Actions
+  // ── actions ─────────────────────────────────────────────────────────────────
 
   const setTodayGoal = useCallback(
-    (goal: Omit<DailyGoal, 'id' | 'completed' | 'createdAt'>) => {
-      update((s) => ({
-        ...s,
-        today: {
-          ...goal,
-          id: `${goal.date}-${Date.now()}`,
-          completed: false,
-          createdAt: new Date().toISOString(),
-        },
+    async (goal: Omit<DailyGoal, 'id' | 'completed' | 'createdAt'>) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data, error } = await supabase
+        .from('daily_goals')
+        .upsert(
+          {
+            user_id: user.id,
+            date: goal.date,
+            main_goal: goal.mainGoal,
+            area_tag: goal.areaTag ?? null,
+            task1_text: goal.task1Text,
+            task1_done: false,
+            task2_text: goal.task2Text,
+            task2_done: false,
+            end_time: goal.endTime,
+            completed: false,
+          },
+          { onConflict: 'user_id,date' }
+        )
+        .select()
+        .single()
+
+      if (error || !data) return
+
+      const newGoal = mapGoal(data)
+      setState((prev) => ({
+        ...prev,
+        today: newGoal,
+        history: [newGoal, ...prev.history.filter((g) => g.date !== newGoal.date)],
       }))
     },
-    [update]
+    [supabase]
   )
 
   const toggleTask = useCallback(
-    (taskNum: 1 | 2) => {
-      update((s) => {
-        if (!s.today) return s
-        const field = taskNum === 1 ? 'task1Done' : 'task2Done'
-        return { ...s, today: { ...s.today, [field]: !s.today[field] } }
+    async (taskNum: 1 | 2) => {
+      if (!state.today) return
+
+      const field = taskNum === 1 ? 'task1Done' : 'task2Done'
+      const dbField = taskNum === 1 ? 'task1_done' : 'task2_done'
+      const newVal = !state.today[field]
+
+      // Optimistic update
+      setState((prev) => {
+        if (!prev.today) return prev
+        return { ...prev, today: { ...prev.today, [field]: newVal } }
       })
+
+      // Persist in background — fire-and-forget, optimistic state already applied
+      supabase
+        .from('daily_goals')
+        .update({ [dbField]: newVal })
+        .eq('id', state.today.id)
+        .then(() => {/* intentional no-op */})
     },
-    [update]
+    [supabase, state.today]
   )
 
   const addOverflow = useCallback(
-    (text: string) => {
-      update((s) => {
-        if (!s.today) return s
-        const item: OverflowItem = {
-          id: `ov-${Date.now()}`,
-          dailyGoalId: s.today.id,
-          text,
-          createdAt: new Date().toISOString(),
-        }
-        return { ...s, overflow: [item, ...s.overflow] }
-      })
+    async (text: string) => {
+      if (!state.today) return
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+
+      const optimisticId = `optimistic-${Date.now()}`
+      const optimistic: OverflowItem = {
+        id: optimisticId,
+        dailyGoalId: state.today.id,
+        text,
+        createdAt: new Date().toISOString(),
+      }
+
+      // Optimistic update
+      setState((prev) => ({ ...prev, overflow: [optimistic, ...prev.overflow] }))
+
+      // Persist and swap out the optimistic id
+      const { data } = await supabase
+        .from('overflow_items')
+        .insert({ user_id: user.id, daily_goal_id: state.today!.id, text })
+        .select()
+        .single()
+
+      if (data) {
+        setState((prev) => ({
+          ...prev,
+          overflow: prev.overflow.map((o) => (o.id === optimisticId ? mapOverflow(data) : o)),
+        }))
+      }
     },
-    [update]
+    [supabase, state.today]
   )
 
   const endDay = useCallback(
-    (completed: boolean) => {
-      update((s) => {
-        if (!s.today) return s
-        const finishedGoal: DailyGoal = { ...s.today, completed }
-        const newStreaks = { ...s.streaks }
+    async (completed: boolean) => {
+      if (!state.today) return
 
+      // Optimistic update
+      setState((prev) => {
+        if (!prev.today) return prev
+        const finishedGoal = { ...prev.today, completed }
+        const newStreaks = { ...prev.streaks }
         if (completed) {
           newStreaks.current += 1
           newStreaks.personalBest = Math.max(newStreaks.personalBest, newStreaks.current)
@@ -147,16 +240,21 @@ export function useAppStore() {
         } else {
           newStreaks.current = 0
         }
-
         return {
-          ...s,
+          ...prev,
           today: finishedGoal,
           streaks: newStreaks,
-          history: [finishedGoal, ...s.history],
+          history: [finishedGoal, ...prev.history.filter((g) => g.date !== finishedGoal.date)],
         }
       })
+
+      // Atomic DB update via RPC
+      await supabase.rpc('end_day', {
+        p_goal_id: state.today.id,
+        p_completed: completed,
+      })
     },
-    [update]
+    [supabase, state.today]
   )
 
   const todayOverflow = state.overflow.filter(
