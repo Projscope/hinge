@@ -8,13 +8,13 @@ export default function LandingPage() {
         <a href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
           Hin<span className="text-gold">.</span>ge
         </a>
-        <ul className="flex items-center gap-8 list-none">
-          <li>
+        <ul className="flex items-center gap-4 sm:gap-8 list-none">
+          <li className="hidden sm:block">
             <a href="#how-it-works" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
               How it works
             </a>
           </li>
-          <li>
+          <li className="hidden sm:block">
             <a href="#pricing" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
               Pricing
             </a>
@@ -31,7 +31,7 @@ export default function LandingPage() {
       </nav>
 
       {/* HERO */}
-      <div className="pt-[140px] pb-[80px] px-8 max-w-[1100px] mx-auto grid grid-cols-2 gap-16 items-center">
+      <div className="pt-[100px] sm:pt-[140px] pb-[60px] sm:pb-[80px] px-6 sm:px-8 max-w-[1100px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         {/* Left copy */}
         <div>
           <p className="text-[12px] font-medium tracking-[0.12em] uppercase text-gold mb-5">
@@ -67,7 +67,7 @@ export default function LandingPage() {
         </div>
 
         {/* Phone mockup */}
-        <div className="flex justify-center items-center relative">
+        <div className="flex justify-center items-center relative mt-4 lg:mt-0">
           <div className="w-[280px] bg-[var(--lk-ink)] rounded-[36px] p-3 shadow-[0_40px_80px_rgba(15,14,12,0.25),0_8px_24px_rgba(15,14,12,0.12)] relative">
             <div className="w-[80px] h-[24px] bg-[var(--lk-ink)] rounded-b-[16px] mx-auto mb-2 relative z-10" />
             <div className="bg-cream rounded-[28px] overflow-hidden min-h-[520px]">
@@ -125,12 +125,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Float cards */}
-          <div className="absolute top-10 -right-14 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
+          {/* Float cards — hidden on small screens to avoid overflow */}
+          <div className="hidden sm:block absolute top-10 -right-14 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
             <p className="font-serif text-[26px] text-[var(--lk-ink)] leading-none mb-0.5">8</p>
             <p className="text-[10px] font-medium tracking-[0.06em] uppercase text-[var(--lk-faint)]">Day streak 🔥</p>
           </div>
-          <div className="absolute bottom-20 -left-16 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
+          <div className="hidden sm:block absolute bottom-20 -left-16 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
             <p className="text-[10px] font-medium tracking-[0.07em] uppercase text-gold mb-1">Goal quality</p>
             <div className="flex items-center gap-1.5 text-[11px] text-[var(--lk-muted)] mt-1">
               <span>Specific</span>
@@ -144,7 +144,7 @@ export default function LandingPage() {
       </div>
 
       {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-20 px-8 bg-white">
+      <section id="how-it-works" className="py-16 sm:py-20 px-6 sm:px-8 bg-white">
         <div className="max-w-[1100px] mx-auto">
           <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
             The 60-second ritual
@@ -156,7 +156,7 @@ export default function LandingPage() {
             Morning setup takes 60 seconds. The rest of your day is just executing.
           </p>
 
-          <div className="grid grid-cols-3 gap-0.5 bg-[var(--lk-border)] rounded-[16px] overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 bg-[var(--lk-border)] rounded-[16px] overflow-hidden">
             {[
               {
                 num: '01',
@@ -194,7 +194,7 @@ export default function LandingPage() {
       </section>
 
       {/* THE CONSTRAINT */}
-      <section className="py-20 px-8">
+      <section className="py-16 sm:py-20 px-6 sm:px-8">
         <div className="max-w-[680px] mx-auto text-center">
           <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold mb-4">
             The philosophy
@@ -216,7 +216,7 @@ export default function LandingPage() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing" className="py-20 px-8 bg-white">
+      <section id="pricing" className="py-16 sm:py-20 px-6 sm:px-8 bg-white">
         <div className="max-w-[1100px] mx-auto">
           <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
             Pricing
@@ -228,7 +228,7 @@ export default function LandingPage() {
             The core ritual is free forever. No card. No trial. No limits on daily use.
           </p>
 
-          <div className="grid grid-cols-2 gap-6 max-w-[720px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[720px] mx-auto">
             {/* Free */}
             <div className="border border-[var(--lk-border)] rounded-[16px] p-8">
               <p className="text-[11px] font-medium tracking-wider uppercase text-[var(--lk-faint)] mb-3">Free</p>
@@ -309,12 +309,12 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 px-8 border-t border-[var(--lk-border)]">
-        <div className="max-w-[1100px] mx-auto flex items-center justify-between">
+      <footer className="py-10 sm:py-12 px-6 sm:px-8 border-t border-[var(--lk-border)]">
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center sm:justify-between gap-4 sm:gap-0">
           <p className="font-serif text-[18px] text-[var(--lk-ink)]">
             Hin<span className="text-gold">.</span>ge
           </p>
-          <p className="text-[13px] text-[var(--lk-faint)]">
+          <p className="text-[13px] text-[var(--lk-faint)] text-center">
             Stop managing tasks. Start finishing goals.
           </p>
           <Link

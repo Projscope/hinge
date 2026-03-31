@@ -70,6 +70,9 @@ const config: Config = {
           '100%': { opacity: '0', transform: 'translateY(90px) rotate(720deg)' },
         },
       },
+      gridTemplateColumns: {
+        app: '220px 1fr 290px',
+      },
       animation: {
         fadeUp: 'fadeUp 0.2s ease forwards',
         toastIn: 'toastIn 0.22s ease forwards',

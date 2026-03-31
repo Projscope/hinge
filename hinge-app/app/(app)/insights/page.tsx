@@ -129,8 +129,8 @@ export default function InsightsPage() {
         <SectionTitle>Hit rate by day of week</SectionTitle>
         <Card className="px-4 py-4">
           <div className="flex items-end gap-2 h-20 mb-2">
-            {DAY_BARS.map(({ label, pct, color }) => (
-              <div key={label} className="flex-1 flex flex-col items-center gap-1 h-full">
+            {DAY_BARS.map(({ label, pct, color }, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full">
                 <div
                   className={`w-full rounded-t-[4px] cursor-pointer ${color}`}
                   style={{ height: `${pct}%` }}
