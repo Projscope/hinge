@@ -5,17 +5,18 @@ interface TaskCardProps {
   text: string
   done: boolean
   onToggle: () => void
+  disabled?: boolean
 }
 
-export default function TaskCard({ label, text, done, onToggle }: TaskCardProps) {
+export default function TaskCard({ label, text, done, onToggle, disabled = false }: TaskCardProps) {
   return (
     <div
-      onClick={onToggle}
+      onClick={disabled ? undefined : onToggle}
       className={`
         flex items-start gap-3 px-4 py-3.5 mb-2
-        bg-bg-3 border rounded-[12px] cursor-pointer
+        bg-bg-3 border rounded-[12px]
         transition-all duration-150
-        hover:border-[var(--border2)] hover:bg-bg-4
+        ${disabled ? 'cursor-default' : 'cursor-pointer hover:border-[var(--border2)] hover:bg-bg-4'}
         ${done ? 'opacity-50' : ''}
       `}
       style={{ borderColor: 'var(--border)' }}
