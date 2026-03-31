@@ -13,7 +13,7 @@ function todayDate(): string {
 
 export default function SetupPage() {
   const router = useRouter()
-  const { setTodayGoal } = useAppStore()
+  const { setTodayGoal, today, hydrated } = useAppStore()
   const now = new Date()
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
 
@@ -24,6 +24,7 @@ export default function SetupPage() {
 
   const quality = scoreGoalQuality(mainGoal)
   const canProceed = mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
+  const goalAlreadySet = hydrated && today?.date === todayDate()
 
   function handleStart() {
     if (!canProceed) return
@@ -43,6 +44,31 @@ export default function SetupPage() {
     if (step === 1) return mainGoal.trim().length > 5 ? 'done' : 'active'
     if (step === 2) return task1.trim().length > 2 ? 'done' : mainGoal.trim().length > 5 ? 'active' : 'pending'
     return task2.trim().length > 2 ? 'done' : task1.trim().length > 2 ? 'active' : 'pending'
+  }
+
+  if (hydrated && goalAlreadySet) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20">
+        <p className="text-[42px] mb-4">{today!.completed ? '🎯' : '⚡'}</p>
+        <p className="font-serif text-[26px] text-ink mb-2 leading-tight">
+          {today!.completed ? 'Goal achieved.' : "Today's goal is set."}
+        </p>
+        <p className="text-[13px] text-ink-3 max-w-[320px] leading-relaxed mb-6">
+          {today!.completed
+            ? 'You already hit today\'s goal. One goal per day — come back tomorrow.'
+            : 'The day hinges on one thing. Go finish it.'}
+        </p>
+        <div className="bg-bg-3 border border-[var(--border)] rounded-[14px] px-5 py-4 max-w-[340px] w-full text-left mb-6">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-ink-3 font-medium mb-1.5">
+            Today&apos;s goal
+          </p>
+          <p className="font-serif text-[16px] text-ink leading-snug">{today!.mainGoal}</p>
+        </div>
+        <Button onClick={() => router.push('/today')}>
+          {today!.completed ? 'View today →' : 'Back to today →'}
+        </Button>
+      </div>
+    )
   }
 
   return (

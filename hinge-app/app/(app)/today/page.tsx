@@ -53,10 +53,18 @@ export default function TodayPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 mt-1">
-          <Pill variant="teal">● Active</Pill>
-          <Button variant="ghost" size="sm" onClick={() => router.push('/snapshot')}>
-            End my day →
-          </Button>
+          {today.completed ? (
+            <Pill variant={today.completed ? 'teal' : 'neutral'}>
+              {today.completed ? '✓ Completed' : '● Active'}
+            </Pill>
+          ) : (
+            <>
+              <Pill variant="teal">● Active</Pill>
+              <Button variant="ghost" size="sm" onClick={() => router.push('/snapshot')}>
+                End my day →
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -71,16 +79,24 @@ export default function TodayPage() {
           text={today.task1Text}
           done={today.task1Done}
           onToggle={() => toggleTask(1)}
+          disabled={today.completed}
         />
         <TaskCard
           label="Support task 2 · involves another person"
           text={today.task2Text}
           done={today.task2Done}
           onToggle={() => toggleTask(2)}
+          disabled={today.completed}
         />
 
+        {today.completed && (
+          <p className="text-[12px] text-ink-3 text-center mt-1 mb-2">
+            Day closed · come back tomorrow for a fresh start
+          </p>
+        )}
+
         {/* Overflow log */}
-        <OverflowLog items={todayOverflow} onAdd={addOverflow} />
+        <OverflowLog items={todayOverflow} onAdd={addOverflow} disabled={today.completed} />
       </div>
     </div>
   )

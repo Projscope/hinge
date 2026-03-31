@@ -72,8 +72,17 @@ export default function SnapshotPage() {
             <p className="font-serif text-[24px] text-ink mb-4">
               Did you hit your goal today?
             </p>
+            {!bothDone && (
+              <p className="text-[12px] text-[rgba(192,57,43,0.9)] bg-[var(--danger-dim)] border border-[rgba(192,57,43,0.2)] rounded-[10px] px-4 py-2.5 mb-4 leading-relaxed">
+                Both support tasks must be completed before you can mark the goal as achieved.
+              </p>
+            )}
             <div className="flex justify-center gap-3">
-              <Button onClick={() => handleEnd(true)}>
+              <Button
+                onClick={() => handleEnd(true)}
+                disabled={!bothDone}
+                className={!bothDone ? 'opacity-30 cursor-not-allowed' : ''}
+              >
                 Yes — goal achieved ✓
               </Button>
               <Button variant="ghost" onClick={() => handleEnd(false)}>

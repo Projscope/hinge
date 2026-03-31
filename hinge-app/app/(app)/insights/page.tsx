@@ -1,24 +1,41 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
+import { scoreGoalQuality } from '@/lib/goalQuality'
+import type { DailyGoal } from '@/lib/types'
 import Pill from '@/components/ui/Pill'
 import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
 import { FOCUS_RANKS } from '@/lib/types'
 
-const DAY_BARS = [
-  { label: 'M', pct: 72, color: 'bg-gold opacity-60' },
-  { label: 'T', pct: 55, color: 'bg-[rgba(200,146,42,0.4)]' },
-  { label: 'W', pct: 89, color: 'bg-teal-bright opacity-70' },
-  { label: 'T', pct: 91, color: 'bg-teal-bright' },
-  { label: 'F', pct: 40, color: 'bg-[rgba(192,57,43,0.6)]' },
-  { label: 'S', pct: 20, color: 'bg-[rgba(255,255,255,0.1)]' },
-  { label: 'S', pct: 15, color: 'bg-[rgba(255,255,255,0.1)]' },
-]
+// Mon=0 … Sun=6 (display order)
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const DAY_JS_INDEX = [1, 2, 3, 4, 5, 6, 0] // JS getDay(): Sun=0
 
-function calcHitRate(history: { completed: boolean }[]): number {
-  if (history.length === 0) return 0
-  return Math.round((history.filter((g) => g.completed).length / history.length) * 100)
+function calcHitRate(goals: DailyGoal[]): number {
+  if (goals.length === 0) return 0
+  return Math.round((goals.filter((g) => g.completed).length / goals.length) * 100)
+}
+
+function dayBarColor(pct: number): string {
+  if (pct >= 70) return 'bg-teal-bright'
+  if (pct >= 50) return 'bg-gold opacity-70'
+  if (pct > 0)   return 'bg-[rgba(192,57,43,0.6)]'
+  return 'bg-[rgba(255,255,255,0.08)]'
+}
+
+function bestAndWorstDays(bars: { label: string; pct: number; count: number }[]) {
+  const withData = bars.filter((b) => b.count > 0)
+  if (withData.length < 2) return null
+  const best  = withData.reduce((a, b) => (b.pct > a.pct ? b : a))
+  const worst = withData.reduce((a, b) => (b.pct < a.pct ? b : a))
+  const dayName = (label: string, idx: number) => {
+    const names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    return names[idx] ?? label
+  }
+  const bestIdx  = bars.indexOf(best)
+  const worstIdx = bars.indexOf(worst)
+  return { best: dayName(best.label, bestIdx), bestPct: best.pct, worst: dayName(worst.label, worstIdx), worstPct: worst.pct }
 }
 
 export default function InsightsPage() {
@@ -26,10 +43,47 @@ export default function InsightsPage() {
 
   if (!hydrated) return null
 
-  const hitRate = calcHitRate(history.slice(0, 30))
-  const rank = FOCUS_RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? FOCUS_RANKS[0]
+  const window30 = history.slice(0, 30)
+  const hitRate  = calcHitRate(window30)
+  const rank     = FOCUS_RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? FOCUS_RANKS[0]
   const nextRank = FOCUS_RANKS[FOCUS_RANKS.indexOf(rank) + 1]
   const rankProgress = ((hitRate - rank.min) / ((rank.max === 100 ? 100 : rank.max + 1) - rank.min)) * 100
+
+  // ── Day-of-week hit rates ────────────────────────────────────────────────
+  const dayBars = DAY_JS_INDEX.map((jsDay, i) => {
+    const dayGoals = window30.filter((g) => new Date(g.date + 'T00:00:00').getDay() === jsDay)
+    const pct = dayGoals.length > 0
+      ? Math.round(dayGoals.filter((g) => g.completed).length / dayGoals.length * 100)
+      : 0
+    return { label: DAY_LABELS[i], pct, count: dayGoals.length }
+  })
+
+  const dayInsight = bestAndWorstDays(dayBars)
+
+  // ── Goal quality split ───────────────────────────────────────────────────
+  const scoredGoals = window30.map((g) => ({
+    ...g,
+    qualityScore: scoreGoalQuality(g.mainGoal).score,
+  }))
+
+  const specificGoals = scoredGoals.filter((g) => g.qualityScore >= 70)
+  const vagueGoals    = scoredGoals.filter((g) => g.qualityScore < 35)
+
+  const avgClarity       = scoredGoals.length > 0
+    ? Math.round(scoredGoals.reduce((s, g) => s + g.qualityScore, 0) / scoredGoals.length)
+    : 0
+  const specificHitRate  = specificGoals.length > 0
+    ? Math.round(specificGoals.filter((g) => g.completed).length / specificGoals.length * 100)
+    : 0
+  const vagueHitRate     = vagueGoals.length > 0
+    ? Math.round(vagueGoals.filter((g) => g.completed).length / vagueGoals.length * 100)
+    : 0
+
+  const multiplier = vagueHitRate > 0
+    ? (specificHitRate / vagueHitRate).toFixed(1)
+    : specificHitRate > 0 ? '∞' : '—'
+
+  const hasEnoughData = window30.length >= 3
 
   return (
     <div>
@@ -40,6 +94,15 @@ export default function InsightsPage() {
         </div>
         <Pill variant="neutral">30-day window</Pill>
       </div>
+
+      {!hasEnoughData && (
+        <div className="mx-8 mb-5 bg-bg-3 border border-[var(--border)] rounded-[12px] px-4 py-4 text-center">
+          <p className="text-[13px] text-ink-3 leading-relaxed">
+            Complete at least 3 days to start seeing your patterns.
+            You have <strong className="text-ink">{window30.length}</strong> so far.
+          </p>
+        </div>
+      )}
 
       <div className="px-8 pb-8">
         {/* Rank hero */}
@@ -106,9 +169,9 @@ export default function InsightsPage() {
         <SectionTitle>Goal quality score</SectionTitle>
         <Card className="px-4 py-4 mb-4">
           {[
-            { label: 'Avg clarity', pct: 78, color: 'bg-gold', textColor: 'text-gold' },
-            { label: 'Specific goals', pct: 91, color: 'bg-teal-bright', textColor: 'text-teal-bright', suffix: 'hit' },
-            { label: 'Vague goals', pct: 44, color: 'bg-[rgba(192,57,43,0.7)]', textColor: 'text-[#e26b5e]', suffix: 'hit' },
+            { label: 'Avg clarity',    pct: avgClarity,      color: 'bg-gold',                      textColor: 'text-gold' },
+            { label: 'Specific goals', pct: specificHitRate, color: 'bg-teal-bright',               textColor: 'text-teal-bright', suffix: 'hit' },
+            { label: 'Vague goals',    pct: vagueHitRate,    color: 'bg-[rgba(192,57,43,0.7)]',     textColor: 'text-[#e26b5e]',   suffix: 'hit' },
           ].map(({ label, pct, color, textColor, suffix }) => (
             <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0">
               <span className="text-[10px] text-ink-3 min-w-[80px]">{label}</span>
@@ -121,7 +184,9 @@ export default function InsightsPage() {
             </div>
           ))}
           <p className="text-[11px] text-ink-3 mt-2.5 pt-2.5 border-t border-[var(--border)] leading-relaxed">
-            Specific goals hit <strong className="text-ink">2.1×</strong> more often. The quality check at setup is working.
+            {specificGoals.length > 0 && vagueGoals.length > 0
+              ? <>Specific goals hit <strong className="text-ink">{multiplier}×</strong> more often. The quality check at setup is working.</>
+              : 'Not enough data yet to compare specific vs vague goal hit rates.'}
           </p>
         </Card>
 
@@ -129,18 +194,22 @@ export default function InsightsPage() {
         <SectionTitle>Hit rate by day of week</SectionTitle>
         <Card className="px-4 py-4">
           <div className="flex items-end gap-2 h-20 mb-2">
-            {DAY_BARS.map(({ label, pct, color }, i) => (
+            {dayBars.map(({ label, pct, count }, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full">
                 <div
-                  className={`w-full rounded-t-[4px] cursor-pointer ${color}`}
-                  style={{ height: `${pct}%` }}
-                  title={`${pct}%`}
+                  className={`w-full rounded-t-[4px] ${dayBarColor(pct)}`}
+                  style={{ height: pct > 0 ? `${pct}%` : '4px' }}
+                  title={count > 0 ? `${pct}% (${count} day${count !== 1 ? 's' : ''})` : 'No data'}
                 />
                 <span className="text-[10px] text-ink-3">{label}</span>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-ink-3 mt-1">Wed & Thu are your power days. Fridays struggle at 40%.</p>
+          <p className="text-[11px] text-ink-3 mt-1">
+            {dayInsight
+              ? `${dayInsight.best}s are your best at ${dayInsight.bestPct}%. ${dayInsight.worst}s struggle at ${dayInsight.worstPct}%.`
+              : 'Complete more days to see your day-of-week patterns.'}
+          </p>
         </Card>
 
         {/* Pro lock for full insights */}

@@ -6,9 +6,10 @@ import type { OverflowItem } from '@/lib/types'
 interface OverflowLogProps {
   items: OverflowItem[]
   onAdd: (text: string) => void
+  disabled?: boolean
 }
 
-export default function OverflowLog({ items, onAdd }: OverflowLogProps) {
+export default function OverflowLog({ items, onAdd, disabled = false }: OverflowLogProps) {
   const [inputVisible, setInputVisible] = useState(false)
   const [value, setValue] = useState('')
 
@@ -42,7 +43,7 @@ export default function OverflowLog({ items, onAdd }: OverflowLogProps) {
         </p>
       ))}
 
-      {inputVisible ? (
+      {!disabled && (inputVisible ? (
         <div className="flex items-center gap-2 mt-1.5">
           <input
             autoFocus
@@ -67,7 +68,7 @@ export default function OverflowLog({ items, onAdd }: OverflowLogProps) {
         >
           + Add to log
         </button>
-      )}
+      ))}
     </div>
   )
 }

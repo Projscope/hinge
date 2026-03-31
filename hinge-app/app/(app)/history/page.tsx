@@ -6,7 +6,8 @@ import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
 import Button from '@/components/ui/Button'
 
-const PAYWALL_THRESHOLD = 7
+// Free users see all history; paywall applies only to Pro-exclusive features
+const PAYWALL_THRESHOLD = Infinity
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
@@ -35,7 +36,7 @@ export default function HistoryPage() {
           <h1 className="font-serif text-[26px] text-ink leading-tight">History</h1>
           <p className="text-[12px] text-ink-3 mt-0.5">Every goal you&apos;ve set, and whether you hit it</p>
         </div>
-        <Pill variant="neutral">7 days free</Pill>
+        <Pill variant="neutral">{allGoals.length} entries</Pill>
       </div>
 
       <div className="px-8 pb-8">
@@ -45,7 +46,7 @@ export default function HistoryPage() {
 
         {recentGoals.length > 0 && (
           <>
-            <SectionTitle>This week — free</SectionTitle>
+            <SectionTitle>All goals</SectionTitle>
             {recentGoals.map((goal) => (
               <div
                 key={goal.id}
