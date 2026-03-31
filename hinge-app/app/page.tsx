@@ -5,9 +5,9 @@ export default function LandingPage() {
     <div className="bg-cream text-[var(--lk-ink)] font-sans min-h-screen">
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-8 bg-[rgba(250,248,244,0.92)] backdrop-blur-md border-b border-[var(--lk-border)]">
-        <a href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
+        <Link href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
           Hin<span className="text-gold">.</span>ge
-        </a>
+        </Link>
         <ul className="flex items-center gap-4 sm:gap-8 list-none">
           <li className="hidden sm:block">
             <a href="#how-it-works" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">

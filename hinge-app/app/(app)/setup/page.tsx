@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import GoalInput from '@/components/setup/GoalInput'
 import Button from '@/components/ui/Button'
-import { scoreGoalQuality } from '@/lib/goalQuality'
-
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10)
 }
@@ -22,7 +20,6 @@ export default function SetupPage() {
   const [task2, setTask2] = useState('')
   const [endTime, setEndTime] = useState('18:00')
 
-  const quality = scoreGoalQuality(mainGoal)
   const canProceed = mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
   const goalAlreadySet = hydrated && today?.date === todayDate()
 

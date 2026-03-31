@@ -2,7 +2,6 @@
 
 import { useAppStore } from '@/lib/store'
 import Pill from '@/components/ui/Pill'
-import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
 import Button from '@/components/ui/Button'
 

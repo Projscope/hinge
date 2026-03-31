@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, TextareaHTMLAttributes } from 'react'
+import { TextareaHTMLAttributes } from 'react'
 import { scoreGoalQuality } from '@/lib/goalQuality'
 
 interface GoalInputProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange'> {
