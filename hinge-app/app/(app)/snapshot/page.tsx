@@ -7,12 +7,14 @@ import Pill from '@/components/ui/Pill'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import Toast from '@/components/ui/Toast'
+import AchievementOverlay from '@/components/overlays/AchievementOverlay'
 import { useState, useCallback } from 'react'
 
 export default function SnapshotPage() {
   const router = useRouter()
-  const { today, streaks, endDay, hydrated } = useAppStore()
+  const { today, streaks, history, endDay, hydrated } = useAppStore()
   const [toast, setToast] = useState<string | null>(null)
+  const [showAchievement, setShowAchievement] = useState(false)
   const dismiss = useCallback(() => setToast(null), [])
 
   if (!hydrated) return null
@@ -32,7 +34,11 @@ export default function SnapshotPage() {
 
   function handleEnd(completed: boolean) {
     endDay(completed)
-    router.push('/today')
+    if (completed) {
+      setShowAchievement(true)
+    } else {
+      router.push('/today')
+    }
   }
 
   const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -120,6 +126,16 @@ export default function SnapshotPage() {
       </div>
 
       {toast && <Toast message={toast} onDone={dismiss} />}
+
+      {showAchievement && (
+        <AchievementOverlay
+          streakCount={streaks.current}
+          personalBest={streaks.personalBest}
+          history={history}
+          goal={today}
+          onDone={() => router.push('/today')}
+        />
+      )}
     </div>
   )
 }

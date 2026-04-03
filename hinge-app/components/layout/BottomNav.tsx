@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { href: '/snapshot', icon: '📊', label: 'Snapshot' },
   { href: '/history', icon: '📅', label: 'History' },
   { href: '/insights', icon: '📈', label: 'Insights' },
-  { href: '/milestones', icon: '🏅', label: 'Goals' },
+  { href: '/settings', icon: '⚙', label: 'Settings' },
 ]
 
 export default function BottomNav() {

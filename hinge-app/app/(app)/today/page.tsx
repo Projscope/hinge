@@ -5,6 +5,7 @@ import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
 import OverflowLog from '@/components/today/OverflowLog'
+import StreakAtRisk from '@/components/today/StreakAtRisk'
 import Pill from '@/components/ui/Pill'
 import Button from '@/components/ui/Button'
 import SectionTitle from '@/components/ui/SectionTitle'
@@ -69,6 +70,9 @@ export default function TodayPage() {
       </div>
 
       <div className="px-8 pb-8">
+        {/* Streak at risk banner */}
+        <StreakAtRisk today={today} />
+
         {/* Goal hero */}
         <GoalHero goal={today} />
 

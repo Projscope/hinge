@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hin.ge — Concept Prototype</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: #111009;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 20px;
+}
+
+/* ── Phone shell ────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: #0f0e0c;
+  border-radius: 48px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 60px 120px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+
+.status-bar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  color: rgba(245,242,234,0.4);
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ── Screens ────────────────────────────────────────── */
+.screen {
+  position: absolute;
+  top: 48px;
+  left: 0; right: 0;
+  bottom: 78px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.hidden { opacity: 0; pointer-events: none; transform: translateY(6px); }
+
+/* ── Bottom nav ────────────────────────────────────── */
+.bottom-nav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 78px;
+  background: #0f0e0c;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  padding-bottom: 6px;
+}
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: rgba(245,242,234,0.28);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: color 0.15s;
+  user-select: none;
+}
+.nav-tab.active { color: #c8922a; }
+.nav-icon { font-size: 20px; line-height: 1; }
+
+/* ── Common ────────────────────────────────────────── */
+.px { padding: 0 20px; }
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.11em;
+  text-transform: uppercase; color: rgba(245,242,234,0.28);
+  margin-bottom: 10px;
+}
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+}
+.gold { color: #c8922a; }
+.teal { color: #2ab87e; }
+.ink  { color: #f5f2ea; }
+.muted { color: rgba(245,242,234,0.5); }
+.faint { color: rgba(245,242,234,0.25); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 20px;
+}
+
+.btn {
+  width: 100%; padding: 14px; border-radius: 12px; border: none;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  user-select: none;
+}
+.btn:active { transform: scale(0.98); opacity: 0.85; }
+.btn-gold { background: #c8922a; color: #0f0e0c; }
+.btn-ghost { background: rgba(255,255,255,0.06); color: rgba(245,242,234,0.7); }
+
+/* ── SCREEN: Today ──────────────────────────────────── */
+
+.weekly-anchor-bar {
+  margin: 14px 20px 0;
+  background: rgba(200,146,42,0.08);
+  border: 1px solid rgba(200,146,42,0.2);
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.weekly-anchor-bar:hover { background: rgba(200,146,42,0.12); }
+.weekly-anchor-bar .wa-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #c8922a; margin-bottom: 3px;
+}
+.weekly-anchor-bar .wa-text {
+  font-size: 13px; color: rgba(245,242,234,0.75); line-height: 1.4;
+}
+
+/* Empty today */
+.empty-today {
+  margin: 16px 20px 0;
+}
+.empty-headline {
+  font-family: Georgia, serif;
+  font-size: 24px; color: #f5f2ea;
+  line-height: 1.25; margin-bottom: 6px;
+}
+.empty-sub {
+  font-size: 13px; color: rgba(245,242,234,0.45); line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Area grid */
+.area-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 0 20px;
+}
+.area-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 14px 14px 12px;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+.area-card:hover { background: rgba(255,255,255,0.07); }
+.area-card.selected {
+  border-color: var(--area-color, #c8922a);
+  background: rgba(255,255,255,0.06);
+}
+.area-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: var(--area-color);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.area-card.selected::before { opacity: 1; }
+.area-icon { font-size: 22px; margin-bottom: 6px; }
+.area-name { font-size: 13px; font-weight: 600; color: #f5f2ea; margin-bottom: 2px; }
+.area-meta { font-size: 10px; color: rgba(245,242,234,0.35); }
+.neglect-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  position: absolute; top: 12px; right: 12px;
+}
+
+/* Active today view */
+.today-goal-card {
+  margin: 12px 20px 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.today-goal-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: 8px;
+}
+.today-goal-body { padding: 14px 16px; }
+.today-goal-text {
+  font-family: Georgia, serif;
+  font-size: 19px; color: #f5f2ea; line-height: 1.3;
+  margin-bottom: 4px;
+}
+.today-goal-anchor {
+  font-size: 11px; color: rgba(245,242,234,0.35);
+  margin-bottom: 14px;
+}
+
+.task-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);
+}
+.task-check {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; margin-top: 1px;
+}
+.task-check.done { background: #2ab87e; border-color: #2ab87e; }
+.task-text { font-size: 14px; color: rgba(245,242,234,0.7); line-height: 1.4; }
+.task-text.done { text-decoration: line-through; color: rgba(245,242,234,0.3); }
+
+/* Progress bar */
+.progress-bar {
+  height: 3px; background: rgba(255,255,255,0.07);
+  border-radius: 2px; overflow: hidden; margin: 14px 0 4px;
+}
+.progress-fill {
+  height: 100%; background: #2ab87e; border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* ── SCREEN: Setup flow ─────────────────────────────── */
+
+.setup-step { display: none; }
+.setup-step.active { display: block; }
+
+.setup-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.setup-step-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(245,242,234,0.3); margin-bottom: 4px;
+}
+.setup-title {
+  font-family: Georgia, serif; font-size: 22px; color: #f5f2ea;
+}
+
+.goal-queue { margin: 14px 20px; display: flex; flex-direction: column; gap: 6px; }
+.queue-item {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 12px 14px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 10px;
+  user-select: none;
+}
+.queue-item:hover { background: rgba(255,255,255,0.07); }
+.queue-item.selected {
+  border-color: var(--area-color, #c8922a);
+  background: rgba(255,255,255,0.07);
+}
+.queue-item-text { font-size: 14px; color: rgba(245,242,234,0.8); flex: 1; line-height: 1.35; }
+.queue-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--area-color); flex-shrink: 0; }
+
+.new-goal-input {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px dashed rgba(255,255,255,0.14);
+  border-radius: 12px; padding: 12px 14px;
+  margin: 0 20px 14px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: text;
+}
+.new-goal-input input {
+  background: none; border: none; outline: none;
+  font-size: 14px; color: #f5f2ea; flex: 1;
+  font-family: inherit;
+}
+.new-goal-input input::placeholder { color: rgba(245,242,234,0.3); }
+
+.task-input-row {
+  margin: 0 20px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.task-input-row .num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(255,255,255,0.08); color: rgba(245,242,234,0.4);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.task-input-row input {
+  background: none; border: none; outline: none;
+  font-size: 14px; color: #f5f2ea; flex: 1; font-family: inherit;
+}
+.task-input-row input::placeholder { color: rgba(245,242,234,0.28); }
+
+.goal-preview-pill {
+  margin: 14px 20px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 12px 14px;
+}
+.gp-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,242,234,0.3); margin-bottom: 4px; }
+.gp-text { font-family: Georgia, serif; font-size: 16px; color: #f5f2ea; line-height: 1.35; }
+
+/* ── SCREEN: Queue ──────────────────────────────────── */
+
+.queue-area-section { margin-bottom: 4px; }
+.queue-area-header {
+  padding: 14px 20px 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.queue-area-icon { font-size: 16px; }
+.queue-area-name { font-size: 13px; font-weight: 700; color: #f5f2ea; }
+.queue-area-count { font-size: 11px; color: rgba(245,242,234,0.3); margin-left: auto; }
+.queue-list { padding: 0 20px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.queue-list-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 11px; padding: 11px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.queue-list-item .qi-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--area-color); flex-shrink: 0; }
+.queue-list-item .qi-text { font-size: 13px; color: rgba(245,242,234,0.75); flex: 1; line-height: 1.35; }
+.queue-list-item .qi-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 2px 6px; border-radius: 6px;
+  background: rgba(255,255,255,0.06); color: rgba(245,242,234,0.35);
+}
+
+/* ── SCREEN: Week ───────────────────────────────────── */
+
+.week-anchor-card {
+  margin: 14px 20px 0;
+  background: rgba(200,146,42,0.07);
+  border: 1px solid rgba(200,146,42,0.18);
+  border-radius: 16px; padding: 16px;
+}
+.wa-edit-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #c8922a; margin-bottom: 6px;
+}
+.wa-edit-text {
+  background: none; border: none; outline: none;
+  font-family: Georgia, serif; font-size: 17px;
+  color: #f5f2ea; width: 100%; resize: none;
+  line-height: 1.4; min-height: 48px;
+}
+
+.week-grid {
+  margin: 16px 20px 0;
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.week-day-label {
+  text-align: center; font-size: 9px; font-weight: 600;
+  color: rgba(245,242,234,0.25); letter-spacing: 0.05em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.week-day-cell {
+  aspect-ratio: 1; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+}
+.week-day-cell.today-cell {
+  border-color: rgba(200,146,42,0.4);
+  background: rgba(200,146,42,0.06);
+}
+
+.area-legend {
+  margin: 16px 20px 0;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.legend-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-size: 13px; color: rgba(245,242,234,0.6); flex: 1; }
+.legend-bar-wrap { width: 100px; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.legend-bar-fill { height: 100%; border-radius: 2px; }
+.legend-days { font-size: 11px; color: rgba(245,242,234,0.3); white-space: nowrap; }
+
+/* ── Modal overlay (weekly anchor edit) ────────────── */
+.overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.overlay-sheet {
+  background: #1a1915;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 32px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  transform: translateY(20px);
+  transition: transform 0.2s;
+}
+.overlay.open .overlay-sheet { transform: translateY(0); }
+.overlay-title { font-family: Georgia, serif; font-size: 20px; color: #f5f2ea; margin-bottom: 4px; }
+.overlay-sub { font-size: 12px; color: rgba(245,242,234,0.4); margin-bottom: 16px; line-height: 1.5; }
+.overlay-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 14px;
+  font-family: Georgia, serif; font-size: 16px;
+  color: #f5f2ea; width: 100%; resize: none;
+  outline: none; min-height: 72px; line-height: 1.5;
+  margin-bottom: 12px;
+}
+.overlay-input::placeholder { color: rgba(245,242,234,0.25); }
+
+/* Divider */
+.divider { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 0; }
+
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span style="font-size:16px; letter-spacing:-1px;">●●●●</span>
+  </div>
+
+  <!-- ══ SCREEN: Today ═════════════════════════════════ -->
+  <div class="screen" id="screen-today">
+
+    <!-- Weekly anchor bar -->
+    <div class="weekly-anchor-bar" onclick="openAnchorEdit()">
+      <div class="wa-label">This week's anchor</div>
+      <div class="wa-text" id="anchor-display">Tap to set your weekly outcome →</div>
+    </div>
+
+    <!-- Empty state (no goal) -->
+    <div id="today-empty" style="padding: 20px 20px 0;">
+      <p class="section-label" style="margin-bottom: 14px;">Today — no goal set</p>
+
+      <p style="font-size: 13px; color: rgba(245,242,234,0.4); margin-bottom: 18px; line-height: 1.6;">
+        Pick an area, grab a goal from your queue, add 2 tasks. Takes 60 seconds.
+      </p>
+
+      <!-- Area grid in today empty state -->
+      <p class="section-label">Which area needs today?</p>
+      <div class="area-grid" id="today-area-grid"></div>
+
+      <div style="margin-top: 14px; padding: 0;">
+        <button class="btn btn-gold" id="today-setup-btn" onclick="goToSetupStep2()" style="opacity:0.4; pointer-events:none;">
+          Pick a goal from queue →
+        </button>
+      </div>
+    </div>
+
+    <!-- Active state (goal set) -->
+    <div id="today-active" style="display:none; padding-bottom: 20px;">
+      <div class="today-goal-card">
+        <div class="today-goal-header">
+          <div class="badge" id="today-area-badge" style="background: rgba(200,146,42,0.12); color: #c8922a; border: 1px solid rgba(200,146,42,0.2);">
+            <span id="today-area-icon">💼</span>
+            <span id="today-area-name">Work</span>
+          </div>
+        </div>
+        <div class="today-goal-body">
+          <div class="today-goal-text" id="today-goal-text">—</div>
+          <div class="today-goal-anchor" id="today-goal-anchor">Part of: —</div>
+          <div class="progress-bar"><div class="progress-fill" id="today-progress" style="width:0%"></div></div>
+          <div style="font-size: 11px; color: rgba(245,242,234,0.3); text-align:right; margin-bottom: 2px;" id="today-progress-label">0 of 2</div>
+          <div id="today-tasks"></div>
+        </div>
+      </div>
+
+      <div style="margin: 12px 20px 0;">
+        <button class="btn btn-ghost" onclick="endDay()" id="end-day-btn">
+          Close day →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: Setup ═══════════════════════════════════ -->
+  <div class="screen hidden" id="screen-setup">
+
+    <!-- Step 1: Area -->
+    <div class="setup-step active" id="step-area">
+      <div class="setup-header">
+        <div class="setup-step-num">Step 1 of 3</div>
+        <div class="setup-title">Which area needs today?</div>
+      </div>
+      <div style="padding: 14px 20px 0;">
+        <p style="font-size: 12px; color: rgba(245,242,234,0.35); margin-bottom: 14px; line-height: 1.6;">
+          Areas you haven't touched in a while are flagged. Balance matters over time.
+        </p>
+        <div class="area-grid" id="setup-area-grid"></div>
+      </div>
+      <div style="padding: 14px 20px 0;">
+        <button class="btn btn-gold" id="step1-btn" onclick="goToStep(2)" style="opacity:0.4; pointer-events:none;">
+          See goal queue →
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Goal queue -->
+    <div class="setup-step" id="step-goal">
+      <div class="setup-header">
+        <div class="setup-step-num">Step 2 of 3</div>
+        <div class="setup-title" id="step2-title">What's today's goal?</div>
+      </div>
+      <div style="padding: 10px 0 0;">
+        <p style="font-size: 12px; color: rgba(245,242,234,0.35); padding: 0 20px; margin-bottom: 12px; line-height: 1.6;">
+          Your queue for this area — tap to select, or write a new one below.
+        </p>
+        <div class="goal-queue" id="goal-queue-list"></div>
+        <div class="divider" style="margin: 6px 20px;"></div>
+        <div class="new-goal-input">
+          <span style="font-size: 16px; color: rgba(245,242,234,0.25);">+</span>
+          <input type="text" id="new-goal-text" placeholder="Write a new goal…" oninput="onNewGoalInput(this.value)">
+        </div>
+      </div>
+      <div style="padding: 4px 20px 0;">
+        <button class="btn btn-ghost" onclick="goToStep(1)" style="margin-bottom: 8px;">← Back</button>
+        <button class="btn btn-gold" id="step2-btn" onclick="goToStep(3)" style="opacity:0.4; pointer-events:none;">
+          Set support tasks →
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Tasks -->
+    <div class="setup-step" id="step-tasks">
+      <div class="setup-header">
+        <div class="setup-step-num">Step 3 of 3</div>
+        <div class="setup-title">Set your scaffolding</div>
+      </div>
+      <div style="padding: 10px 0 0;">
+        <div class="goal-preview-pill">
+          <div class="gp-label">Today's goal</div>
+          <div class="gp-text" id="step3-goal-preview">—</div>
+        </div>
+        <p style="font-size: 12px; color: rgba(245,242,234,0.35); padding: 0 20px; margin-bottom: 12px; line-height: 1.6;">
+          Two tasks that directly scaffold the goal. Not a to-do list — scaffolding.
+        </p>
+        <div class="task-input-row">
+          <div class="num">1</div>
+          <input type="text" id="task1-input" placeholder="First support task…" oninput="checkStep3()">
+        </div>
+        <div class="task-input-row">
+          <div class="num">2</div>
+          <input type="text" id="task2-input" placeholder="Second support task…" oninput="checkStep3()">
+        </div>
+      </div>
+      <div style="padding: 8px 20px 0;">
+        <button class="btn btn-ghost" onclick="goToStep(2)" style="margin-bottom: 8px;">← Back</button>
+        <button class="btn btn-gold" id="step3-btn" onclick="lockInGoal()" style="opacity:0.4; pointer-events:none;">
+          Lock it in →
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ SCREEN: Queue ══════════════════════════════════ -->
+  <div class="screen hidden" id="screen-queue">
+    <div style="padding: 16px 20px 8px; display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <p class="section-label" style="margin-bottom:2px;">Goal queue</p>
+        <p style="font-size: 12px; color: rgba(245,242,234,0.35);">Your backlog by area — pull from here each morning</p>
+      </div>
+    </div>
+    <div id="queue-screen-content"></div>
+  </div>
+
+  <!-- ══ SCREEN: Week ════════════════════════════════════ -->
+  <div class="screen hidden" id="screen-week">
+    <div style="padding: 16px 20px 0;">
+      <p class="section-label" style="margin-bottom: 2px;">This week</p>
+      <p style="font-size: 12px; color: rgba(245,242,234,0.35); margin-bottom: 0;">Weekly anchor drives your daily choices</p>
+    </div>
+
+    <div class="week-anchor-card" onclick="openAnchorEdit()">
+      <div class="wa-edit-label">Weekly anchor — tap to edit</div>
+      <div style="font-family: Georgia, serif; font-size: 18px; color: #f5f2ea; line-height: 1.4;" id="week-anchor-display">
+        Tap to set your weekly outcome →
+      </div>
+    </div>
+
+    <div style="padding: 16px 20px 6px;">
+      <p class="section-label">Area coverage — last 7 days</p>
+    </div>
+    <div style="padding: 0 20px; display:grid; grid-template-columns: repeat(7,1fr); gap:4px; margin-bottom:8px;">
+      <div class="week-day-label">M</div>
+      <div class="week-day-label">T</div>
+      <div class="week-day-label">W</div>
+      <div class="week-day-label">T</div>
+      <div class="week-day-label">F</div>
+      <div class="week-day-label">S</div>
+      <div class="week-day-label">S</div>
+    </div>
+    <div id="week-grid-cells" style="padding: 0 20px; display:grid; grid-template-columns: repeat(7,1fr); gap:4px;"></div>
+
+    <div style="padding: 16px 20px 0;">
+      <p class="section-label">Focus distribution</p>
+      <div class="area-legend" id="area-legend"></div>
+    </div>
+
+    <div style="height: 20px;"></div>
+  </div>
+
+  <!-- ══ BOTTOM NAV ══════════════════════════════════════ -->
+  <div class="bottom-nav">
+    <div class="nav-tab active" id="nav-today" onclick="showScreen('today')">
+      <div class="nav-icon">◎</div>
+      <span>Today</span>
+    </div>
+    <div class="nav-tab" id="nav-setup" onclick="showScreen('setup')">
+      <div class="nav-icon">⊕</div>
+      <span>Setup</span>
+    </div>
+    <div class="nav-tab" id="nav-queue" onclick="showScreen('queue')">
+      <div class="nav-icon">≡</div>
+      <span>Queue</span>
+    </div>
+    <div class="nav-tab" id="nav-week" onclick="showScreen('week')">
+      <div class="nav-icon">⬚</div>
+      <span>Week</span>
+    </div>
+  </div>
+
+  <!-- ══ OVERLAY: Anchor edit ═══════════════════════════ -->
+  <div class="overlay" id="anchor-overlay" onclick="closeAnchorIfOutside(event)">
+    <div class="overlay-sheet">
+      <div class="overlay-title">Weekly anchor</div>
+      <div class="overlay-sub">One outcome that makes this week a win. Your daily goals should serve it.</div>
+      <textarea class="overlay-input" id="anchor-input" placeholder="e.g. Close the auth refactor and get it into staging" rows="3"></textarea>
+      <button class="btn btn-gold" onclick="saveAnchor()">Save anchor →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Label below phone ── -->
+<div style="position:fixed; bottom: 20px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.2); letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap;">
+  Concept prototype · not the real app
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────
+
+const AREAS = [
+  { id: 'work',     label: 'Work',         icon: '💼', color: '#c8922a', lastDays: 0 },
+  { id: 'health',   label: 'Health',       icon: '🏃', color: '#2ab87e', lastDays: 3 },
+  { id: 'side',     label: 'Side project', icon: '⚡', color: '#7c6df5', lastDays: 5 },
+  { id: 'learning', label: 'Learning',     icon: '📚', color: '#3b9fd4', lastDays: 1 },
+  { id: 'personal', label: 'Personal',     icon: '🌱', color: '#888',    lastDays: 7 },
+]
+
+const QUEUE = {
+  work:     ['Ship auth refactor to staging', 'Write Q2 product roadmap', 'Close 3 open review comments', 'Send weekly status update'],
+  health:   ['30-min morning run', 'Meal prep for the week', 'Book physio appointment'],
+  side:     ['Build goal queue UI', 'Write landing page copy', 'Set up analytics + funnels'],
+  learning: ['Finish chapter 5 of SICP', 'Watch 2 ML lectures', 'Read the distributed systems paper'],
+  personal: ['Call mom', 'Declutter desk', 'Plan weekend hiking trip'],
+}
+
+// Sample week: area IDs for last 7 days (Sun→Sat), null = no goal
+const WEEK_HISTORY = ['work','health','work','side','learning',null,null]
+
+const state = {
+  currentScreen: 'today',
+  anchor: '',
+  selectedArea: null,
+  selectedGoal: null,
+  todayGoal: null,
+  setupStep: 1,
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+function neglectColor(days) {
+  if (days === 0) return '#2ab87e'   // green — today
+  if (days <= 2)  return '#c8922a'   // gold — recent
+  if (days <= 5)  return '#e07b3a'   // orange — getting stale
+  return '#c0392b'                   // red — neglected
+}
+
+function neglectLabel(days) {
+  if (days === 0) return 'Active today'
+  if (days === 1) return 'Yesterday'
+  return `${days} days ago`
+}
+
+function areaById(id) { return AREAS.find(a => a.id === id) }
+
+// ── Render: Area grid ─────────────────────────────────────────────────────
+
+function renderAreaGrid(containerId, onSelect) {
+  const container = document.getElementById(containerId)
+  container.innerHTML = ''
+
+  // Sort: most neglected first
+  const sorted = [...AREAS].sort((a,b) => b.lastDays - a.lastDays)
+
+  sorted.forEach(area => {
+    const card = document.createElement('div')
+    card.className = 'area-card'
+    card.style.setProperty('--area-color', area.color)
+    card.id = `area-card-${containerId}-${area.id}`
+
+    const dotColor = neglectColor(area.lastDays)
+    const urgent = area.lastDays >= 5
+
+    card.innerHTML = `
+      <div class="neglect-dot" style="background:${dotColor}; ${urgent ? 'box-shadow:0 0 6px '+dotColor : ''}"></div>
+      <div class="area-icon">${area.icon}</div>
+      <div class="area-name ink">${area.label}</div>
+      <div class="area-meta" style="color:${dotColor}">${neglectLabel(area.lastDays)}</div>
+    `
+    card.addEventListener('click', () => {
+      document.querySelectorAll(`#${containerId} .area-card`).forEach(c => c.classList.remove('selected'))
+      card.classList.add('selected')
+      onSelect(area)
+    })
+    container.appendChild(card)
+  })
+}
+
+// ── Render: Queue screen ──────────────────────────────────────────────────
+
+function renderQueueScreen() {
+  const container = document.getElementById('queue-screen-content')
+  container.innerHTML = ''
+
+  AREAS.forEach(area => {
+    const items = QUEUE[area.id] || []
+    const section = document.createElement('div')
+    section.className = 'queue-area-section'
+    section.innerHTML = `
+      <div class="queue-area-header">
+        <span class="queue-area-icon">${area.icon}</span>
+        <span class="queue-area-name" style="color:${area.color}">${area.label}</span>
+        <span class="queue-area-count">${items.length} queued</span>
+      </div>
+      <div class="queue-list">
+        ${items.map((item, i) => `
+          <div class="queue-list-item" style="--area-color:${area.color}">
+            <div class="qi-dot" style="background:${area.color}"></div>
+            <div class="qi-text">${item}</div>
+            ${i === 0 ? '<div class="qi-tag">Next up</div>' : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div class="divider" style="margin: 4px 20px 8px;"></div>
+    `
+    container.appendChild(section)
+  })
+}
+
+// ── Render: Week grid ─────────────────────────────────────────────────────
+
+function renderWeekGrid() {
+  const cells = document.getElementById('week-grid-cells')
+  cells.innerHTML = ''
+  const todayIdx = 4 // Friday in our prototype
+
+  WEEK_HISTORY.forEach((areaId, i) => {
+    const area = areaId ? areaById(areaId) : null
+    const cell = document.createElement('div')
+    cell.className = 'week-day-cell' + (i === todayIdx ? ' today-cell' : '')
+    cell.style.background = area
+      ? area.color + '22'
+      : 'rgba(255,255,255,0.03)'
+    cell.style.borderColor = area
+      ? area.color + '44'
+      : 'rgba(255,255,255,0.06)'
+    cell.innerHTML = area ? `<span style="font-size:14px">${area.icon}</span>` : ''
+    cells.appendChild(cell)
+  })
+
+  // Legend
+  const legend = document.getElementById('area-legend')
+  legend.innerHTML = ''
+  const counts = {}
+  WEEK_HISTORY.forEach(id => { if (id) counts[id] = (counts[id]||0)+1 })
+
+  AREAS.forEach(area => {
+    const c = counts[area.id] || 0
+    const pct = (c / 7) * 100
+    const row = document.createElement('div')
+    row.className = 'legend-row'
+    row.innerHTML = `
+      <div class="legend-dot" style="background:${area.color}"></div>
+      <div class="legend-name">${area.icon} ${area.label}</div>
+      <div class="legend-bar-wrap">
+        <div class="legend-bar-fill" style="width:${pct}%; background:${area.color}"></div>
+      </div>
+      <div class="legend-days" style="color:${c>0?area.color:'rgba(245,242,234,0.2)'}">
+        ${c > 0 ? `${c}d` : '—'}
+      </div>
+    `
+    legend.appendChild(row)
+  })
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────
+
+function showScreen(name) {
+  ['today','setup','queue','week'].forEach(s => {
+    document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name)
+    document.getElementById(`nav-${s}`).classList.toggle('active', s !== name ? false : true)
+  })
+  state.currentScreen = name
+
+  if (name === 'queue') renderQueueScreen()
+  if (name === 'week') renderWeekGrid()
+  if (name === 'setup' && state.setupStep === 1) {
+    // re-render area grid fresh
+    renderAreaGrid('setup-area-grid', (area) => {
+      state.selectedArea = area
+      document.getElementById('step1-btn').style.opacity = '1'
+      document.getElementById('step1-btn').style.pointerEvents = 'auto'
+    })
+  }
+}
+
+// ── Setup flow ────────────────────────────────────────────────────────────
+
+function goToStep(n) {
+  state.setupStep = n
+  document.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'))
+  document.getElementById(['','step-area','step-goal','step-tasks'][n]).classList.add('active')
+
+  if (n === 2) renderGoalQueue()
+  if (n === 3) {
+    document.getElementById('step3-goal-preview').textContent = state.selectedGoal || '—'
+    checkStep3()
+  }
+}
+
+function renderGoalQueue() {
+  const area = state.selectedArea
+  if (!area) return
+
+  document.getElementById('step2-title').textContent = `${area.icon}  ${area.label} queue`
+
+  const list = document.getElementById('goal-queue-list')
+  list.innerHTML = ''
+  const items = QUEUE[area.id] || []
+
+  items.forEach(item => {
+    const el = document.createElement('div')
+    el.className = 'queue-item'
+    el.style.setProperty('--area-color', area.color)
+    el.innerHTML = `
+      <div class="queue-dot"></div>
+      <div class="queue-item-text">${item}</div>
+    `
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.queue-item').forEach(q => q.classList.remove('selected'))
+      el.classList.add('selected')
+      state.selectedGoal = item
+      document.getElementById('new-goal-text').value = ''
+      enableStep2()
+    })
+    list.appendChild(el)
+  })
+
+  document.getElementById('step2-btn').style.opacity = '0.4'
+  document.getElementById('step2-btn').style.pointerEvents = 'none'
+}
+
+function onNewGoalInput(val) {
+  if (val.trim().length > 5) {
+    document.querySelectorAll('.queue-item').forEach(q => q.classList.remove('selected'))
+    state.selectedGoal = val.trim()
+    enableStep2()
+  } else if (!document.querySelector('.queue-item.selected')) {
+    state.selectedGoal = null
+    document.getElementById('step2-btn').style.opacity = '0.4'
+    document.getElementById('step2-btn').style.pointerEvents = 'none'
+  }
+}
+
+function enableStep2() {
+  document.getElementById('step2-btn').style.opacity = '1'
+  document.getElementById('step2-btn').style.pointerEvents = 'auto'
+}
+
+function checkStep3() {
+  const t1 = document.getElementById('task1-input').value.trim()
+  const t2 = document.getElementById('task2-input').value.trim()
+  const ok = t1.length > 2 && t2.length > 2
+  document.getElementById('step3-btn').style.opacity = ok ? '1' : '0.4'
+  document.getElementById('step3-btn').style.pointerEvents = ok ? 'auto' : 'none'
+}
+
+function lockInGoal() {
+  const area = state.selectedArea
+  const goal = state.selectedGoal
+  const t1 = document.getElementById('task1-input').value.trim()
+  const t2 = document.getElementById('task2-input').value.trim()
+
+  state.todayGoal = {
+    area,
+    goal,
+    anchor: state.anchor,
+    tasks: [
+      { text: t1, done: false },
+      { text: t2, done: false },
+    ]
+  }
+
+  // Remove goal from queue
+  if (QUEUE[area.id]) {
+    const idx = QUEUE[area.id].indexOf(goal)
+    if (idx > -1) QUEUE[area.id].splice(idx, 1)
+  }
+
+  // Update area lastDays
+  area.lastDays = 0
+
+  // Reset inputs
+  document.getElementById('task1-input').value = ''
+  document.getElementById('task2-input').value = ''
+  document.getElementById('new-goal-text').value = ''
+  state.selectedGoal = null
+  state.selectedArea = null
+  state.setupStep = 1
+  document.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'))
+  document.getElementById('step-area').classList.add('active')
+
+  renderTodayActive()
+  showScreen('today')
+}
+
+// ── Today screen ──────────────────────────────────────────────────────────
+
+function renderTodayActive() {
+  const g = state.todayGoal
+  if (!g) return
+
+  document.getElementById('today-empty').style.display = 'none'
+  document.getElementById('today-active').style.display = 'block'
+
+  // Area badge
+  const badge = document.getElementById('today-area-badge')
+  badge.style.background = g.area.color + '18'
+  badge.style.color = g.area.color
+  badge.style.borderColor = g.area.color + '33'
+  document.getElementById('today-area-icon').textContent = g.area.icon
+  document.getElementById('today-area-name').textContent = g.area.label
+
+  // Goal
+  document.getElementById('today-goal-text').textContent = g.goal
+  document.getElementById('today-goal-anchor').textContent =
+    g.anchor ? `Part of: ${g.anchor}` : 'No weekly anchor set'
+
+  renderTasks()
+}
+
+function renderTasks() {
+  const g = state.todayGoal
+  const container = document.getElementById('today-tasks')
+  container.innerHTML = ''
+
+  g.tasks.forEach((t, i) => {
+    const row = document.createElement('div')
+    row.className = 'task-row'
+    row.innerHTML = `
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${i})">
+        ${t.done ? '<svg width="10" height="8" viewBox="0 0 10 8"><path d="M1 4L4 7L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>' : ''}
+      </div>
+      <div class="task-text ${t.done ? 'done' : ''}">${t.text}</div>
+    `
+    container.appendChild(row)
+  })
+
+  // Progress
+  const done = g.tasks.filter(t => t.done).length
+  const pct = (done / g.tasks.length) * 100
+  document.getElementById('today-progress').style.width = pct + '%'
+  document.getElementById('today-progress-label').textContent = `${done} of ${g.tasks.length}`
+
+  // End day button
+  const canEnd = done === g.tasks.length
+  const btn = document.getElementById('end-day-btn')
+  btn.textContent = canEnd ? 'Mark as achieved ✓' : 'Close day (miss)'
+  btn.style.background = canEnd ? 'rgba(42,184,126,0.12)' : 'rgba(255,255,255,0.06)'
+  btn.style.color = canEnd ? '#2ab87e' : 'rgba(245,242,234,0.5)'
+  btn.style.borderColor = canEnd ? 'rgba(42,184,126,0.25)' : 'transparent'
+  btn.style.border = canEnd ? '1px solid rgba(42,184,126,0.25)' : ''
+}
+
+function toggleTask(i) {
+  state.todayGoal.tasks[i].done = !state.todayGoal.tasks[i].done
+  renderTasks()
+}
+
+function endDay() {
+  const done = state.todayGoal.tasks.filter(t => t.done).length
+  const achieved = done === state.todayGoal.tasks.length
+  const msg = achieved
+    ? '🏆 Goal achieved! Great work.'
+    : '📋 Day closed. Tomorrow is a blank slate.'
+
+  // Flash message
+  const card = document.querySelector('.today-goal-card')
+  const orig = card.style.border
+  card.style.border = achieved ? '1.5px solid #2ab87e' : '1.5px solid rgba(255,255,255,0.2)'
+  setTimeout(() => { card.style.border = orig }, 1200)
+
+  // Reset to empty state after brief delay
+  setTimeout(() => {
+    state.todayGoal = null
+    document.getElementById('today-empty').style.display = 'block'
+    document.getElementById('today-active').style.display = 'none'
+    // Re-render area grid with refreshed neglect
+    renderAreaGrid('today-area-grid', (area) => {
+      state.selectedArea = area
+      document.getElementById('today-setup-btn').style.opacity = '1'
+      document.getElementById('today-setup-btn').style.pointerEvents = 'auto'
+    })
+    // Show a simple notification
+    showToast(msg)
+  }, 800)
+}
+
+function goToSetupStep2() {
+  if (!state.selectedArea) return
+  showScreen('setup')
+  goToStep(2)
+}
+
+// ── Weekly anchor ─────────────────────────────────────────────────────────
+
+function openAnchorEdit() {
+  document.getElementById('anchor-input').value = state.anchor
+  document.getElementById('anchor-overlay').classList.add('open')
+  setTimeout(() => document.getElementById('anchor-input').focus(), 200)
+}
+
+function closeAnchorIfOutside(e) {
+  if (e.target === document.getElementById('anchor-overlay')) closeAnchor()
+}
+
+function closeAnchor() {
+  document.getElementById('anchor-overlay').classList.remove('open')
+}
+
+function saveAnchor() {
+  state.anchor = document.getElementById('anchor-input').value.trim()
+  const display = state.anchor || 'Tap to set your weekly outcome →'
+  document.getElementById('anchor-display').textContent = display
+  document.getElementById('week-anchor-display').textContent = display
+  if (state.todayGoal) {
+    state.todayGoal.anchor = state.anchor
+    document.getElementById('today-goal-anchor').textContent =
+      state.anchor ? `Part of: ${state.anchor}` : 'No weekly anchor set'
+  }
+  closeAnchor()
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  const t = document.createElement('div')
+  t.style.cssText = `
+    position:absolute; bottom:90px; left:20px; right:20px;
+    background:#1a1915; border:1px solid rgba(255,255,255,0.12);
+    border-radius:12px; padding:12px 16px;
+    font-size:13px; color:#f5f2ea;
+    z-index:200; text-align:center;
+    transition: opacity 0.3s;
+  `
+  t.textContent = msg
+  document.querySelector('.phone').appendChild(t)
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300) }, 2200)
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+
+// Render today area grid
+renderAreaGrid('today-area-grid', (area) => {
+  state.selectedArea = area
+  document.getElementById('today-setup-btn').style.opacity = '1'
+  document.getElementById('today-setup-btn').style.pointerEvents = 'auto'
+})
+
+// Render setup area grid
+renderAreaGrid('setup-area-grid', (area) => {
+  state.selectedArea = area
+  document.getElementById('step1-btn').style.opacity = '1'
+  document.getElementById('step1-btn').style.pointerEvents = 'auto'
+})
+
+// Week grid initial render
+renderWeekGrid()
+</script>
+</body>
+</html>

@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect } from 'react'
 import Sidebar from '@/components/layout/Sidebar'
 import RightPanel from '@/components/layout/RightPanel'
 import BottomNav from '@/components/layout/BottomNav'
 import { useAppStore } from '@/lib/store'
+import { initNotifications } from '@/lib/notifications'
 
 function calcHitRate(history: { completed: boolean }[]): number {
   if (history.length === 0) return 0
@@ -14,6 +16,10 @@ function calcHitRate(history: { completed: boolean }[]): number {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { streaks, history, today, plan, hydrated } = useAppStore()
   const hitRate = calcHitRate(history.slice(0, 30))
+
+  useEffect(() => {
+    initNotifications()
+  }, [])
 
   if (!hydrated) {
     return (
