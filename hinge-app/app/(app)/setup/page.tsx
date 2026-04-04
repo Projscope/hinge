@@ -1,17 +1,55 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import GoalInput from '@/components/setup/GoalInput'
 import Button from '@/components/ui/Button'
+import { AREA_TAGS } from '@/lib/types'
+import type { AreaTag } from '@/lib/types'
+import { loadQueue, removeFromQueue } from '@/lib/goalQueue'
+import type { QueueItem } from '@/lib/goalQueue'
+import { getWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
+
 function todayDate(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
+const AREA_COLORS: Record<AreaTag, string> = {
+  work: '#c8922a',
+  home: '#3b9fd4',
+  family: '#7c6df5',
+  health: '#2ab87e',
+  personal: '#888888',
+}
+
+const AREA_ORDER: AreaTag[] = ['work', 'home', 'family', 'health', 'personal']
+
+function getNeglectLabel(
+  area: AreaTag,
+  history: { date: string; areaTag?: AreaTag; completed?: boolean }[],
+  todayStr: string
+): { label: string; color: string } {
+  const withArea = history.filter((g) => g.areaTag === area)
+  if (withArea.length === 0) {
+    return { label: 'Never', color: '#c8922a' }
+  }
+  const latest = withArea[0].date
+  if (latest === todayStr) {
+    return { label: 'Active', color: '#2ab87e' }
+  }
+  // days since last
+  const now = new Date(todayStr)
+  const last = new Date(latest)
+  const diff = Math.round((now.getTime() - last.getTime()) / 86_400_000)
+  if (diff === 1) return { label: 'Yesterday', color: 'rgba(245,242,234,0.5)' }
+  if (diff <= 5) return { label: `${diff}d ago`, color: '#c8922a' }
+  return { label: `${diff}d ago`, color: '#e05a5a' }
+}
+
 export default function SetupPage() {
   const router = useRouter()
-  const { setTodayGoal, today, hydrated } = useAppStore()
+  const { setTodayGoal, today, hydrated, history } = useAppStore()
   const now = new Date()
   const greeting = now.getHours() < 12 ? 'Good morning' : now.getHours() < 18 ? 'Good afternoon' : 'Good evening'
 
@@ -20,14 +58,48 @@ export default function SetupPage() {
   const [task2, setTask2] = useState('')
   const [endTime, setEndTime] = useState('18:00')
 
+  // Area selection
+  const [selectedArea, setSelectedArea] = useState<AreaTag | null>(null)
+  const [areaExpanded, setAreaExpanded] = useState(true)
+  const [queueItems, setQueueItems] = useState<QueueItem[]>([])
+  const [selectedQueueItemId, setSelectedQueueItemId] = useState<string | null>(null)
+
+  // Weekly anchor
+  const [weeklyAnchorText, setWeeklyAnchorText] = useState<string | null>(null)
+
+  useEffect(() => {
+    const anchor = getWeeklyAnchor()
+    if (anchor && anchor.weekStart === getCurrentWeekStart()) {
+      setWeeklyAnchorText(anchor.text)
+    }
+  }, [])
+
   const canProceed = mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
   const goalAlreadySet = hydrated && today?.date === todayDate()
+  const todayStr = todayDate()
+
+  function handleAreaSelect(area: AreaTag) {
+    setSelectedArea(area)
+    setAreaExpanded(false)
+    const items = loadQueue().filter((item) => item.areaTag === area)
+    setQueueItems(items)
+  }
+
+  function handleQueueItemClick(item: QueueItem) {
+    setMainGoal(item.text)
+    setSelectedQueueItemId(item.id)
+  }
 
   function handleStart() {
     if (!canProceed) return
+    // Remove the selected queue item if one was used
+    if (selectedQueueItemId) {
+      removeFromQueue(selectedQueueItemId)
+    }
     setTodayGoal({
-      date: todayDate(),
+      date: todayStr,
       mainGoal: mainGoal.trim(),
+      areaTag: selectedArea ?? undefined,
       task1Text: task1.trim(),
       task1Done: false,
       task2Text: task2.trim(),
@@ -79,6 +151,11 @@ export default function SetupPage() {
           <p className="text-[12px] text-ink-3 mt-0.5">
             60 seconds. Sets the tone for everything.
           </p>
+          {weeklyAnchorText && (
+            <p className="text-[11px] mt-1.5" style={{ color: '#c8922a' }}>
+              This week: {weeklyAnchorText}
+            </p>
+          )}
         </div>
         <span className="inline-flex items-center gap-1.5 bg-[rgba(200,146,42,0.12)] text-gold text-[11px] font-medium px-[11px] py-1 rounded-full border border-[rgba(200,146,42,0.18)] mt-1">
           🌅 {now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
@@ -86,6 +163,183 @@ export default function SetupPage() {
       </div>
 
       <div className="px-8 pb-8 max-w-[620px]">
+
+        {/* Area selection */}
+        {!areaExpanded && selectedArea ? (
+          // Collapsed area pill
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: `${AREA_COLORS[selectedArea]}18`,
+                border: `1px solid ${AREA_COLORS[selectedArea]}35`,
+                borderRadius: '20px',
+                padding: '5px 12px',
+                fontSize: '12px',
+                color: AREA_COLORS[selectedArea],
+                fontWeight: 500,
+              }}
+            >
+              <span>{AREA_TAGS[selectedArea].icon}</span>
+              <span>{AREA_TAGS[selectedArea].label}</span>
+            </span>
+            <button
+              onClick={() => setAreaExpanded(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontSize: '11px',
+                color: 'rgba(245,242,234,0.4)',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              change
+            </button>
+          </div>
+        ) : (
+          // Expanded area grid
+          <div style={{ marginBottom: '20px' }}>
+            <p
+              style={{
+                fontSize: '10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                color: 'rgba(245,242,234,0.35)',
+                marginBottom: '10px',
+                fontWeight: 500,
+              }}
+            >
+              Area (optional)
+            </p>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '8px',
+                marginBottom: queueItems.length > 0 ? '12px' : '0',
+              }}
+            >
+              {AREA_ORDER.map((area) => {
+                const { label, icon } = AREA_TAGS[area]
+                const color = AREA_COLORS[area]
+                const neglect = getNeglectLabel(area, history, todayStr)
+                const isSelected = selectedArea === area
+
+                return (
+                  <button
+                    key={area}
+                    onClick={() => handleAreaSelect(area)}
+                    style={{
+                      background: isSelected ? `${color}18` : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${isSelected ? color + '50' : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: '12px',
+                      padding: '12px 8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <span style={{ fontSize: '20px', lineHeight: 1 }}>{icon}</span>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: isSelected ? color : '#f5f2ea',
+                      }}
+                    >
+                      {label}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '9px',
+                        color: neglect.color,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {neglect.label}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Queued goals for selected area */}
+            {selectedArea && queueItems.length > 0 && (
+              <div style={{ marginTop: '10px' }}>
+                <p
+                  style={{
+                    fontSize: '10px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    color: 'rgba(245,242,234,0.35)',
+                    marginBottom: '6px',
+                    fontWeight: 500,
+                  }}
+                >
+                  From your queue — tap to use
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {queueItems.map((item) => {
+                    const isActive = selectedQueueItemId === item.id
+                    const color = AREA_COLORS[selectedArea]
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleQueueItemClick(item)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          background: isActive ? `${color}12` : 'rgba(255,255,255,0.03)',
+                          border: `1px solid ${isActive ? color + '40' : 'rgba(255,255,255,0.07)'}`,
+                          borderRadius: '9px',
+                          padding: '9px 13px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: isActive ? color : 'rgba(245,242,234,0.2)',
+                            flexShrink: 0,
+                            transition: 'background 0.15s',
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: isActive ? '#f5f2ea' : 'rgba(245,242,234,0.6)',
+                          }}
+                        >
+                          {item.text}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="w-[2px] h-[2px] mb-1" />
 
         {/* Step 1 */}
         <StepRow

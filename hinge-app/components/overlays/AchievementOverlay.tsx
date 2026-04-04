@@ -4,14 +4,7 @@ import { useState, useEffect } from 'react'
 import type { DailyGoal } from '@/lib/types'
 import { FOCUS_RANKS } from '@/lib/types'
 import { requestNotificationPermission, getNotificationPrefs, saveNotificationPrefs } from '@/lib/notifications'
-
-interface GoalQueueItem {
-  id: string
-  text: string
-  createdAt: string
-}
-
-const GOAL_QUEUE_KEY = 'hinge_goal_queue'
+import { addToQueue } from '@/lib/goalQueue'
 
 const MILESTONES: Record<number, { icon: string; message: string }> = {
   3:   { icon: '🌱', message: 'First streak — the habit is starting' },
@@ -35,24 +28,6 @@ function computeRank(history: DailyGoal[]) {
     if (rate >= FOCUS_RANKS[i].min) return FOCUS_RANKS[i]
   }
   return FOCUS_RANKS[0]
-}
-
-function saveGoalQueue(items: GoalQueueItem[]): void {
-  try {
-    localStorage.setItem(GOAL_QUEUE_KEY, JSON.stringify(items))
-  } catch {
-    // ignore
-  }
-}
-
-function loadGoalQueue(): GoalQueueItem[] {
-  try {
-    const raw = localStorage.getItem(GOAL_QUEUE_KEY)
-    if (!raw) return []
-    return JSON.parse(raw) as GoalQueueItem[]
-  } catch {
-    return []
-  }
 }
 
 interface Props {
@@ -91,13 +66,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
   function handleQueueSubmit() {
     const text = queueText.trim()
     if (!text) return
-    const existing = loadGoalQueue()
-    const newItem: GoalQueueItem = {
-      id: `queue-${Date.now()}`,
-      text,
-      createdAt: new Date().toISOString(),
-    }
-    saveGoalQueue([...existing, newItem])
+    addToQueue(text, goal.areaTag ?? 'work')
     setQueueText('')
     setQueued(true)
   }

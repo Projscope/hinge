@@ -4,11 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
-  { href: '/today', icon: '⚡', label: 'Today' },
-  { href: '/setup', icon: '🌅', label: 'Setup' },
-  { href: '/snapshot', icon: '📊', label: 'Snapshot' },
-  { href: '/history', icon: '📅', label: 'History' },
-  { href: '/insights', icon: '📈', label: 'Insights' },
+  { href: '/today', icon: '◎', label: 'Today' },
+  { href: '/setup', icon: '⊕', label: 'Setup' },
+  { href: '/queue', icon: '☰', label: 'Queue' },
+  { href: '/snapshot', icon: '◈', label: 'Snapshot' },
   { href: '/settings', icon: '⚙', label: 'Settings' },
 ]
 

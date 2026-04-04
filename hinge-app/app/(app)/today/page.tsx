@@ -6,6 +6,7 @@ import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
 import OverflowLog from '@/components/today/OverflowLog'
 import StreakAtRisk from '@/components/today/StreakAtRisk'
+import WeeklyAnchorBanner from '@/components/today/WeeklyAnchorBanner'
 import Pill from '@/components/ui/Pill'
 import Button from '@/components/ui/Button'
 import SectionTitle from '@/components/ui/SectionTitle'
@@ -70,6 +71,9 @@ export default function TodayPage() {
       </div>
 
       <div className="px-8 pb-8">
+        {/* Weekly anchor */}
+        <WeeklyAnchorBanner />
+
         {/* Streak at risk banner */}
         <StreakAtRisk today={today} />
 
