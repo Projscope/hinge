@@ -27,43 +27,46 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // Keep public snapshot in sync whenever streaks or history change
   useEffect(() => {
     if (!hydrated) return
-    const profile = getPublicProfile()
-    if (!profile) return
+    async function sync() {
+      const profile = await getPublicProfile()
+      if (!profile) return
 
-    const recent30 = history.slice(0, 30)
-    const rate = calcHitRate(recent30)
+      const recent30 = history.slice(0, 30)
+      const rate = calcHitRate(recent30)
 
-    // Compute rank
-    let rank: typeof FOCUS_RANKS[number] = FOCUS_RANKS[0]
-    for (let i = FOCUS_RANKS.length - 1; i >= 0; i--) {
-      if (rate >= FOCUS_RANKS[i].min) {
-        rank = FOCUS_RANKS[i]
-        break
+      // Compute rank
+      let rank: typeof FOCUS_RANKS[number] = FOCUS_RANKS[0]
+      for (let i = FOCUS_RANKS.length - 1; i >= 0; i--) {
+        if (rate >= FOCUS_RANKS[i].min) {
+          rank = FOCUS_RANKS[i]
+          break
+        }
       }
+
+      // Build last14 array
+      const today14 = new Date().toISOString().slice(0, 10)
+      const last14 = Array.from({ length: 14 }, (_, idx): 'hit' | 'miss' | 'none' => {
+        const d = new Date(today14)
+        d.setDate(d.getDate() - idx)
+        const dateStr = d.toISOString().slice(0, 10)
+        const entry = history.find((g) => g.date === dateStr)
+        if (!entry) return 'none'
+        return entry.completed ? 'hit' : 'miss'
+      })
+
+      updatePublicSnapshot({
+        streakCurrent: streaks.current,
+        streakPersonalBest: streaks.personalBest,
+        hitRate30: rate,
+        rankLabel: rank.label,
+        rankIcon: rank.icon,
+        last14,
+        displayName: profile.displayName,
+        username: profile.username,
+        updatedAt: new Date().toISOString(),
+      })
     }
-
-    // Build last14 array
-    const today14 = new Date().toISOString().slice(0, 10)
-    const last14 = Array.from({ length: 14 }, (_, idx): 'hit' | 'miss' | 'none' => {
-      const d = new Date(today14)
-      d.setDate(d.getDate() - idx)
-      const dateStr = d.toISOString().slice(0, 10)
-      const entry = history.find((g) => g.date === dateStr)
-      if (!entry) return 'none'
-      return entry.completed ? 'hit' : 'miss'
-    })
-
-    updatePublicSnapshot({
-      streakCurrent: streaks.current,
-      streakPersonalBest: streaks.personalBest,
-      hitRate30: rate,
-      rankLabel: rank.label,
-      rankIcon: rank.icon,
-      last14,
-      displayName: profile.displayName,
-      username: profile.username,
-      updatedAt: new Date().toISOString(),
-    })
+    sync()
   }, [streaks, history, hydrated])
 
   if (!hydrated) {

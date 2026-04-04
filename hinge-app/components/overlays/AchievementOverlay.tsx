@@ -65,11 +65,12 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
     }
 
     // Load public profile data
-    const profile = getPublicProfile()
-    if (profile) {
-      setPublicProfileUsername(profile.username)
-      setProfileIsPublic(profile.isPublic)
-    }
+    getPublicProfile().then((profile) => {
+      if (profile) {
+        setPublicProfileUsername(profile.username)
+        setProfileIsPublic(profile.isPublic)
+      }
+    })
 
     return () => cancelAnimationFrame(raf)
   }, [])

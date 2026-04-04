@@ -1,4 +1,4 @@
-const KEY = 'hinge_public_profile'
+import { createClient } from '@/lib/supabase/client'
 
 export interface PublicProfile {
   username: string
@@ -7,47 +7,55 @@ export interface PublicProfile {
   createdAt: string
 }
 
-export function getPublicProfile(): PublicProfile | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(KEY)
-    if (!raw) return null
-    return JSON.parse(raw) as PublicProfile
-  } catch {
-    return null
-  }
-}
-
-export function setPublicProfile(username: string, displayName: string): PublicProfile {
-  const existing = getPublicProfile()
-  const profile: PublicProfile = {
-    username: username.trim().toLowerCase(),
-    displayName: displayName.trim(),
-    isPublic: existing?.isPublic ?? true,
-    createdAt: existing?.createdAt ?? new Date().toISOString(),
-  }
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(KEY, JSON.stringify(profile))
-  }
-  return profile
-}
-
-export function updatePublicProfileVisibility(isPublic: boolean): void {
-  if (typeof window === 'undefined') return
-  const existing = getPublicProfile()
-  if (!existing) return
-  localStorage.setItem(KEY, JSON.stringify({ ...existing, isPublic }))
-}
-
 export function validateUsername(username: string): { valid: boolean; error?: string } {
-  if (username.length < 3) {
-    return { valid: false, error: 'Username must be at least 3 characters' }
-  }
-  if (username.length > 20) {
-    return { valid: false, error: 'Username must be 20 characters or fewer' }
-  }
-  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-    return { valid: false, error: 'Only letters, numbers, and underscores allowed' }
-  }
+  if (username.length < 3) return { valid: false, error: 'Username must be at least 3 characters' }
+  if (username.length > 20) return { valid: false, error: 'Username must be 20 characters or fewer' }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) return { valid: false, error: 'Only letters, numbers, and underscores allowed' }
   return { valid: true }
+}
+
+export async function getPublicProfile(): Promise<PublicProfile | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data } = await supabase
+    .from('public_profiles')
+    .select('username, display_name, is_public, created_at')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!data) return null
+  return {
+    username: data.username as string,
+    displayName: data.display_name as string,
+    isPublic: data.is_public as boolean,
+    createdAt: data.created_at as string,
+  }
+}
+
+export async function savePublicProfile(
+  username: string,
+  displayName: string,
+  isPublic: boolean
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('public_profiles')
+    .upsert({
+      user_id: user.id,
+      username: username.trim().toLowerCase(),
+      display_name: displayName.trim(),
+      is_public: isPublic,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' })
+
+  if (error) {
+    if (error.code === '23505') return { success: false, error: 'Username already taken' }
+    return { success: false, error: error.message }
+  }
+  return { success: true }
 }
