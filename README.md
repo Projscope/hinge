@@ -24,7 +24,7 @@ Hin.ge is a daily focus app built around a single constraint: one main goal, two
 - **Styling:** Tailwind CSS v3 with a custom dark palette
 - **Backend:** Supabase (Postgres, Auth, RLS)
 - **Auth:** Magic link (email OTP) via Supabase Auth
-- **Storage:** Supabase for auth/profile · localStorage for queue, streaks, settings
+- **Storage:** Supabase for auth/goals/queue/public profiles · localStorage for settings/anchors
 - **Fonts:** DM Serif Display, DM Sans, DM Mono (Google Fonts)
 - **Notifications:** Web Push API + Service Worker (public/sw.js)
 
@@ -35,9 +35,11 @@ Hin.ge is a daily focus app built around a single constraint: one main goal, two
 ### 1. Supabase project
 
 1. Create a project at [supabase.com](https://supabase.com)
-2. Run migrations via the migration runner (see below) or paste both files into the **SQL Editor** manually:
+2. Run migrations via the migration runner (see below) or paste all files into the **SQL Editor** in order:
    - `supabase/migrations/001_initial_schema.sql`
    - `supabase/migrations/002_end_day_function.sql`
+   - `supabase/migrations/003_goal_queue.sql`
+   - `supabase/migrations/004_public_profiles.sql`
 3. In **Authentication > URL Configuration**, add your production URL to the redirect allow-list (e.g. `https://your-app.netlify.app/**`) — magic links redirect there, not localhost
 
 ### 2. Environment variables
@@ -91,7 +93,8 @@ hinge-app/
   app/
     page.tsx                        # Landing page
     checkin/page.tsx                # Mid-day check-in (public — linked from notification)
-    u/[username]/page.tsx           # Public streak page at /u/yourname
+    leaderboard/page.tsx            # Public streak leaderboard at /leaderboard
+    u/[username]/page.tsx           # Public achievements page at /u/yourname
     (app)/
       layout.tsx                    # Server wrapper (force-dynamic)
       today/page.tsx                # Main daily view — goal + tasks + overflow log
@@ -131,12 +134,12 @@ hinge-app/
     store.ts                        # App state — Supabase-backed Zustand store
     types.ts                        # Shared types, FOCUS_RANKS, AREA_TAGS
     goalQuality.ts                  # Goal quality scoring (0–100)
-    goalQueue.ts                    # Queue CRUD — localStorage, tagged by area
+    goalQueue.ts                    # Queue CRUD — Supabase-backed, tagged by area
     weeklyAnchor.ts                 # Weekly focus phrase — resets each Monday
     notifications.ts                # Web Push prefs, scheduleNotifications, initNotifications
     accountability.ts               # Accountability partner — get/set/remove
-    publicProfile.ts                # Username/displayName/isPublic — get/set/validate
-    publicSnapshot.ts               # Public streak snapshot — get/update
+    publicProfile.ts                # Username/displayName/isPublic — Supabase-backed, async
+    publicSnapshot.ts               # Public streak snapshot — get/update (localStorage cache)
     supabase/
       client.ts                     # Browser Supabase client
       server.ts                     # Server Supabase client (cookie-based session)
@@ -146,6 +149,8 @@ supabase/
   migrations/
     001_initial_schema.sql          # Tables, RLS policies, auto-create profile trigger
     002_end_day_function.sql        # Atomic end_day RPC (goal verdict + streak in one tx)
+    003_goal_queue.sql              # goal_queue table — Supabase-backed queue per user
+    004_public_profiles.sql         # public_profiles table + public RLS on goals/streaks
 scripts/
   migrate.mjs                       # Migration runner (uses SUPABASE_ACCESS_TOKEN)
 ```
@@ -164,6 +169,8 @@ scripts/
 | History | `/history` | 16-week heatmap + personal records |
 | Insights | `/insights` | Pattern callouts, day-of-week chart, focus rank |
 | Settings | `/settings` | Notifications, accountability partner, public profile |
+| Achievements | `/u/[username]` | Public page — stats, heatmap, milestones, goals by area |
+| Leaderboard | `/leaderboard` | Top streaks across all public profiles |
 
 ---
 
@@ -178,7 +185,7 @@ scripts/
 | Weekly anchor | ✓ | ✓ |
 | Win / miss verdict | ✓ | ✓ |
 | Smart notifications | ✓ | ✓ |
-| Public streak page | ✓ | ✓ |
+| Public achievements page + leaderboard | ✓ | ✓ |
 | Full history + heatmap | — | ✓ |
 | Pattern insights | — | ✓ |
 | Milestone share cards | — | ✓ |
@@ -243,7 +250,12 @@ Hit rate is calculated over your last 30 days.
 - [x] Public streak page — `/u/[username]` with streak, rank, 14-day heatmap, join CTA
 - [x] Accountability partner — email form, partner card, "Email delivery coming soon" badge
 - [x] App shell — sidebar (desktop), right stats panel (desktop), bottom tab nav (mobile)
-- [x] State persistence — Supabase for auth/goals, localStorage for queue/settings/streaks
+- [x] Goal queue stored in Supabase — syncs across devices (migration 003)
+- [x] Public profiles in Supabase — username lookup, RLS for public reads (migration 004)
+- [x] Public achievements page — `/u/[username]` with stats, heatmap, milestones, goals by area
+- [x] Leaderboard — `/leaderboard` ranked by current streak, top 50 public profiles
+- [x] Custom Supabase email templates — magic link + password reset (dark-themed HTML)
+- [x] State persistence — Supabase for auth/goals/queue/public profiles
 - [x] Supabase backend — Postgres schema, RLS, magic-link auth, session middleware
 - [x] `end_day` atomic RPC — streak + goal verdict in a single DB transaction
 - [x] Netlify deploy — @netlify/plugin-nextjs, env vars via Netlify API
