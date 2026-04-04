@@ -1,12 +1,14 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
 import OverflowLog from '@/components/today/OverflowLog'
 import StreakAtRisk from '@/components/today/StreakAtRisk'
 import WeeklyAnchorBanner from '@/components/today/WeeklyAnchorBanner'
+import ComebackBanner from '@/components/overlays/ComebackBanner'
 import Pill from '@/components/ui/Pill'
 import Button from '@/components/ui/Button'
 import SectionTitle from '@/components/ui/SectionTitle'
@@ -29,7 +31,8 @@ function timeLeft(endTime: string): string {
 
 export default function TodayPage() {
   const router = useRouter()
-  const { today, todayOverflow, toggleTask, addOverflow, hydrated } = useAppStore()
+  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks } = useAppStore()
+  const [showComeback, setShowComeback] = useState(true)
 
   if (!hydrated) return null
 
@@ -106,6 +109,15 @@ export default function TodayPage() {
         {/* Overflow log */}
         <OverflowLog items={todayOverflow} onAdd={addOverflow} disabled={today.completed} />
       </div>
+
+      {/* Comeback banner — shown when returning after a streak break */}
+      {showComeback && (
+        <ComebackBanner
+          history={history}
+          streaks={streaks}
+          onDismiss={() => setShowComeback(false)}
+        />
+      )}
     </div>
   )
 }

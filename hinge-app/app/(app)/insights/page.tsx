@@ -7,6 +7,7 @@ import Pill from '@/components/ui/Pill'
 import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
 import { FOCUS_RANKS } from '@/lib/types'
+import PatternCallouts from '@/components/insights/PatternCallouts'
 
 // Mon=0 … Sun=6 (display order)
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -39,7 +40,7 @@ function bestAndWorstDays(bars: { label: string; pct: number; count: number }[])
 }
 
 export default function InsightsPage() {
-  const { history, plan, hydrated } = useAppStore()
+  const { history, plan, hydrated, streaks } = useAppStore()
 
   if (!hydrated) return null
 
@@ -113,6 +114,9 @@ export default function InsightsPage() {
       )}
 
       <div className="px-8 pb-8">
+        {/* Pattern callouts */}
+        <PatternCallouts history={history} streaks={streaks} />
+
         {/* Rank hero */}
         <Card gold className="px-6 py-5 mb-4 relative overflow-hidden">
           <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-[radial-gradient(circle,rgba(200,146,42,0.08),transparent_70%)] pointer-events-none" />

@@ -4,6 +4,8 @@ import { useAppStore } from '@/lib/store'
 import Pill from '@/components/ui/Pill'
 import SectionTitle from '@/components/ui/SectionTitle'
 import Button from '@/components/ui/Button'
+import ContributionHeatmap from '@/components/history/ContributionHeatmap'
+import PersonalRecords from '@/components/history/PersonalRecords'
 
 // Free users see all history; paywall applies only to Pro-exclusive features
 const PAYWALL_THRESHOLD = Infinity
@@ -17,7 +19,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function HistoryPage() {
-  const { history, today, plan, hydrated } = useAppStore()
+  const { history, today, plan, hydrated, streaks } = useAppStore()
 
   if (!hydrated) return null
 
@@ -39,6 +41,18 @@ export default function HistoryPage() {
       </div>
 
       <div className="px-8 pb-8">
+        {/* Activity heatmap */}
+        <section className="mb-5">
+          <SectionTitle>Activity</SectionTitle>
+          <ContributionHeatmap history={history} today={today} />
+        </section>
+
+        {/* Personal records */}
+        <section className="mb-5">
+          <SectionTitle>Personal records</SectionTitle>
+          <PersonalRecords history={history} streaks={streaks} />
+        </section>
+
         {recentGoals.length === 0 && (
           <p className="text-ink-3 text-[14px]">No goals yet. Start your first morning setup.</p>
         )}
