@@ -236,8 +236,8 @@ export default function PublicProfileSection() {
           <p style={{ fontSize: '12px', color: '#2ab87e', marginTop: '10px' }}>✓ Profile saved</p>
         )}
 
-        {/* Shareable URL */}
-        {profile && isPublic && username && (
+        {/* Shareable URL — shown as soon as username is entered */}
+        {isPublic && username && (
           <div
             style={{
               marginTop: '16px',
@@ -245,39 +245,64 @@ export default function PublicProfileSection() {
               border: '1px solid rgba(200,146,42,0.2)',
               borderRadius: '10px',
               padding: '12px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '10px',
             }}
           >
-            <span
-              style={{
-                fontSize: '13px',
-                color: '#c8922a',
-                fontFamily: 'monospace',
-                wordBreak: 'break-all',
-              }}
-            >
-              {shareUrl}
-            </span>
-            <button
-              onClick={handleCopy}
-              style={{
-                background: copied ? 'rgba(42,184,126,0.15)' : 'rgba(200,146,42,0.15)',
-                color: copied ? '#2ab87e' : '#c8922a',
-                border: `1px solid ${copied ? 'rgba(42,184,126,0.3)' : 'rgba(200,146,42,0.3)'}`,
-                borderRadius: '7px',
-                padding: '5px 10px',
-                fontSize: '12px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                flexShrink: 0,
-                transition: 'all 0.15s',
-              }}
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
+            <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(245,242,234,0.3)', marginBottom: '8px', fontWeight: 500 }}>
+              Your public streak page
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+              <a
+                href={`/u/${username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontSize: '13px',
+                  color: '#c8922a',
+                  fontFamily: 'monospace',
+                  wordBreak: 'break-all',
+                  textDecoration: 'none',
+                  flex: 1,
+                }}
+              >
+                hin.ge/u/{username}
+              </a>
+              <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                <a
+                  href={`/u/${username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    background: 'rgba(200,146,42,0.15)',
+                    color: '#c8922a',
+                    border: '1px solid rgba(200,146,42,0.3)',
+                    borderRadius: '7px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                  }}
+                >
+                  Open ↗
+                </a>
+                <button
+                  onClick={handleCopy}
+                  style={{
+                    background: copied ? 'rgba(42,184,126,0.15)' : 'rgba(200,146,42,0.15)',
+                    color: copied ? '#2ab87e' : '#c8922a',
+                    border: `1px solid ${copied ? 'rgba(42,184,126,0.3)' : 'rgba(200,146,42,0.3)'}`,
+                    borderRadius: '7px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
