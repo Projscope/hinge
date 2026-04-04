@@ -36,7 +36,17 @@
       "Bash(supabase login:*)",
       "Bash(curl -s -X POST \"https://api.supabase.com/v1/projects/jbqikgiajvumqlhpipce/database/query\" -H \"Authorization: Bearer sbp_v0_aa13f5a2b23777a2171221cbeb79b468d8648450\" -H \"Content-Type: application/json\" -d '{\"\"query\"\": \"\"SELECT 1\"\"}')",
       "Bash(node -e \":*)",
-      "Bash(curl -s -X POST \"https://api.supabase.com/v1/projects/jbqikgiajvumqlhpipce/database/query\" -H \"Authorization: Bearer sbp_v0_aa13f5a2b23777a2171221cbeb79b468d8648450\" -H \"Content-Type: application/json\" --data-binary @/tmp/migration2.json)"
+      "Bash(curl -s -X POST \"https://api.supabase.com/v1/projects/jbqikgiajvumqlhpipce/database/query\" -H \"Authorization: Bearer sbp_v0_aa13f5a2b23777a2171221cbeb79b468d8648450\" -H \"Content-Type: application/json\" --data-binary @/tmp/migration2.json)",
+      "Bash(npm run:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cat -n /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/setup/page.tsx)",
+      "Bash(ls /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/)",
+      "Bash(ls /c/Development/Tests/hinge/hinge-app/lib/goalQueue.ts /c/Development/Tests/hinge/hinge-app/lib/weeklyAnchor.ts /c/Development/Tests/hinge/hinge-app/components/today/WeeklyAnchorBanner.tsx /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/queue/page.tsx)",
+      "Bash(npx tsc:*)",
+      "Bash(cat -n /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/history/page.tsx)",
+      "Bash(cat -n /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/insights/page.tsx)"
     ]
   }
 }
