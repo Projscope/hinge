@@ -12,12 +12,14 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { href: '/today', icon: '⚡', label: 'Today', group: 'Daily' },
-  { href: '/setup', icon: '🌅', label: 'Morning setup', group: 'Daily' },
-  { href: '/snapshot', icon: '📊', label: 'Snapshot', group: 'Daily' },
-  { href: '/history', icon: '📅', label: 'History', group: 'Progress' },
-  { href: '/insights', icon: '📈', label: 'Insights', group: 'Progress' },
-  { href: '/milestones', icon: '🏅', label: 'Milestones', group: 'Progress' },
+  { href: '/today',     icon: '⚡', label: 'Today',          group: 'Daily' },
+  { href: '/setup',     icon: '🌅', label: 'Morning setup',  group: 'Daily' },
+  { href: '/snapshot',  icon: '📊', label: 'Snapshot',       group: 'Daily' },
+  { href: '/queue',     icon: '☰',  label: 'Goal queue',     group: 'Daily' },
+  { href: '/history',   icon: '📅', label: 'History',        group: 'Progress' },
+  { href: '/insights',  icon: '📈', label: 'Insights',       group: 'Progress' },
+  { href: '/milestones',icon: '🏅', label: 'Milestones',     group: 'Progress' },
+  { href: '/settings',  icon: '⚙',  label: 'Settings',       group: 'Progress' },
 ]
 
 function getRank(hitRate: number) {
