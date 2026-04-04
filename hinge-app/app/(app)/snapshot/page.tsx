@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card'
 import Toast from '@/components/ui/Toast'
 import AchievementOverlay from '@/components/overlays/AchievementOverlay'
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 
 export default function SnapshotPage() {
   const router = useRouter()
@@ -122,6 +123,13 @@ export default function SnapshotPage() {
         <p className="text-center text-[12px] text-ink-3 leading-[1.8] mt-5">
           Resets at midnight · Tomorrow is a blank slate<br />
           <span className="text-[11px] text-ink-4">Set your goal in the morning — not tonight.</span>
+        </p>
+
+        <p className="text-center text-[12px] text-ink-3 mt-4">
+          See how you stack up →{' '}
+          <Link href="/leaderboard" className="text-gold underline-offset-2 hover:underline">
+            View leaderboard
+          </Link>
         </p>
       </div>
 

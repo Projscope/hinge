@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
@@ -103,6 +104,15 @@ export default function TodayPage() {
         {today.completed && (
           <p className="text-[12px] text-ink-3 text-center mt-1 mb-2">
             Day closed · come back tomorrow for a fresh start
+          </p>
+        )}
+
+        {today.completed && (
+          <p className="text-center text-[12px] text-ink-3 mt-3">
+            See how you stack up →{' '}
+            <Link href="/leaderboard" className="text-gold underline-offset-2 hover:underline">
+              View leaderboard
+            </Link>
           </p>
         )}
 
