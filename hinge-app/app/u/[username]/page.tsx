@@ -80,7 +80,7 @@ function DotRow({ goals }: { goals: DailyGoalRow[] }) {
   )
 }
 
-export default function PublicProfilePage({ params }: { params: { username: string } }) {
+export default function PublicProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const [data, setData] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
@@ -88,7 +88,8 @@ export default function PublicProfilePage({ params }: { params: { username: stri
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const username = params.username.toLowerCase()
+      const { username: rawUsername } = await params
+      const username = rawUsername.toLowerCase()
 
       // 1. Look up public profile
       const { data: profileRow } = await supabase
@@ -124,7 +125,7 @@ export default function PublicProfilePage({ params }: { params: { username: stri
       setLoading(false)
     }
     load()
-  }, [params.username])
+  }, [params])
 
   if (loading) {
     return (
