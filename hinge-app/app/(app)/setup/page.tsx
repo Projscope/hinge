@@ -166,45 +166,109 @@ export default function SetupPage() {
 
         {/* Area selection */}
         {!areaExpanded && selectedArea ? (
-          // Collapsed area pill
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              marginBottom: '20px',
-            }}
-          >
-            <span
+          // Collapsed area pill + queue items
+          <div style={{ marginBottom: '20px' }}>
+            <div
               style={{
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                background: `${AREA_COLORS[selectedArea]}18`,
-                border: `1px solid ${AREA_COLORS[selectedArea]}35`,
-                borderRadius: '20px',
-                padding: '5px 12px',
-                fontSize: '12px',
-                color: AREA_COLORS[selectedArea],
-                fontWeight: 500,
+                gap: '10px',
+                marginBottom: queueItems.length > 0 ? '12px' : '0',
               }}
             >
-              <span>{AREA_TAGS[selectedArea].icon}</span>
-              <span>{AREA_TAGS[selectedArea].label}</span>
-            </span>
-            <button
-              onClick={() => setAreaExpanded(true)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                fontSize: '11px',
-                color: 'rgba(245,242,234,0.4)',
-                cursor: 'pointer',
-                padding: 0,
-              }}
-            >
-              change
-            </button>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: `${AREA_COLORS[selectedArea]}18`,
+                  border: `1px solid ${AREA_COLORS[selectedArea]}35`,
+                  borderRadius: '20px',
+                  padding: '5px 12px',
+                  fontSize: '12px',
+                  color: AREA_COLORS[selectedArea],
+                  fontWeight: 500,
+                }}
+              >
+                <span>{AREA_TAGS[selectedArea].icon}</span>
+                <span>{AREA_TAGS[selectedArea].label}</span>
+              </span>
+              <button
+                onClick={() => setAreaExpanded(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '11px',
+                  color: 'rgba(245,242,234,0.4)',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                change
+              </button>
+            </div>
+
+            {/* Queue items for selected area */}
+            {queueItems.length > 0 && (
+              <div>
+                <p
+                  style={{
+                    fontSize: '10px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    color: 'rgba(245,242,234,0.35)',
+                    marginBottom: '6px',
+                    fontWeight: 500,
+                  }}
+                >
+                  From your queue — tap to use
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {queueItems.map((item) => {
+                    const isActive = selectedQueueItemId === item.id
+                    const color = AREA_COLORS[selectedArea]
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleQueueItemClick(item)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          background: isActive ? `${color}12` : 'rgba(255,255,255,0.03)',
+                          border: `1px solid ${isActive ? color + '40' : 'rgba(255,255,255,0.07)'}`,
+                          borderRadius: '9px',
+                          padding: '9px 13px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                          width: '100%',
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            background: isActive ? color : 'rgba(245,242,234,0.2)',
+                            flexShrink: 0,
+                            transition: 'background 0.15s',
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: isActive ? '#f5f2ea' : 'rgba(245,242,234,0.6)',
+                          }}
+                        >
+                          {item.text}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           // Expanded area grid
