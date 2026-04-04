@@ -42,8 +42,8 @@ export default function LandingPage() {
             Start finishing <em className="italic text-gold">goals.</em>
           </h1>
           <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.65] max-w-[420px] mb-10">
-            One goal per day. Two support tasks that scaffold it. A hard 3-slot limit
-            the app refuses to break. The day hinges on one thing.
+            One goal per day. Two support tasks that scaffold it. A goal queue so
+            morning setup takes 10 seconds. The day hinges on one thing.
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <Link
@@ -74,7 +74,7 @@ export default function LandingPage() {
               {/* Screen header */}
               <div className="p-5 pb-4 border-b border-[var(--lk-border)]">
                 <p className="text-[11px] font-medium tracking-[0.08em] uppercase text-[var(--lk-faint)] mb-1">
-                  Monday, Mar 31
+                  Today · Work
                 </p>
                 <p className="font-serif text-[17px] text-[var(--lk-ink)] leading-tight">
                   Today&apos;s focus
@@ -125,58 +125,81 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Float cards — hidden on small screens to avoid overflow */}
+          {/* Float cards */}
           <div className="hidden sm:block absolute top-10 -right-14 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
-            <p className="font-serif text-[26px] text-[var(--lk-ink)] leading-none mb-0.5">8</p>
+            <p className="font-serif text-[26px] text-[var(--lk-ink)] leading-none mb-0.5">14</p>
             <p className="text-[10px] font-medium tracking-[0.06em] uppercase text-[var(--lk-faint)]">Day streak 🔥</p>
           </div>
           <div className="hidden sm:block absolute bottom-20 -left-16 bg-white rounded-[12px] px-3.5 py-2.5 shadow-[0_4px_20px_rgba(15,14,12,0.10)] border border-[var(--lk-border)]">
-            <p className="text-[10px] font-medium tracking-[0.07em] uppercase text-gold mb-1">Goal quality</p>
-            <div className="flex items-center gap-1.5 text-[11px] text-[var(--lk-muted)] mt-1">
-              <span>Specific</span>
-              <div className="h-[3px] w-12 bg-teal-light rounded-full overflow-hidden">
-                <div className="h-full w-[91%] bg-teal rounded-full" />
-              </div>
-              <span className="text-teal font-medium">91%</span>
+            <p className="text-[10px] font-medium tracking-[0.07em] uppercase text-gold mb-1.5">Queue · Work</p>
+            <div className="flex flex-col gap-1">
+              <p className="text-[11px] text-[var(--lk-muted)]">Write Q2 roadmap</p>
+              <p className="text-[11px] text-[var(--lk-faint)]">Refactor billing module</p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* FEATURE STRIP */}
+      <div className="border-y border-[var(--lk-border)] bg-white">
+        <div className="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4 text-center">
+          {[
+            { icon: '🎯', label: 'One goal per day' },
+            { icon: '☰', label: 'Goal queue' },
+            { icon: '🏷️', label: 'Life area tags' },
+            { icon: '🔥', label: 'Streak tracking' },
+            { icon: '📈', label: 'Pattern insights' },
+            { icon: '🔔', label: 'Smart reminders' },
+          ].map((f) => (
+            <div key={f.label} className="flex flex-col items-center gap-2">
+              <span className="text-[24px]">{f.icon}</span>
+              <span className="text-[12px] text-[var(--lk-muted)] font-medium leading-tight">{f.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* HOW IT WORKS */}
-      <section id="how-it-works" className="py-16 sm:py-20 px-6 sm:px-8 bg-white">
+      <section id="how-it-works" className="py-16 sm:py-20 px-6 sm:px-8 bg-[var(--lk-bg,#faf8f4)]">
         <div className="max-w-[1100px] mx-auto">
           <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
-            The 60-second ritual
+            The daily ritual
           </p>
           <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] text-center mb-4">
-            Three screens. One outcome.
+            Four moments. One outcome.
           </h2>
           <p className="text-[16px] font-light text-[var(--lk-muted)] text-center max-w-[540px] mx-auto mb-16 leading-[1.65]">
-            Morning setup takes 60 seconds. The rest of your day is just executing.
+            Morning setup takes 60 seconds — less if you pre-loaded your queue. The rest of the day is just executing.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-0.5 bg-[var(--lk-border)] rounded-[16px] overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0.5 bg-[var(--lk-border)] rounded-[16px] overflow-hidden">
             {[
               {
                 num: '01',
-                title: 'Morning setup',
-                sub: '60 seconds',
-                desc: 'Name the one thing that makes today a win. Add two tasks that directly scaffold it. The app scores your goal quality in real time.',
-                accent: 'text-gold',
+                title: 'Build your queue',
+                sub: 'Anytime',
+                desc: 'Add goals to your queue when ideas hit — tagged by life area (work, health, family…). Morning setup pulls directly from it.',
+                accent: 'text-[var(--lk-faint)]',
               },
               {
                 num: '02',
-                title: 'Active day',
-                sub: 'Full focus',
-                desc: 'Your goal stays front and center all day. Check off support tasks, log interruptions without guilt. One countdown. One outcome.',
-                accent: 'text-teal-bright',
+                title: 'Morning setup',
+                sub: '60 seconds',
+                desc: 'Pick from queue or type fresh. Add two scaffolding tasks. The app scores goal quality in real time and shows which areas you\'ve been neglecting.',
+                accent: 'text-gold',
               },
               {
                 num: '03',
-                title: 'End-of-day snapshot',
+                title: 'Active day',
+                sub: 'Full focus',
+                desc: 'Your goal stays front and center. Check off tasks, watch the countdown. A mid-day nudge keeps you honest. Streak at risk? You\'ll know.',
+                accent: 'text-teal-bright',
+              },
+              {
+                num: '04',
+                title: 'Close the day',
                 sub: 'Binary verdict',
-                desc: 'Hit or miss — no partial credit. Streak updates, share card unlocks. Resets at midnight. Tomorrow is a blank slate.',
+                desc: 'Hit or miss — no partial credit. Achievement overlay fires, streak updates, share card unlocks. Queue a next goal while the win is fresh.',
                 accent: 'text-[var(--lk-ink)]',
               },
             ].map((step) => (
@@ -187,6 +210,76 @@ export default function LandingPage() {
                   {step.sub}
                 </p>
                 <p className="text-[14px] text-[var(--lk-muted)] leading-[1.65]">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES DETAIL */}
+      <section className="py-16 sm:py-20 px-6 sm:px-8 bg-white">
+        <div className="max-w-[1100px] mx-auto">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
+            Built to keep you coming back
+          </p>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] text-center mb-16">
+            Everything the habit needs.
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: '☰',
+                title: 'Goal queue',
+                desc: 'Pre-load goals any time — tagged by life area. Morning setup becomes a one-tap pick, not a blank-page moment.',
+              },
+              {
+                icon: '🏷️',
+                title: 'Area balance',
+                desc: 'Work, home, family, health, personal. Each area shows when you last focused on it — so nothing important goes dark.',
+              },
+              {
+                icon: '🔥',
+                title: 'Streak + ranks',
+                desc: 'Current streak, personal best, 30-day hit rate. Climb from Drifting → Intentional → Focused → Sharp → Summit.',
+              },
+              {
+                icon: '📊',
+                title: 'Contribution heatmap',
+                desc: '16-week grid of hits and misses. Longest streak, best month, best area — all from real data, not demo numbers.',
+              },
+              {
+                icon: '📈',
+                title: 'Pattern insights',
+                desc: 'Which day of the week is your strongest? Which area gets neglected? What goal quality score predicts a win?',
+              },
+              {
+                icon: '🔔',
+                title: 'Smart notifications',
+                desc: 'Morning intention nudge, mid-day check-in with Yes / No actions, evening streak-at-risk alert. All configurable.',
+              },
+              {
+                icon: '🏅',
+                title: 'Milestones',
+                desc: 'Earned badges at 3, 7, 14, 30, 50, 100-day streaks. Achievement overlay fires when a goal is completed.',
+              },
+              {
+                icon: '🌐',
+                title: 'Public streak page',
+                desc: 'Share your streak and rank at hin.ge/u/yourname. Show the world your consistency without sharing the details.',
+              },
+              {
+                icon: '🤝',
+                title: 'Accountability partner',
+                desc: 'Add one person who gets notified when your streak is at risk. Social pressure, applied minimally.',
+              },
+            ].map((f) => (
+              <div key={f.title} className="flex gap-4">
+                <span className="text-[28px] flex-shrink-0 mt-0.5">{f.icon}</span>
+                <div>
+                  <h3 className="font-serif text-[18px] text-[var(--lk-ink)] mb-1.5">{f.title}</h3>
+                  <p className="text-[14px] text-[var(--lk-muted)] leading-[1.65]">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -237,21 +330,23 @@ export default function LandingPage() {
               <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
                 {[
                   'Full 3-screen daily loop',
-                  'Goal quality check',
-                  'Overflow log',
-                  'Current streak counter',
-                  '7-day week view',
+                  'Goal queue + area tags',
+                  'Goal quality scoring',
+                  'Current streak + personal best',
+                  'Weekly anchor',
                   'Win / miss verdict',
+                  'Smart notifications',
+                  'Public streak page',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <span className="text-teal mt-0.5">✓</span> {f}
                   </li>
                 ))}
                 {[
-                  'History beyond 7 days',
-                  'Personal best',
+                  'Full history + heatmap',
+                  'Pattern insights',
+                  'Milestone share cards',
                   'Streak freeze',
-                  'Share cards',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2 opacity-40 line-through">
                     <span className="mt-0.5">—</span> {f}
@@ -280,13 +375,13 @@ export default function LandingPage() {
               <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
                 {[
                   'Everything in Free',
-                  'Full history + heatmap',
-                  'Personal best revealed',
-                  '1 streak freeze per month',
+                  'Full history + 16-week heatmap',
                   'Pattern insights',
-                  'Milestone share cards',
-                  'Focus rank + quality score',
-                  'Smart notifications',
+                  'Focus rank + quality analytics',
+                  'Milestone badges + share cards',
+                  '1 streak freeze per month',
+                  'Accountability partner',
+                  'Priority support',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <span className="text-gold mt-0.5">✓</span> {f}
