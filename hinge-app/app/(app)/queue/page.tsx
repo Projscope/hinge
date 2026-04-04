@@ -62,14 +62,14 @@ export default function QueuePage() {
         </p>
       </div>
 
-      <div className="px-8 pb-8 max-w-[620px]">
+      <div className="px-4 sm:px-8 pb-8 max-w-[620px]">
         {/* Add goal input */}
         <div
           style={{
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid var(--border)',
             borderRadius: '14px',
-            padding: '16px 20px',
+            padding: '16px',
             marginBottom: '28px',
           }}
         >
@@ -85,28 +85,31 @@ export default function QueuePage() {
           >
             Add to queue
           </p>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-            <select
-              value={newArea}
-              onChange={(e) => setNewArea(e.target.value as AreaTag)}
-              style={{
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '8px',
-                padding: '8px 10px',
-                fontSize: '13px',
-                color: AREA_COLORS[newArea],
-                outline: 'none',
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              {AREA_ORDER.map((area) => (
-                <option key={area} value={area} style={{ color: AREA_COLORS[area], background: '#1a1814' }}>
-                  {AREA_TAGS[area].icon} {AREA_TAGS[area].label}
-                </option>
-              ))}
-            </select>
+          {/* Area selector */}
+          <select
+            value={newArea}
+            onChange={(e) => setNewArea(e.target.value as AreaTag)}
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: '8px',
+              padding: '8px 10px',
+              fontSize: '13px',
+              color: AREA_COLORS[newArea],
+              outline: 'none',
+              cursor: 'pointer',
+              marginBottom: '8px',
+            }}
+          >
+            {AREA_ORDER.map((area) => (
+              <option key={area} value={area} style={{ color: AREA_COLORS[area], background: '#1a1814' }}>
+                {AREA_TAGS[area].icon} {AREA_TAGS[area].label}
+              </option>
+            ))}
+          </select>
+          {/* Text input + Add button */}
+          <div style={{ display: 'flex', gap: '8px' }}>
             <input
               type="text"
               value={newText}
@@ -115,6 +118,7 @@ export default function QueuePage() {
               placeholder="What's a goal you want to tackle?"
               style={{
                 flex: 1,
+                minWidth: 0,
                 background: 'rgba(255,255,255,0.05)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '8px',
@@ -132,12 +136,12 @@ export default function QueuePage() {
                 color: newText.trim() ? '#0f0e0c' : 'rgba(200,146,42,0.5)',
                 border: 'none',
                 borderRadius: '8px',
-                padding: '8px 16px',
+                padding: '8px 18px',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: newText.trim() ? 'pointer' : 'not-allowed',
                 transition: 'all 0.15s',
-                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
               Add
