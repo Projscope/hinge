@@ -64,9 +64,12 @@ export default function SetupPage() {
   const [queueItems, setQueueItems] = useState<QueueItem[]>([])
   const [selectedQueueItemId, setSelectedQueueItemId] = useState<string | null>(null)
 
-  // Queue state for "already set" view
-  const [addedToQueue, setAddedToQueue] = useState(false)
-  const [addingToQueue, setAddingToQueue] = useState(false)
+  // Queue form state for "already set" view
+  const [queueFormOpen, setQueueFormOpen] = useState(false)
+  const [queueText, setQueueText] = useState('')
+  const [queueArea, setQueueArea] = useState<AreaTag>('work')
+  const [queueSaving, setQueueSaving] = useState(false)
+  const [queueAdded, setQueueAdded] = useState(false)
 
   // Weekly anchor
   const [weeklyAnchorText, setWeeklyAnchorText] = useState<string | null>(null)
@@ -119,12 +122,14 @@ export default function SetupPage() {
     return task2.trim().length > 2 ? 'done' : task1.trim().length > 2 ? 'active' : 'pending'
   }
 
-  async function handleAddToQueue() {
-    if (!today || addingToQueue || addedToQueue) return
-    setAddingToQueue(true)
-    await addToQueue(today.mainGoal, (today.areaTag as AreaTag) ?? 'work')
-    setAddingToQueue(false)
-    setAddedToQueue(true)
+  async function handleQueueSubmit() {
+    const text = queueText.trim()
+    if (!text || queueSaving) return
+    setQueueSaving(true)
+    await addToQueue(text, queueArea)
+    setQueueSaving(false)
+    setQueueAdded(true)
+    setQueueText('')
   }
 
   if (hydrated && goalAlreadySet) {
@@ -150,7 +155,126 @@ export default function SetupPage() {
 
         {/* Queue CTA */}
         <div className="max-w-[340px] w-full mb-6">
-          {addedToQueue ? (
+          {!queueFormOpen && !queueAdded && (
+            <button
+              onClick={() => setQueueFormOpen(true)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '12px 16px',
+                background: 'rgba(200,146,42,0.06)',
+                border: '1px solid rgba(200,146,42,0.2)',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{ fontSize: '18px', flexShrink: 0 }}>☰</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#c8922a', marginBottom: '2px' }}>
+                  Queue a goal for a future day
+                </span>
+                <span style={{ display: 'block', fontSize: '11px', color: 'rgba(245,242,234,0.4)', lineHeight: 1.4 }}>
+                  Pre-load goals so tomorrow&apos;s setup takes one tap.
+                </span>
+              </span>
+            </button>
+          )}
+
+          {queueFormOpen && !queueAdded && (
+            <div
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(200,146,42,0.2)',
+                borderRadius: '12px',
+                padding: '14px',
+              }}
+            >
+              <p style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(245,242,234,0.4)', marginBottom: '10px', fontWeight: 500 }}>
+                Add to queue
+              </p>
+              <input
+                type="text"
+                value={queueText}
+                onChange={(e) => setQueueText(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleQueueSubmit()}
+                placeholder="What goal do you want to tackle?"
+                autoFocus
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  fontSize: '13px',
+                  color: '#f5f2ea',
+                  outline: 'none',
+                  marginBottom: '8px',
+                  boxSizing: 'border-box',
+                }}
+              />
+              <select
+                value={queueArea}
+                onChange={(e) => setQueueArea(e.target.value as AreaTag)}
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '8px',
+                  padding: '8px 10px',
+                  fontSize: '13px',
+                  color: AREA_COLORS[queueArea],
+                  outline: 'none',
+                  marginBottom: '10px',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {AREA_ORDER.map((area) => (
+                  <option key={area} value={area} style={{ color: AREA_COLORS[area], background: '#1a1814' }}>
+                    {AREA_TAGS[area].icon} {AREA_TAGS[area].label}
+                  </option>
+                ))}
+              </select>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={handleQueueSubmit}
+                  disabled={!queueText.trim() || queueSaving}
+                  style={{
+                    flex: 1,
+                    background: queueText.trim() && !queueSaving ? '#c8922a' : 'rgba(200,146,42,0.2)',
+                    color: queueText.trim() && !queueSaving ? '#0f0e0c' : 'rgba(200,146,42,0.5)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: queueText.trim() && !queueSaving ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  {queueSaving ? 'Adding…' : 'Add to queue'}
+                </button>
+                <button
+                  onClick={() => setQueueFormOpen(false)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    color: 'rgba(245,242,234,0.4)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {queueAdded && (
             <div
               style={{
                 display: 'flex',
@@ -167,36 +291,14 @@ export default function SetupPage() {
               }}
             >
               <span>✓</span>
-              <span>Added to your queue</span>
+              <span>Added to queue</span>
+              <button
+                onClick={() => { setQueueAdded(false); setQueueFormOpen(true) }}
+                style={{ background: 'transparent', border: 'none', color: 'rgba(42,184,126,0.6)', fontSize: '12px', cursor: 'pointer', marginLeft: '4px' }}
+              >
+                + add another
+              </button>
             </div>
-          ) : (
-            <button
-              onClick={handleAddToQueue}
-              disabled={addingToQueue}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                padding: '12px 16px',
-                background: 'rgba(200,146,42,0.06)',
-                border: '1px solid rgba(200,146,42,0.2)',
-                borderRadius: '10px',
-                cursor: addingToQueue ? 'default' : 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.15s',
-              }}
-            >
-              <span style={{ fontSize: '18px', flexShrink: 0 }}>☰</span>
-              <span style={{ flex: 1 }}>
-                <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#c8922a', marginBottom: '2px' }}>
-                  {addingToQueue ? 'Adding…' : 'Add to queue for a future day'}
-                </span>
-                <span style={{ display: 'block', fontSize: '11px', color: 'rgba(245,242,234,0.4)', lineHeight: 1.4 }}>
-                  The queue lets you pre-load goals so tomorrow&apos;s setup takes one tap.
-                </span>
-              </span>
-            </button>
           )}
         </div>
 
