@@ -21,33 +21,42 @@ export default function QueuePage() {
   const [newText, setNewText] = useState('')
   const [newArea, setNewArea] = useState<AreaTag>('work')
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    setItems(loadQueue())
+    loadQueue().then((q) => {
+      setItems(q)
+      setLoading(false)
+    })
   }, [])
 
-  function handleAdd() {
+  async function handleAdd() {
     const text = newText.trim()
-    if (!text) return
-    addToQueue(text, newArea)
-    setItems(loadQueue())
+    if (!text || saving) return
+    setSaving(true)
+    const item = await addToQueue(text, newArea)
+    if (item) setItems((prev) => [...prev, item])
     setNewText('')
+    setSaving(false)
   }
 
-  function handleRemove(id: string) {
-    removeFromQueue(id)
-    setItems(loadQueue())
+  async function handleRemove(id: string) {
+    setItems((prev) => prev.filter((i) => i.id !== id))
+    await removeFromQueue(id)
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') handleAdd()
   }
 
-  if (!mounted) {
+  if (!mounted || loading) {
     return (
       <div className="px-8 pt-7">
         <div className="h-8 w-32 bg-bg-3 rounded animate-pulse mb-4" />
+        <div className="h-4 w-48 bg-bg-3 rounded animate-pulse mb-8" />
+        <div className="h-24 bg-bg-3 rounded-[14px] animate-pulse" />
       </div>
     )
   }
@@ -130,21 +139,21 @@ export default function QueuePage() {
             />
             <button
               onClick={handleAdd}
-              disabled={!newText.trim()}
+              disabled={!newText.trim() || saving}
               style={{
-                background: newText.trim() ? '#c8922a' : 'rgba(200,146,42,0.2)',
-                color: newText.trim() ? '#0f0e0c' : 'rgba(200,146,42,0.5)',
+                background: newText.trim() && !saving ? '#c8922a' : 'rgba(200,146,42,0.2)',
+                color: newText.trim() && !saving ? '#0f0e0c' : 'rgba(200,146,42,0.5)',
                 border: 'none',
                 borderRadius: '8px',
                 padding: '8px 18px',
                 fontSize: '13px',
                 fontWeight: 600,
-                cursor: newText.trim() ? 'pointer' : 'not-allowed',
+                cursor: newText.trim() && !saving ? 'pointer' : 'not-allowed',
                 transition: 'all 0.15s',
                 flexShrink: 0,
               }}
             >
-              Add
+              {saving ? '…' : 'Add'}
             </button>
           </div>
         </div>

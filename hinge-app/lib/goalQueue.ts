@@ -1,3 +1,4 @@
+import { createClient } from '@/lib/supabase/client'
 import type { AreaTag } from './types'
 
 export interface QueueItem {
@@ -7,51 +8,50 @@ export interface QueueItem {
   createdAt: string
 }
 
-const QUEUE_KEY = 'hinge_goal_queue'
+export async function loadQueue(): Promise<QueueItem[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('goal_queue')
+    .select('id, text, area_tag, created_at')
+    .order('created_at', { ascending: true })
 
-export function loadQueue(): QueueItem[] {
-  if (typeof window === 'undefined') return []
-  try {
-    const raw = localStorage.getItem(QUEUE_KEY)
-    if (!raw) return []
-    const parsed = JSON.parse(raw) as Array<Partial<QueueItem>>
-    return parsed.map((item) => ({
-      id: item.id ?? `queue-${Date.now()}-${Math.random()}`,
-      text: item.text ?? '',
-      areaTag: (item.areaTag as AreaTag) ?? 'work',
-      createdAt: item.createdAt ?? new Date().toISOString(),
-    }))
-  } catch {
-    return []
+  if (error || !data) return []
+
+  return data.map((row) => ({
+    id: row.id as string,
+    text: row.text as string,
+    areaTag: row.area_tag as AreaTag,
+    createdAt: row.created_at as string,
+  }))
+}
+
+export async function addToQueue(text: string, areaTag: AreaTag): Promise<QueueItem | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('goal_queue')
+    .insert({ text: text.trim(), area_tag: areaTag, user_id: user.id })
+    .select('id, text, area_tag, created_at')
+    .single()
+
+  if (error || !data) return null
+
+  return {
+    id: data.id as string,
+    text: data.text as string,
+    areaTag: data.area_tag as AreaTag,
+    createdAt: data.created_at as string,
   }
 }
 
-export function saveQueue(items: QueueItem[]): void {
-  if (typeof window === 'undefined') return
-  try {
-    localStorage.setItem(QUEUE_KEY, JSON.stringify(items))
-  } catch {
-    // ignore
-  }
+export async function removeFromQueue(id: string): Promise<void> {
+  const supabase = createClient()
+  await supabase.from('goal_queue').delete().eq('id', id)
 }
 
-export function addToQueue(text: string, areaTag: AreaTag): QueueItem {
-  const item: QueueItem = {
-    id: `queue-${Date.now()}`,
-    text: text.trim(),
-    areaTag,
-    createdAt: new Date().toISOString(),
-  }
-  const existing = loadQueue()
-  saveQueue([...existing, item])
-  return item
-}
-
-export function removeFromQueue(id: string): void {
-  const existing = loadQueue()
-  saveQueue(existing.filter((item) => item.id !== id))
-}
-
-export function getQueueByArea(areaTag: AreaTag): QueueItem[] {
-  return loadQueue().filter((item) => item.areaTag === areaTag)
+export async function getQueueByArea(areaTag: AreaTag): Promise<QueueItem[]> {
+  const all = await loadQueue()
+  return all.filter((item) => item.areaTag === areaTag)
 }

@@ -78,11 +78,11 @@ export default function SetupPage() {
   const goalAlreadySet = hydrated && today?.date === todayDate()
   const todayStr = todayDate()
 
-  function handleAreaSelect(area: AreaTag) {
+  async function handleAreaSelect(area: AreaTag) {
     setSelectedArea(area)
     setAreaExpanded(false)
-    const items = loadQueue().filter((item) => item.areaTag === area)
-    setQueueItems(items)
+    const all = await loadQueue()
+    setQueueItems(all.filter((item) => item.areaTag === area))
   }
 
   function handleQueueItemClick(item: QueueItem) {
@@ -90,11 +90,11 @@ export default function SetupPage() {
     setSelectedQueueItemId(item.id)
   }
 
-  function handleStart() {
+  async function handleStart() {
     if (!canProceed) return
     // Remove the selected queue item if one was used
     if (selectedQueueItemId) {
-      removeFromQueue(selectedQueueItemId)
+      await removeFromQueue(selectedQueueItemId)
     }
     setTodayGoal({
       date: todayStr,
