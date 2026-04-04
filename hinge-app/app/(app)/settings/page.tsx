@@ -7,6 +7,8 @@ import {
   requestNotificationPermission,
   type NotificationPrefs,
 } from '@/lib/notifications'
+import AccountabilitySection from '@/components/settings/AccountabilitySection'
+import PublicProfileSection from '@/components/settings/PublicProfileSection'
 
 function PermissionBadge({ permission }: { permission: string }) {
   const map: Record<string, { label: string; color: string }> = {
@@ -97,6 +99,8 @@ export default function SettingsPage() {
   const [prefs, setPrefs] = useState<NotificationPrefs>({
     morningEnabled: false,
     morningTime: '08:00',
+    middayEnabled: false,
+    middayTime: '12:30',
     eveningEnabled: false,
     eveningTime: '20:00',
   })
@@ -125,7 +129,7 @@ export default function SettingsPage() {
     setRequesting(true)
     const granted = await requestNotificationPermission()
     setPermission(granted ? 'granted' : 'denied')
-    if (granted && (prefs.morningEnabled || prefs.eveningEnabled)) {
+    if (granted && (prefs.morningEnabled || prefs.middayEnabled || prefs.eveningEnabled)) {
       saveNotificationPrefs(prefs)
     }
     setRequesting(false)
@@ -226,6 +230,39 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Mid-day check-in */}
+        <div
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: '14px',
+            padding: '16px 20px',
+            marginBottom: '12px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div>
+              <p style={{ fontSize: '14px', color: '#f5f2ea', fontWeight: 500 }}>Mid-day check-in</p>
+              <p style={{ fontSize: '12px', color: 'rgba(245,242,234,0.45)', marginTop: '2px' }}>
+                A quick &ldquo;still on track?&rdquo; tap at midday
+              </p>
+            </div>
+            <Toggle
+              checked={prefs.middayEnabled}
+              onChange={(v) => updatePrefs({ middayEnabled: v })}
+              disabled={!canToggle}
+            />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '12px', color: 'rgba(245,242,234,0.5)' }}>Time</span>
+            <TimeInput
+              value={prefs.middayTime}
+              onChange={(v) => updatePrefs({ middayTime: v })}
+              disabled={!prefs.middayEnabled || !canToggle}
+            />
+          </div>
+        </div>
+
         {/* Evening notification */}
         <div
           style={{
@@ -271,6 +308,12 @@ export default function SettingsPage() {
             Enable browser notifications above to turn on reminders.
           </p>
         )}
+
+        {/* Accountability partner section */}
+        <AccountabilitySection />
+
+        {/* Public profile section */}
+        <PublicProfileSection />
       </div>
     </div>
   )

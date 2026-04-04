@@ -3,6 +3,8 @@ const PREFS_KEY = 'hinge_notification_prefs'
 export interface NotificationPrefs {
   morningEnabled: boolean
   morningTime: string // 'HH:MM'
+  middayEnabled: boolean
+  middayTime: string // 'HH:MM'
   eveningEnabled: boolean
   eveningTime: string // 'HH:MM'
 }
@@ -10,6 +12,8 @@ export interface NotificationPrefs {
 const DEFAULT_PREFS: NotificationPrefs = {
   morningEnabled: false,
   morningTime: '08:00',
+  middayEnabled: false,
+  middayTime: '12:30',
   eveningEnabled: false,
   eveningTime: '20:00',
 }
@@ -68,10 +72,14 @@ export async function registerServiceWorker(): Promise<void> {
   }
 }
 
+export function showMiddayCheckIn(): void {
+  scheduleNotifications(getNotificationPrefs())
+}
+
 export async function initNotifications(): Promise<void> {
   await registerServiceWorker()
   const prefs = getNotificationPrefs()
-  if (prefs.morningEnabled || prefs.eveningEnabled) {
+  if (prefs.morningEnabled || prefs.middayEnabled || prefs.eveningEnabled) {
     if (Notification.permission === 'granted') {
       scheduleNotifications(prefs)
     }

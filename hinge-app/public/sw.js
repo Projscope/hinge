@@ -42,6 +42,21 @@ function showMorningNotification() {
   })
 }
 
+function showMiddayNotification() {
+  self.registration.showNotification('Still on track?', {
+    body: 'Quick check — is your goal still happening today?',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: 'hinge-midday',
+    renotify: true,
+    actions: [
+      { action: 'yes', title: '✓ On track' },
+      { action: 'no', title: '⚠ Off track' },
+    ],
+    data: { url: '/checkin' },
+  })
+}
+
 function showEveningNotification() {
   self.registration.showNotification("Don't forget to close your day", {
     body: 'Review your progress and mark your goal as achieved or missed.',
@@ -74,6 +89,10 @@ self.addEventListener('message', (event) => {
       scheduleRepeating('morning', showMorningNotification, prefs.morningTime)
     }
 
+    if (prefs.middayEnabled && prefs.middayTime) {
+      scheduleRepeating('midday', showMiddayNotification, prefs.middayTime)
+    }
+
     if (prefs.eveningEnabled && prefs.eveningTime) {
       scheduleRepeating('evening', showEveningNotification, prefs.eveningTime)
     }
@@ -86,6 +105,34 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
+
+  // Mid-day check-in action handling
+  if (event.notification.tag === 'hinge-midday') {
+    if (event.action === 'yes') {
+      // User is on track — just close the notification, no navigation needed
+      return
+    }
+    // action === 'no' or default click → navigate to /checkin
+    const checkinUrl = '/checkin'
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+        for (const client of clientList) {
+          if ('focus' in client) {
+            client.focus()
+            if ('navigate' in client) {
+              return client.navigate(checkinUrl)
+            }
+            return
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(checkinUrl)
+        }
+      })
+    )
+    return
+  }
+
   const url = (event.notification.data && event.notification.data.url) || '/'
 
   event.waitUntil(

@@ -5,6 +5,7 @@ import type { DailyGoal } from '@/lib/types'
 import { FOCUS_RANKS } from '@/lib/types'
 import { requestNotificationPermission, getNotificationPrefs, saveNotificationPrefs } from '@/lib/notifications'
 import { addToQueue } from '@/lib/goalQueue'
+import { getPublicProfile } from '@/lib/publicProfile'
 
 const MILESTONES: Record<number, { icon: string; message: string }> = {
   3:   { icon: '🌱', message: 'First streak — the habit is starting' },
@@ -44,6 +45,9 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
   const [notifStatus, setNotifStatus] = useState<'default' | 'granted' | 'denied' | 'unsupported'>('default')
   const [notifRequesting, setNotifRequesting] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [streakUrlCopied, setStreakUrlCopied] = useState(false)
+  const [publicProfileUsername, setPublicProfileUsername] = useState<string | null>(null)
+  const [profileIsPublic, setProfileIsPublic] = useState(false)
 
   const milestone = getMilestone(streakCount)
   const rank = computeRank(history)
@@ -60,8 +64,26 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
       setNotifStatus('unsupported')
     }
 
+    // Load public profile data
+    const profile = getPublicProfile()
+    if (profile) {
+      setPublicProfileUsername(profile.username)
+      setProfileIsPublic(profile.isPublic)
+    }
+
     return () => cancelAnimationFrame(raf)
   }, [])
+
+  async function handleCopyStreakUrl() {
+    if (!publicProfileUsername) return
+    try {
+      await navigator.clipboard.writeText(`https://hin.ge/u/${publicProfileUsername}`)
+      setStreakUrlCopied(true)
+      setTimeout(() => setStreakUrlCopied(false), 2000)
+    } catch {
+      // Clipboard unavailable
+    }
+  }
 
   function handleQueueSubmit() {
     const text = queueText.trim()
@@ -305,6 +327,67 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
               </span>
             </div>
           </div>
+
+          {/* Share streak page row */}
+          {publicProfileUsername && profileIsPublic ? (
+            <div
+              style={{
+                background: 'rgba(200,146,42,0.06)',
+                border: '1px solid rgba(200,146,42,0.18)',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '10px',
+              }}
+            >
+              <div>
+                <p style={{ fontSize: '12px', color: 'rgba(245,242,234,0.7)', marginBottom: '2px' }}>
+                  Share your streak page
+                </p>
+                <span style={{ fontSize: '12px', color: '#c8922a', fontFamily: 'monospace' }}>
+                  hin.ge/u/{publicProfileUsername}
+                </span>
+              </div>
+              <button
+                onClick={handleCopyStreakUrl}
+                style={{
+                  background: streakUrlCopied ? 'rgba(42,184,126,0.15)' : 'rgba(200,146,42,0.15)',
+                  color: streakUrlCopied ? '#2ab87e' : '#c8922a',
+                  border: `1px solid ${streakUrlCopied ? 'rgba(42,184,126,0.3)' : 'rgba(200,146,42,0.3)'}`,
+                  borderRadius: '7px',
+                  padding: '5px 10px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.15s',
+                }}
+              >
+                {streakUrlCopied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          ) : (
+            <div
+              style={{
+                marginBottom: '16px',
+                textAlign: 'center',
+              }}
+            >
+              <a
+                href="/settings"
+                style={{
+                  fontSize: '12px',
+                  color: 'rgba(200,146,42,0.7)',
+                  textDecoration: 'none',
+                }}
+              >
+                Set up your public streak page →
+              </a>
+            </div>
+          )}
 
           {/* Goal queue input */}
           <div
