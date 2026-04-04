@@ -7,7 +7,7 @@ import GoalInput from '@/components/setup/GoalInput'
 import Button from '@/components/ui/Button'
 import { AREA_TAGS } from '@/lib/types'
 import type { AreaTag } from '@/lib/types'
-import { loadQueue, removeFromQueue } from '@/lib/goalQueue'
+import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { getWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
 
@@ -64,6 +64,10 @@ export default function SetupPage() {
   const [queueItems, setQueueItems] = useState<QueueItem[]>([])
   const [selectedQueueItemId, setSelectedQueueItemId] = useState<string | null>(null)
 
+  // Queue state for "already set" view
+  const [addedToQueue, setAddedToQueue] = useState(false)
+  const [addingToQueue, setAddingToQueue] = useState(false)
+
   // Weekly anchor
   const [weeklyAnchorText, setWeeklyAnchorText] = useState<string | null>(null)
 
@@ -115,6 +119,14 @@ export default function SetupPage() {
     return task2.trim().length > 2 ? 'done' : task1.trim().length > 2 ? 'active' : 'pending'
   }
 
+  async function handleAddToQueue() {
+    if (!today || addingToQueue || addedToQueue) return
+    setAddingToQueue(true)
+    await addToQueue(today.mainGoal, (today.areaTag as AreaTag) ?? 'work')
+    setAddingToQueue(false)
+    setAddedToQueue(true)
+  }
+
   if (hydrated && goalAlreadySet) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20">
@@ -124,15 +136,70 @@ export default function SetupPage() {
         </p>
         <p className="text-[13px] text-ink-3 max-w-[320px] leading-relaxed mb-6">
           {today!.completed
-            ? 'You already hit today\'s goal. One goal per day — come back tomorrow.'
+            ? "You already hit today's goal. One goal per day — come back tomorrow."
             : 'The day hinges on one thing. Go finish it.'}
         </p>
-        <div className="bg-bg-3 border border-[var(--border)] rounded-[14px] px-5 py-4 max-w-[340px] w-full text-left mb-6">
+
+        {/* Today's goal card */}
+        <div className="bg-bg-3 border border-[var(--border)] rounded-[14px] px-5 py-4 max-w-[340px] w-full text-left mb-4">
           <p className="text-[10px] uppercase tracking-[0.08em] text-ink-3 font-medium mb-1.5">
             Today&apos;s goal
           </p>
           <p className="font-serif text-[16px] text-ink leading-snug">{today!.mainGoal}</p>
         </div>
+
+        {/* Queue CTA */}
+        <div className="max-w-[340px] w-full mb-6">
+          {addedToQueue ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                justifyContent: 'center',
+                padding: '10px 16px',
+                background: 'rgba(26,122,101,0.12)',
+                border: '1px solid rgba(26,122,101,0.25)',
+                borderRadius: '10px',
+                fontSize: '13px',
+                color: '#2ab87e',
+                fontWeight: 500,
+              }}
+            >
+              <span>✓</span>
+              <span>Added to your queue</span>
+            </div>
+          ) : (
+            <button
+              onClick={handleAddToQueue}
+              disabled={addingToQueue}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '12px 16px',
+                background: 'rgba(200,146,42,0.06)',
+                border: '1px solid rgba(200,146,42,0.2)',
+                borderRadius: '10px',
+                cursor: addingToQueue ? 'default' : 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s',
+              }}
+            >
+              <span style={{ fontSize: '18px', flexShrink: 0 }}>☰</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#c8922a', marginBottom: '2px' }}>
+                  {addingToQueue ? 'Adding…' : 'Add to queue for a future day'}
+                </span>
+                <span style={{ display: 'block', fontSize: '11px', color: 'rgba(245,242,234,0.4)', lineHeight: 1.4 }}>
+                  The queue lets you pre-load goals so tomorrow&apos;s setup takes one tap.
+                </span>
+              </span>
+            </button>
+          )}
+        </div>
+
         <Button onClick={() => router.push('/today')}>
           {today!.completed ? 'View today →' : 'Back to today →'}
         </Button>
