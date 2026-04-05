@@ -38,8 +38,7 @@ export default function LandingPage() {
             One question. Every morning.
           </p>
           <h1 className="font-serif text-[clamp(38px,5vw,58px)] leading-[1.08] tracking-[-0.02em] text-[var(--lk-ink)] mb-6">
-            What one thing, if done<br />
-            today, makes your <em className="italic text-gold">day?</em>
+            What one thing, if done today, makes your <em className="italic text-gold">day?</em>
           </h1>
           <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.65] max-w-[420px] mb-10">
             Not a to-do list. One goal that actually matters.
