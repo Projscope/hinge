@@ -105,12 +105,12 @@ export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
 
       {/* Upgrade CTA — free only */}
       {plan === 'free' && (
-        <div className="mx-3.5 mb-3.5 bg-gold rounded-[10px] px-3.5 py-2.5 cursor-pointer hover:opacity-90 transition-opacity">
+        <Link href="/settings#billing" className="mx-3.5 mb-3.5 bg-gold rounded-[10px] px-3.5 py-2.5 cursor-pointer hover:opacity-90 transition-opacity no-underline block">
           <p className="text-[9px] uppercase tracking-[0.08em] text-black/50 font-semibold mb-0.5">
             Free plan
           </p>
           <p className="text-[11px] text-black font-semibold">Upgrade to Pro →</p>
-        </div>
+        </Link>
       )}
 
       {/* Streak counter + logout bottom */}

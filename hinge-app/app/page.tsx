@@ -389,10 +389,10 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/setup"
+                href="/today"
                 className="mt-8 block text-center py-3 rounded-[8px] bg-[var(--lk-ink)] text-cream text-[14px] font-medium no-underline hover:opacity-85 transition-opacity"
               >
-                Start free, upgrade anytime
+                Start free, upgrade in settings
               </Link>
             </div>
           </div>

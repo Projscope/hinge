@@ -9,6 +9,8 @@ import {
 } from '@/lib/notifications'
 import AccountabilitySection from '@/components/settings/AccountabilitySection'
 import PublicProfileSection from '@/components/settings/PublicProfileSection'
+import BillingSection from '@/components/billing/BillingSection'
+import { useAppStore } from '@/lib/store'
 
 function PermissionBadge({ permission }: { permission: string }) {
   const map: Record<string, { label: string; color: string }> = {
@@ -96,6 +98,7 @@ function TimeInput({ value, onChange, disabled }: TimeInputProps) {
 }
 
 export default function SettingsPage() {
+  const { plan } = useAppStore()
   const [prefs, setPrefs] = useState<NotificationPrefs>({
     morningEnabled: false,
     morningTime: '08:00',
@@ -314,6 +317,9 @@ export default function SettingsPage() {
 
         {/* Public profile section */}
         <PublicProfileSection />
+
+        {/* Billing section */}
+        <BillingSection plan={plan} />
       </div>
     </div>
   )
