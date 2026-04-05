@@ -25,11 +25,11 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Hin.ge — Stop managing tasks. Start finishing goals.',
+  title: 'myhinge — Stop managing tasks. Start finishing goals.',
   description:
     'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
   openGraph: {
-    title: 'Hin.ge',
+    title: 'myhinge',
     description: 'Stop managing tasks. Start finishing goals.',
     type: 'website',
   },

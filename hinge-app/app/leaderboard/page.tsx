@@ -198,7 +198,7 @@ export default function LeaderboardPage() {
             Want your name on this list?
           </p>
           <Link href="/" style={{ display: 'inline-block', background: '#c8922a', color: '#0f0e0c', borderRadius: '12px', padding: '13px 28px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>
-            Join Hin.ge →
+            Join myhinge →
           </Link>
         </div>
 

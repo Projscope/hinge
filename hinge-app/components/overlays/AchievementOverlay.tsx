@@ -78,7 +78,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
   async function handleCopyStreakUrl() {
     if (!publicProfileUsername) return
     try {
-      await navigator.clipboard.writeText(`https://hin.ge/u/${publicProfileUsername}`)
+      await navigator.clipboard.writeText(`https://myhinge.app/u/${publicProfileUsername}`)
       setStreakUrlCopied(true)
       setTimeout(() => setStreakUrlCopied(false), 2000)
     } catch {
@@ -324,7 +324,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
                   letterSpacing: '0.05em',
                 }}
               >
-                hin.ge
+                myhinge
               </span>
             </div>
           </div>
@@ -349,7 +349,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
                   Share your streak page
                 </p>
                 <span style={{ fontSize: '12px', color: '#c8922a', fontFamily: 'monospace' }}>
-                  hin.ge/u/{publicProfileUsername}
+                  myhinge/u/{publicProfileUsername}
                 </span>
               </div>
               <button

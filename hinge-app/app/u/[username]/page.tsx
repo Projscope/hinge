@@ -146,7 +146,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
             This streak page doesn&apos;t exist or hasn&apos;t been made public yet.
           </p>
           <Link href="/" style={{ display: 'inline-block', background: '#c8922a', color: '#0f0e0c', borderRadius: '10px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>
-            Join Hin.ge
+            Join myhinge
           </Link>
         </div>
       </div>
@@ -315,10 +315,10 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
         {/* CTA */}
         <div style={{ textAlign: 'center', paddingTop: '12px' }}>
           <p style={{ fontSize: '13px', color: 'rgba(245,242,234,0.4)', marginBottom: '14px' }}>
-            Build your own streak with Hin.ge
+            Build your own streak with myhinge
           </p>
           <Link href="/" style={{ display: 'inline-block', background: '#c8922a', color: '#0f0e0c', borderRadius: '12px', padding: '14px 32px', fontSize: '15px', fontWeight: 600, textDecoration: 'none' }}>
-            Join Hin.ge →
+            Join myhinge →
           </Link>
         </div>
 

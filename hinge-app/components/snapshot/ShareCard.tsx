@@ -14,7 +14,7 @@ export default function ShareCard({ streakCount, onShare }: ShareCardProps) {
       <div className="absolute -top-5 -right-5 w-24 h-24 rounded-full bg-[radial-gradient(circle,rgba(200,146,42,0.15),transparent_70%)] pointer-events-none" />
 
       <p className="text-[9px] tracking-[0.12em] uppercase text-[rgba(200,146,42,0.4)] mb-1.5 font-mono">
-        Hin.ge
+        myhinge
       </p>
       <div className="flex items-baseline gap-2.5 mb-2.5">
         <span className="font-serif text-[28px] text-gold leading-none">{streakCount}</span>

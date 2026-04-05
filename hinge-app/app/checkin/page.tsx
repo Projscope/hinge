@@ -90,7 +90,7 @@ export default function CheckinPage() {
               letterSpacing: '0.05em',
             }}
           >
-            Hin.ge
+            myhinge
           </span>
         </div>
 

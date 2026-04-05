@@ -67,7 +67,7 @@ export default function PublicProfileSection() {
   }
 
   async function handleCopy() {
-    const url = `https://hin.ge/u/${profile?.username ?? username}`
+    const url = `https://myhinge.app/u/${profile?.username ?? username}`
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -150,7 +150,7 @@ export default function PublicProfileSection() {
           />
           {/* Live URL preview */}
           <p style={{ fontSize: '12px', color: previewHandle ? '#c8922a' : 'rgba(245,242,234,0.2)', marginTop: '5px', fontFamily: 'monospace' }}>
-            hin.ge/u/{previewHandle || 'your_handle'}
+            myhinge.app/u/{previewHandle || 'your_handle'}
           </p>
           {usernameError && (
             <p style={{ fontSize: '11px', color: 'rgba(220,90,80,0.9)', marginTop: '3px' }}>{usernameError}</p>
@@ -187,7 +187,7 @@ export default function PublicProfileSection() {
                 rel="noopener noreferrer"
                 style={{ fontSize: '13px', color: '#c8922a', fontFamily: 'monospace', wordBreak: 'break-all', textDecoration: 'none', flex: 1 }}
               >
-                hin.ge/u/{shareUsername}
+                myhinge.app/u/{shareUsername}
               </a>
               <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                 <a

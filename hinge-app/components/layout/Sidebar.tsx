@@ -37,7 +37,7 @@ export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
       <div className="px-5 py-[22px] border-b border-[var(--border)]">
         <Link href="/" className="no-underline">
           <p className="font-serif text-[22px] text-ink tracking-tight">
-            Hin<span className="text-gold">.</span>ge
+            my<span className="text-gold">hinge</span>
           </p>
           <p className="text-[11px] text-ink-3 mt-0.5">Stop managing. Start finishing.</p>
         </Link>

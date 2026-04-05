@@ -6,7 +6,7 @@ export default function LandingPage() {
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-8 bg-[rgba(250,248,244,0.92)] backdrop-blur-md border-b border-[var(--lk-border)]">
         <Link href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
-          Hin<span className="text-gold">.</span>ge
+          my<span className="text-gold">hinge</span>
         </Link>
         <ul className="flex items-center gap-4 sm:gap-8 list-none">
           <li className="hidden sm:block">
@@ -266,7 +266,7 @@ export default function LandingPage() {
               {
                 icon: '🌐',
                 title: 'Public streak page',
-                desc: 'Share your streak and rank at hin.ge/u/yourname. Show the world your consistency without sharing the details.',
+                desc: 'Share your streak and rank at myhinge.app/u/yourname. Show the world your consistency without sharing the details.',
               },
               {
                 icon: '🤝',
@@ -407,7 +407,7 @@ export default function LandingPage() {
       <footer className="py-10 sm:py-12 px-6 sm:px-8 border-t border-[var(--lk-border)]">
         <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center sm:justify-between gap-4 sm:gap-0">
           <p className="font-serif text-[18px] text-[var(--lk-ink)]">
-            Hin<span className="text-gold">.</span>ge
+            my<span className="text-gold">hinge</span>
           </p>
           <p className="text-[13px] text-[var(--lk-faint)] text-center">
             Stop managing tasks. Start finishing goals.

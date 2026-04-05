@@ -39,7 +39,7 @@ export default function LoginPage() {
       <div className="text-center mb-10">
         <Link href="/" className="no-underline">
           <p className="font-serif text-[32px] text-ink tracking-tight">
-            Hin<span className="text-gold">.</span>ge
+            my<span className="text-gold">hinge</span>
           </p>
         </Link>
         <p className="text-[13px] text-ink-3 mt-1">Stop managing. Start finishing.</p>

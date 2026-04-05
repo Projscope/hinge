@@ -89,7 +89,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="w-[11px] h-[11px] rounded-full bg-[#5be07d]" />
         </div>
         <div className="flex-1 bg-[rgba(255,255,255,0.04)] rounded-[6px] px-3 py-[3px] text-[11px] text-ink-3 max-w-[340px] mx-auto font-mono">
-          hin.ge/today
+          myhinge.app/today
         </div>
       </div>
 
