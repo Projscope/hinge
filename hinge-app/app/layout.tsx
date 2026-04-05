@@ -28,6 +28,12 @@ export const metadata: Metadata = {
   title: 'myhinge — Stop managing tasks. Start finishing goals.',
   description:
     'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'myhinge',
+  },
   openGraph: {
     title: 'myhinge',
     description: 'Stop managing tasks. Start finishing goals.',
@@ -45,6 +51,11 @@ export default function RootLayout({
       lang="en"
       className={`${dmSerif.variable} ${dmSans.variable} ${dmMono.variable}`}
     >
+      <head>
+        <meta name="theme-color" content="#0f0e0c" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

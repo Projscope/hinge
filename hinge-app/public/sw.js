@@ -1,12 +1,79 @@
-// Hin.ge Service Worker
-// Handles scheduled push notifications via postMessage + setTimeout
+// myhinge Service Worker
+// Handles push notifications + offline caching
 
-self.addEventListener('install', () => {
+const CACHE_NAME = 'myhinge-v1'
+
+// Core app shell — cached on install for offline support
+const PRECACHE_URLS = [
+  '/',
+  '/today',
+  '/setup',
+  '/queue',
+  '/snapshot',
+  '/offline',
+]
+
+self.addEventListener('install', (event) => {
   self.skipWaiting()
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS).catch(() => {}))
+  )
 })
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim())
+  // Remove old caches
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  )
+})
+
+self.addEventListener('fetch', (event) => {
+  const { request } = event
+  const url = new URL(request.url)
+
+  // Only handle same-origin GET requests
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return
+
+  // Skip Supabase API calls — always network
+  if (url.hostname.includes('supabase.co')) return
+
+  // Cache-first for static assets (JS, CSS, images, fonts)
+  if (
+    url.pathname.startsWith('/_next/static/') ||
+    url.pathname.startsWith('/icons/') ||
+    /\.(png|jpg|jpeg|svg|gif|webp|woff2?|ico)$/.test(url.pathname)
+  ) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached
+        return fetch(request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone()
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone))
+          }
+          return response
+        })
+      })
+    )
+    return
+  }
+
+  // Network-first for HTML pages — fall back to cache, then /offline
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          const clone = response.clone()
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone))
+        }
+        return response
+      })
+      .catch(() =>
+        caches.match(request).then((cached) => cached || caches.match('/offline'))
+      )
+  )
 })
 
 // Track scheduled notification timers
