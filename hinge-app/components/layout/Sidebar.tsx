@@ -118,7 +118,7 @@ export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
         <span className="font-serif text-[20px] text-gold">{streaks.current}</span>
         <div className="flex-1">
           <p className="text-[11px] text-ink font-medium leading-none">day streak 🔥</p>
-          <p className="text-[10px] text-ink-3 mt-0.5">Best: {plan === 'pro' ? streaks.personalBest : '??'}</p>
+          <p className="text-[10px] text-ink-3 mt-0.5">Best: {streaks.personalBest}</p>
         </div>
         <button
           onClick={() => setShowConfirm(true)}
