@@ -92,13 +92,14 @@ export async function seedOnboardingQueue(): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  // Check if already seeded
-  const { data: profile } = await supabase
+  // Check if already seeded (column may not exist if migration 005 hasn't run)
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('onboarding_seeded')
     .eq('id', user.id)
     .single()
 
+  if (profileError?.code === '42703') return // column missing — skip silently
   if (!profile || profile.onboarding_seeded) return
 
   // Insert example items
