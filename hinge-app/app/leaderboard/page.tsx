@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
       {/* Top bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 0', maxWidth: '560px', margin: '0 auto' }}>
         <Link href="/" style={{ fontFamily: 'Georgia,serif', fontSize: '20px', color: '#c8922a', textDecoration: 'none' }}>
-          Hin<span>.</span>ge
+          my<span style={{ color: '#c8922a' }}>hinge</span>
         </Link>
         <Link href="/today" style={{ fontSize: '12px', color: 'rgba(245,242,234,0.4)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '4px 12px' }}>
           Open app →
