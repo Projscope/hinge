@@ -19,10 +19,30 @@ const ONBOARDING_EXAMPLES: { text: string; areaTag: AreaTag }[] = [
 
 export async function loadQueue(): Promise<QueueItem[]> {
   const supabase = createClient()
+
+  // Try with is_example column first (requires migration 005)
   const { data, error } = await supabase
     .from('goal_queue')
     .select('id, text, area_tag, created_at, is_example')
     .order('created_at', { ascending: true })
+
+  // If is_example column doesn't exist yet, fall back without it
+  if (error?.code === '42703') {
+    const { data: fallback, error: fallbackError } = await supabase
+      .from('goal_queue')
+      .select('id, text, area_tag, created_at')
+      .order('created_at', { ascending: true })
+
+    if (fallbackError || !fallback) return []
+
+    return fallback.map((row) => ({
+      id: row.id as string,
+      text: row.text as string,
+      areaTag: row.area_tag as AreaTag,
+      createdAt: row.created_at as string,
+      isExample: false,
+    }))
+  }
 
   if (error || !data) return []
 
