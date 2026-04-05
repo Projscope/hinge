@@ -51,7 +51,7 @@ export default function Heatmap({ history, today }: HeatmapProps) {
           return (
             <div
               key={date}
-              title={date}
+              title={new Date(date + 'T12:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               className={`h-4 rounded-[3px] transition-transform hover:scale-110 cursor-pointer
                 ${isFuture ? 'bg-[rgba(255,255,255,0.03)]' : ''}
                 ${!isFuture && !hit && !miss ? 'bg-[rgba(255,255,255,0.05)]' : ''}
