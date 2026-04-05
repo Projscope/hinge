@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { AREA_TAGS } from '@/lib/types'
@@ -23,13 +23,20 @@ export default function QueuePage() {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
 
   useEffect(() => {
     setMounted(true)
+    setBannerDismissed(localStorage.getItem('queue_example_banner_dismissed') === '1')
     loadQueue().then((q) => {
       setItems(q)
       setLoading(false)
     })
+  }, [])
+
+  const dismissBanner = useCallback(() => {
+    localStorage.setItem('queue_example_banner_dismissed', '1')
+    setBannerDismissed(true)
   }, [])
 
   async function handleAdd() {
@@ -72,6 +79,48 @@ export default function QueuePage() {
       </div>
 
       <div className="px-4 sm:px-8 pb-8 max-w-[620px]">
+        {/* Onboarding example banner */}
+        {!bannerDismissed && items.some((i) => i.isExample) && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px',
+              background: 'rgba(200,146,42,0.08)',
+              border: '1px solid rgba(200,146,42,0.25)',
+              borderRadius: '12px',
+              padding: '14px 16px',
+              marginBottom: '20px',
+            }}
+          >
+            <span style={{ fontSize: '20px', flexShrink: 0, lineHeight: 1.3 }}>💡</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: '13px', color: '#f5f2ea', fontWeight: 600, marginBottom: '3px' }}>
+                We&apos;ve added example goals to get you started
+              </p>
+              <p style={{ fontSize: '12px', color: 'rgba(245,242,234,0.5)', lineHeight: 1.5 }}>
+                Items marked <span style={{ color: '#c8922a', fontWeight: 600 }}>Example</span> are placeholders — replace the bracketed parts with your own specifics, or delete them and add your own.
+              </p>
+            </div>
+            <button
+              onClick={dismissBanner}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'rgba(245,242,234,0.3)',
+                fontSize: '18px',
+                cursor: 'pointer',
+                padding: '0',
+                lineHeight: 1,
+                flexShrink: 0,
+              }}
+              title="Dismiss"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Add goal input */}
         <div
           style={{
@@ -244,6 +293,25 @@ export default function QueuePage() {
                         }}
                       >
                         {item.text}
+                        {item.isExample && (
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              marginLeft: '8px',
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              color: '#c8922a',
+                              background: 'rgba(200,146,42,0.12)',
+                              border: '1px solid rgba(200,146,42,0.25)',
+                              borderRadius: '4px',
+                              padding: '1px 6px',
+                              letterSpacing: '0.04em',
+                              verticalAlign: 'middle',
+                            }}
+                          >
+                            Example
+                          </span>
+                        )}
                       </span>
                       <button
                         onClick={() => handleRemove(item.id)}

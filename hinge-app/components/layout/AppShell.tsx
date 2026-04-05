@@ -8,6 +8,7 @@ import { useAppStore } from '@/lib/store'
 import { initNotifications } from '@/lib/notifications'
 import { updatePublicSnapshot } from '@/lib/publicSnapshot'
 import { getPublicProfile } from '@/lib/publicProfile'
+import { seedOnboardingQueue } from '@/lib/goalQueue'
 import { FOCUS_RANKS } from '@/lib/types'
 
 function calcHitRate(history: { completed: boolean }[]): number {
@@ -22,6 +23,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     initNotifications()
+    seedOnboardingQueue()
   }, [])
 
   // Keep public snapshot in sync whenever streaks or history change
