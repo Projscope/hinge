@@ -321,7 +321,7 @@ export default function LandingPage() {
             The core ritual is free forever. No card. No trial. No limits on daily use.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[720px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-[960px] mx-auto">
             {/* Free */}
             <div className="border border-[var(--lk-border)] rounded-[16px] p-8">
               <p className="text-[11px] font-medium tracking-wider uppercase text-[var(--lk-faint)] mb-3">Free</p>
@@ -336,7 +336,8 @@ export default function LandingPage() {
                   'Weekly anchor',
                   'Win / miss verdict',
                   'Smart notifications',
-                  'Public streak page',
+                  'Public streak page + leaderboard',
+                  'PWA — install on phone',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2">
                     <span className="text-teal mt-0.5">✓</span> {f}
@@ -347,6 +348,7 @@ export default function LandingPage() {
                   'Pattern insights',
                   'Milestone share cards',
                   'Streak freeze',
+                  'Accountability partner',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2 opacity-40 line-through">
                     <span className="mt-0.5">—</span> {f}
@@ -354,24 +356,24 @@ export default function LandingPage() {
                 ))}
               </ul>
               <Link
-                href="/setup"
+                href="/today"
                 className="mt-8 block text-center py-3 rounded-[8px] border border-[var(--lk-border)] text-[14px] font-medium text-[var(--lk-muted)] no-underline hover:border-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors"
               >
                 Start free
               </Link>
             </div>
 
-            {/* Pro */}
+            {/* Pro Monthly */}
             <div className="border-2 border-[var(--lk-ink)] rounded-[16px] p-8 relative">
               <span className="absolute top-4 right-4 text-[11px] font-semibold bg-gold text-white px-2.5 py-0.5 rounded-full">
-                Most popular
+                Pro
               </span>
-              <p className="text-[11px] font-medium tracking-wider uppercase text-gold mb-3">Pro</p>
+              <p className="text-[11px] font-medium tracking-wider uppercase text-gold mb-3">Monthly</p>
               <div className="flex items-baseline gap-1.5 mb-1">
                 <p className="font-serif text-[36px] text-[var(--lk-ink)] leading-none">$4</p>
                 <p className="text-[14px] text-[var(--lk-faint)]">/mo</p>
               </div>
-              <p className="text-[13px] text-[var(--lk-faint)] mb-6">$39/yr — save 20%</p>
+              <p className="text-[13px] text-[var(--lk-faint)] mb-6">Billed monthly. Cancel anytime.</p>
               <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
                 {[
                   'Everything in Free',
@@ -392,13 +394,45 @@ export default function LandingPage() {
                 href="/today"
                 className="mt-8 block text-center py-3 rounded-[8px] bg-[var(--lk-ink)] text-cream text-[14px] font-medium no-underline hover:opacity-85 transition-opacity"
               >
-                Start free, upgrade in settings
+                Get started →
+              </Link>
+            </div>
+
+            {/* Pro Yearly */}
+            <div className="border-2 border-gold rounded-[16px] p-8 relative bg-[var(--gold-faint)]">
+              <span className="absolute top-4 right-4 text-[11px] font-semibold bg-gold text-white px-2.5 py-0.5 rounded-full">
+                Best value
+              </span>
+              <p className="text-[11px] font-medium tracking-wider uppercase text-gold mb-3">Yearly</p>
+              <div className="flex items-baseline gap-1.5 mb-1">
+                <p className="font-serif text-[36px] text-[var(--lk-ink)] leading-none">$39</p>
+                <p className="text-[14px] text-[var(--lk-faint)]">/yr</p>
+              </div>
+              <p className="text-[13px] text-[var(--lk-faint)] mb-6">
+                <span className="text-gold font-semibold">Save 20%</span> vs monthly · $3.25/mo
+              </p>
+              <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
+                {[
+                  'Everything in Pro Monthly',
+                  'Two months free',
+                  'Priority feature requests',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-gold mt-0.5">✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/today"
+                className="mt-8 block text-center py-3 rounded-[8px] bg-gold text-black text-[14px] font-semibold no-underline hover:opacity-90 transition-opacity"
+              >
+                Get started →
               </Link>
             </div>
           </div>
 
           <p className="text-[13px] text-center text-[var(--lk-faint)] mt-8">
-            Never shown an upgrade prompt in your first 3 days. The paywall appears naturally when you need it.
+            Start free — upgrade anytime from Settings. Never shown a prompt in your first 3 days.
           </p>
         </div>
       </section>
