@@ -99,7 +99,9 @@ export default function PublicProfileSection() {
     boxSizing: 'border-box',
   }
 
-  const shareUsername = profile?.username ?? username
+  const savedHandle = profile?.username ?? ''
+  const previewHandle = username.trim().toLowerCase()
+  const shareUsername = savedHandle || previewHandle
 
   return (
     <div style={{ marginTop: '28px' }}>
@@ -109,10 +111,10 @@ export default function PublicProfileSection() {
 
       <div style={cardStyle}>
         {/* Public toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div>
             <p style={{ fontSize: '14px', color: '#f5f2ea', fontWeight: 500 }}>Make my streak page public</p>
-            <p style={{ fontSize: '12px', color: 'rgba(245,242,234,0.45)', marginTop: '2px' }}>Share your streak with anyone</p>
+            <p style={{ fontSize: '12px', color: 'rgba(245,242,234,0.45)', marginTop: '2px' }}>Anyone with the link can view your progress</p>
           </div>
           <button
             role="switch"
@@ -134,29 +136,31 @@ export default function PublicProfileSection() {
           </button>
         </div>
 
-        {/* Username */}
+        {/* Profile URL handle */}
         <div style={{ marginBottom: '12px' }}>
           <label style={{ display: 'block', fontSize: '11px', color: 'rgba(245,242,234,0.4)', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Username
+            Profile URL handle
           </label>
           <input
             type="text"
             value={username}
             onChange={(e) => { setUsername(e.target.value.toLowerCase()); setUsernameError('') }}
-            placeholder="your_username"
+            placeholder="your_handle"
             style={{ ...inputStyle, borderColor: usernameError ? 'rgba(192,59,43,0.5)' : 'rgba(255,255,255,0.1)' }}
           />
-          {usernameError ? (
-            <p style={{ fontSize: '11px', color: 'rgba(220,90,80,0.9)', marginTop: '4px' }}>{usernameError}</p>
-          ) : (
-            <p style={{ fontSize: '11px', color: 'rgba(245,242,234,0.3)', marginTop: '4px' }}>3–20 chars, letters/numbers/underscores</p>
+          {/* Live URL preview */}
+          <p style={{ fontSize: '12px', color: previewHandle ? '#c8922a' : 'rgba(245,242,234,0.2)', marginTop: '5px', fontFamily: 'monospace' }}>
+            hin.ge/u/{previewHandle || 'your_handle'}
+          </p>
+          {usernameError && (
+            <p style={{ fontSize: '11px', color: 'rgba(220,90,80,0.9)', marginTop: '3px' }}>{usernameError}</p>
           )}
         </div>
 
         {/* Display name */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', fontSize: '11px', color: 'rgba(245,242,234,0.4)', marginBottom: '5px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Display name
+            Your name on the page
           </label>
           <input
             type="text"
@@ -165,28 +169,14 @@ export default function PublicProfileSection() {
             placeholder="Your name"
             style={inputStyle}
           />
+          <p style={{ fontSize: '11px', color: 'rgba(245,242,234,0.3)', marginTop: '4px' }}>
+            Shown as your name on your public profile
+          </p>
         </div>
 
-        {/* Save button */}
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{
-            background: saving ? 'rgba(200,146,42,0.4)' : '#c8922a',
-            color: '#0f0e0c', border: 'none', borderRadius: '8px',
-            padding: '10px 18px', fontSize: '13px', fontWeight: 600,
-            cursor: saving ? 'default' : 'pointer', width: '100%', transition: 'opacity 0.15s',
-          }}
-        >
-          {saving ? 'Saving…' : 'Save profile'}
-        </button>
-
-        {saved && <p style={{ fontSize: '12px', color: '#2ab87e', marginTop: '10px' }}>✓ Profile saved</p>}
-        {saveError && <p style={{ fontSize: '12px', color: 'rgba(220,90,80,0.9)', marginTop: '10px' }}>{saveError}</p>}
-
-        {/* Shareable URL */}
+        {/* Shareable URL — shown prominently if profile is saved and public */}
         {isPublic && shareUsername && (
-          <div style={{ marginTop: '16px', background: 'rgba(200,146,42,0.07)', border: '1px solid rgba(200,146,42,0.2)', borderRadius: '10px', padding: '12px 14px' }}>
+          <div style={{ marginBottom: '16px', background: 'rgba(200,146,42,0.07)', border: '1px solid rgba(200,146,42,0.2)', borderRadius: '10px', padding: '12px 14px' }}>
             <p style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(245,242,234,0.3)', marginBottom: '8px', fontWeight: 500 }}>
               Your public streak page
             </p>
@@ -224,6 +214,22 @@ export default function PublicProfileSection() {
             </div>
           </div>
         )}
+
+        {/* Save button */}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            background: saving ? 'rgba(200,146,42,0.4)' : '#c8922a',
+            color: '#0f0e0c', border: 'none', borderRadius: '8px',
+            padding: '10px 18px', fontSize: '13px', fontWeight: 600,
+            cursor: saving ? 'default' : 'pointer', width: '100%', transition: 'opacity 0.15s',
+          }}
+        >
+          {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save profile'}
+        </button>
+
+        {saveError && <p style={{ fontSize: '12px', color: 'rgba(220,90,80,0.9)', marginTop: '10px' }}>{saveError}</p>}
       </div>
     </div>
   )
