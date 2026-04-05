@@ -66,6 +66,25 @@ export async function addToQueue(text: string, areaTag: AreaTag): Promise<QueueI
     .select('id, text, area_tag, created_at, is_example')
     .single()
 
+  // If is_example column doesn't exist yet, retry without it
+  if (error?.code === '42703') {
+    const { data: fallback, error: fallbackError } = await supabase
+      .from('goal_queue')
+      .insert({ text: text.trim(), area_tag: areaTag, user_id: user.id })
+      .select('id, text, area_tag, created_at')
+      .single()
+
+    if (fallbackError || !fallback) return null
+
+    return {
+      id: fallback.id as string,
+      text: fallback.text as string,
+      areaTag: fallback.area_tag as AreaTag,
+      createdAt: fallback.created_at as string,
+      isExample: false,
+    }
+  }
+
   if (error || !data) return null
 
   return {
