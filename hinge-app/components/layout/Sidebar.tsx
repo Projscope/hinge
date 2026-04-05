@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import type { Streaks, Plan } from '@/lib/types'
 import { FOCUS_RANKS } from '@/lib/types'
+import { createClient } from '@/lib/supabase/client'
 
 interface SidebarProps {
   streaks: Streaks
@@ -28,7 +30,15 @@ function getRank(hitRate: number) {
 
 export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const rank = getRank(hitRate)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/')
+  }
   const rankProgress = ((hitRate - rank.min) / ((rank.max === 100 ? 100 : rank.max + 1) - rank.min)) * 100
 
   return (
@@ -103,14 +113,47 @@ export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
         </div>
       )}
 
-      {/* Streak counter bottom */}
+      {/* Streak counter + logout bottom */}
       <div className="px-5 pb-4 pt-1 flex items-center gap-2 border-t border-[var(--border)]">
         <span className="font-serif text-[20px] text-gold">{streaks.current}</span>
-        <div>
+        <div className="flex-1">
           <p className="text-[11px] text-ink font-medium leading-none">day streak 🔥</p>
           <p className="text-[10px] text-ink-3 mt-0.5">Best: {plan === 'pro' ? streaks.personalBest : '??'}</p>
         </div>
+        <button
+          onClick={() => setShowConfirm(true)}
+          title="Log out"
+          className="text-ink-4 hover:text-ink-2 transition-colors text-[13px] px-1 py-1 rounded"
+        >
+          ↪
+        </button>
       </div>
+
+      {/* Logout confirmation dialog */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-bg-2 border border-[var(--border)] rounded-[16px] p-6 w-[280px] shadow-xl">
+            <p className="font-serif text-[20px] text-ink mb-2">Log out?</p>
+            <p className="text-[13px] text-ink-3 mb-6 leading-relaxed">
+              Your streak and goals are safely stored. You can log back in anytime.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] text-ink-2 text-[13px] font-medium py-2.5 rounded-[10px] transition-colors border border-[var(--border)]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 bg-[rgba(192,57,43,0.15)] hover:bg-[rgba(192,57,43,0.25)] text-[#e26b5e] text-[13px] font-medium py-2.5 rounded-[10px] transition-colors border border-[rgba(192,57,43,0.25)]"
+              >
+                Log out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }
