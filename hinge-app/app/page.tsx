@@ -35,15 +35,16 @@ export default function LandingPage() {
         {/* Left copy */}
         <div>
           <p className="text-[12px] font-medium tracking-[0.12em] uppercase text-gold mb-5">
-            Daily focus, finally
+            One question. Every morning.
           </p>
           <h1 className="font-serif text-[clamp(38px,5vw,58px)] leading-[1.08] tracking-[-0.02em] text-[var(--lk-ink)] mb-6">
-            Stop managing tasks.<br />
-            Start finishing <em className="italic text-gold">goals.</em>
+            What one thing, if done<br />
+            today, makes your <em className="italic text-gold">day?</em>
           </h1>
           <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.65] max-w-[420px] mb-10">
-            One goal per day. Two support tasks that scaffold it. A goal queue so
-            morning setup takes 10 seconds. The day hinges on one thing.
+            Not a to-do list. One goal that actually matters.
+            Two tasks to make it happen. At the end of the day — did you nail it?
+            That&apos;s the whole system.
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <Link
