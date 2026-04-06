@@ -26,8 +26,8 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="lg:hidden flex-shrink-0 bg-bg-2 border-t border-[var(--border)] overflow-x-auto scrollbar-none">
-        <div className="flex min-w-max px-1">
+      <nav className="lg:hidden flex-shrink-0 bg-bg-2 border-t border-[var(--border)]">
+        <div className="flex w-full">
           {NAV_ITEMS.map((item) => {
             const active = pathname === item.href
             return (
@@ -35,7 +35,7 @@ export default function BottomNav() {
                 key={item.href}
                 href={item.href}
                 className={`
-                  flex flex-col items-center justify-center gap-0.5 py-2.5 px-4 no-underline transition-colors
+                  flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 no-underline transition-colors
                   ${active ? 'text-gold' : 'text-ink-3'}
                 `}
               >
@@ -50,7 +50,7 @@ export default function BottomNav() {
           {/* Logout button */}
           <button
             onClick={() => setShowConfirm(true)}
-            className="flex flex-col items-center justify-center gap-0.5 py-2.5 px-4 text-ink-3 hover:text-ink-2 transition-colors"
+            className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-ink-3 hover:text-ink-2 transition-colors"
           >
             <span className="text-[18px] leading-none">↪</span>
             <span className="text-[9px] font-medium tracking-wide text-ink-4">Logout</span>
