@@ -330,7 +330,7 @@ export default function LandingPage() {
                 ))}
               </ol>
               <p className="mt-5 text-[12px] text-[var(--lk-faint)] leading-relaxed">
-                You may also see a banner at the bottom of the page saying "Add myhinge to Home screen" — tap that too.
+                You may also see a banner at the bottom of the page saying &ldquo;Add myhinge to Home screen&rdquo; — tap that too.
               </p>
             </div>
 
