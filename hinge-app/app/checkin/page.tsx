@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { localDateStr } from '@/lib/dateUtils'
 
 interface CheckinNote {
   date: string
@@ -15,7 +16,7 @@ function saveNote(note: string): void {
   try {
     const raw = localStorage.getItem(NOTES_KEY)
     const existing: CheckinNote[] = raw ? (JSON.parse(raw) as CheckinNote[]) : []
-    const today = new Date().toISOString().slice(0, 10)
+    const today = localDateStr()
     existing.unshift({ date: today, note: note.trim() })
     // Keep last 90 notes max
     localStorage.setItem(NOTES_KEY, JSON.stringify(existing.slice(0, 90)))

@@ -8,6 +8,7 @@ import { useAppStore } from '@/lib/store'
 import { initNotifications } from '@/lib/notifications'
 import { updatePublicSnapshot } from '@/lib/publicSnapshot'
 import { getPublicProfile } from '@/lib/publicProfile'
+import { localDateStr } from '@/lib/dateUtils'
 import { seedOnboardingQueue } from '@/lib/goalQueue'
 import { FOCUS_RANKS } from '@/lib/types'
 
@@ -46,11 +47,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       }
 
       // Build last14 array
-      const today14 = new Date().toISOString().slice(0, 10)
       const last14 = Array.from({ length: 14 }, (_, idx): 'hit' | 'miss' | 'none' => {
-        const d = new Date(today14)
+        const d = new Date()
         d.setDate(d.getDate() - idx)
-        const dateStr = d.toISOString().slice(0, 10)
+        const dateStr = localDateStr(d)
         const entry = history.find((g) => g.date === dateStr)
         if (!entry) return 'none'
         return entry.completed ? 'hit' : 'miss'

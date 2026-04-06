@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react'
 import type { DailyGoal } from '@/lib/types'
+import { localDateStr } from '@/lib/dateUtils'
 
 interface Props {
   history: DailyGoal[]
@@ -11,9 +12,9 @@ interface Props {
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const DAY_LABELS = ['M', '', 'W', '', 'F', '', ''] // M, W, F shown; others blank
 
-// Returns 'YYYY-MM-DD' for a Date object
+// Returns 'YYYY-MM-DD' in local timezone for a Date object
 function toDateStr(d: Date): string {
-  return d.toISOString().slice(0, 10)
+  return localDateStr(d)
 }
 
 // Offset today's local date by N days back

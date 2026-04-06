@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from './supabase/client'
 import type { AppState, DailyGoal, OverflowItem, Streaks } from './types'
+import { localDateStr } from './dateUtils'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 function todayDate(): string {
-  return new Date().toISOString().slice(0, 10)
+  return localDateStr()
 }
 
 function defaultStreaks(): Streaks {

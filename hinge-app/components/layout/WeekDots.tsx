@@ -1,4 +1,5 @@
 import type { DailyGoal } from '@/lib/types'
+import { localDateStr } from '@/lib/dateUtils'
 
 const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
@@ -16,13 +17,13 @@ function getThisWeekDays(): string[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday)
     d.setDate(monday.getDate() + i)
-    return d.toISOString().slice(0, 10)
+    return localDateStr(d)
   })
 }
 
 export default function WeekDots({ history, today }: WeekDotsProps) {
   const days = getThisWeekDays()
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const todayStr = localDateStr()
 
   const goalMap = new Map<string, boolean>()
   for (const g of history) goalMap.set(g.date, g.completed)

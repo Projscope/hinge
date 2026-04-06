@@ -1,3 +1,5 @@
+import { localDateStr } from './dateUtils'
+
 const ANCHOR_KEY = 'hinge_weekly_anchor'
 
 export interface WeeklyAnchor {
@@ -12,7 +14,7 @@ export function getCurrentWeekStart(): string {
   const diff = day === 0 ? -6 : 1 - day // days back to Monday
   const monday = new Date(now)
   monday.setDate(now.getDate() + diff)
-  return monday.toISOString().slice(0, 10)
+  return localDateStr(monday)
 }
 
 export function getWeeklyAnchor(): WeeklyAnchor | null {

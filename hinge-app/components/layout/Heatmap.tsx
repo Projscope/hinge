@@ -1,4 +1,5 @@
 import type { DailyGoal } from '@/lib/types'
+import { localDateStr } from '@/lib/dateUtils'
 
 interface HeatmapProps {
   history: DailyGoal[]
@@ -18,7 +19,7 @@ export default function Heatmap({ history, today }: HeatmapProps) {
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth()
-  const todayStr = now.toISOString().slice(0, 10)
+  const todayStr = localDateStr(now)
 
   const days = getDaysInMonth(year, month)
 

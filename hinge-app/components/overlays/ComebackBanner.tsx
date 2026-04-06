@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { DailyGoal } from '@/lib/types'
+import { localDateStr } from '@/lib/dateUtils'
 
 interface Props {
   history: DailyGoal[]
@@ -12,7 +13,7 @@ interface Props {
 const SESSION_KEY = 'hinge_comeback_dismissed'
 
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10)
+  return localDateStr()
 }
 
 export default function ComebackBanner({ history, streaks, onDismiss }: Props) {
@@ -53,7 +54,7 @@ export default function ComebackBanner({ history, streaks, onDismiss }: Props) {
     let run = 0
     const cursor = new Date(lastCompletedDate + 'T00:00:00')
     while (true) {
-      const ds = cursor.toISOString().slice(0, 10)
+      const ds = localDateStr(cursor)
       const goal = history.find((g) => g.date === ds)
       if (!goal || !goal.completed) break
       run++

@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { AREA_TAGS, FOCUS_RANKS, type AreaTag } from '@/lib/types'
+import { localDateStr } from '@/lib/dateUtils'
 
 const AREA_ORDER: AreaTag[] = ['work', 'home', 'family', 'health', 'personal']
 
@@ -59,7 +60,7 @@ function DotRow({ goals }: { goals: DailyGoalRow[] }) {
   const last14 = Array.from({ length: 14 }, (_, i) => {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    const ds = d.toISOString().slice(0, 10)
+    const ds = localDateStr(d)
     const g = goals.find(g => g.date === ds)
     if (!g) return 'none'
     return g.completed ? 'hit' : 'miss'

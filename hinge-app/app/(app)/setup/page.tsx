@@ -10,9 +10,10 @@ import type { AreaTag } from '@/lib/types'
 import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { getWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
+import { localDateStr } from '@/lib/dateUtils'
 
 function todayDate(): string {
-  return new Date().toISOString().slice(0, 10)
+  return localDateStr()
 }
 
 const AREA_COLORS: Record<AreaTag, string> = {

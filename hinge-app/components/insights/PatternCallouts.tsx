@@ -3,6 +3,7 @@
 import type { DailyGoal, AreaTag } from '@/lib/types'
 import { AREA_TAGS } from '@/lib/types'
 import { scoreGoalQuality } from '@/lib/goalQuality'
+import { localDateStr } from '@/lib/dateUtils'
 
 interface Props {
   history: DailyGoal[]
@@ -125,9 +126,9 @@ export default function PatternCallouts({ history, streaks }: Props) {
   cutoff14.setDate(cutoff14.getDate() - 14)
   const cutoff28 = new Date(now)
   cutoff28.setDate(cutoff28.getDate() - 28)
-  const cutoff14Str = cutoff14.toISOString().slice(0, 10)
-  const cutoff28Str = cutoff28.toISOString().slice(0, 10)
-  const todayStr = now.toISOString().slice(0, 10)
+  const cutoff14Str = localDateStr(cutoff14)
+  const cutoff28Str = localDateStr(cutoff28)
+  const todayStr = localDateStr(now)
 
   const recent14 = history.filter((g) => g.date > cutoff14Str && g.date <= todayStr)
   const prior14 = history.filter((g) => g.date > cutoff28Str && g.date <= cutoff14Str)
