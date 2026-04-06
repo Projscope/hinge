@@ -18,9 +18,7 @@ const NAV_ITEMS = [
   { href: '/setup',     icon: '🌅', label: 'Morning setup',  group: 'Daily' },
   { href: '/snapshot',  icon: '📊', label: 'Snapshot',       group: 'Daily' },
   { href: '/queue',     icon: '☰',  label: 'Goal queue',     group: 'Daily' },
-  { href: '/history',   icon: '📅', label: 'History',        group: 'Progress' },
-  { href: '/insights',  icon: '📈', label: 'Insights',       group: 'Progress' },
-  { href: '/milestones',icon: '🏅', label: 'Milestones',     group: 'Progress' },
+  { href: '/progress',  icon: '📊', label: 'Progress',        group: 'Progress' },
   { href: '/settings',  icon: '⚙',  label: 'Settings',       group: 'Progress' },
 ]
 

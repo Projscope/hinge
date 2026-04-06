@@ -9,9 +9,7 @@ const NAV_ITEMS = [
   { href: '/today',      icon: '◎',  label: 'Today' },
   { href: '/setup',      icon: '⊕',  label: 'Setup' },
   { href: '/queue',      icon: '☰',  label: 'Queue' },
-  { href: '/history',    icon: '📅', label: 'History' },
-  { href: '/insights',   icon: '📈', label: 'Insights' },
-  { href: '/milestones', icon: '🏅', label: 'Badges' },
+  { href: '/progress',   icon: '📊', label: 'Progress' },
   { href: '/settings',   icon: '⚙',  label: 'Settings' },
 ]
 
