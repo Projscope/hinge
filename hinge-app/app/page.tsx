@@ -534,9 +534,14 @@ export default function LandingPage() {
           <p className="font-serif text-[18px] text-[var(--lk-ink)]">
             my<span className="text-gold">hinge</span>
           </p>
-          <p className="text-[13px] text-[var(--lk-faint)] text-center">
-            Stop managing tasks. Start finishing goals.
-          </p>
+          <div className="flex flex-col items-center gap-1.5 text-center">
+            <p className="text-[13px] text-[var(--lk-faint)]">
+              Stop managing tasks. Start finishing goals.
+            </p>
+            <Link href="/privacy" className="text-[12px] text-[var(--lk-faint)] no-underline hover:text-[var(--lk-muted)] transition-colors">
+              Privacy Policy
+            </Link>
+          </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <a
               href="https://projscope.com"
