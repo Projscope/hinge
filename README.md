@@ -163,7 +163,6 @@ hinge-app/
     insights/
       PatternCallouts.tsx           # 2–4 insight cards from history patterns
     settings/
-      AccountabilitySection.tsx     # Accountability partner email form
       PublicProfileSection.tsx      # Handle, display name, public toggle, live URL preview
     ui/
       Button.tsx                    # primary / ghost / gold variants
@@ -177,7 +176,6 @@ hinge-app/
     goalQueue.ts                    # Queue CRUD — Supabase-backed, tagged by area, onboarding seed
     weeklyAnchor.ts                 # Weekly focus phrase — resets each Monday
     notifications.ts                # Web Push prefs, scheduleNotifications, initNotifications
-    accountability.ts               # Accountability partner — get/set/remove
     publicProfile.ts                # Username/displayName/isPublic — Supabase-backed, async
     publicSnapshot.ts               # Public streak snapshot — get/update (localStorage cache)
     stripe.ts                       # Lazy Stripe client — instantiated only at request time
@@ -245,7 +243,6 @@ scripts/
 | Milestone share cards | — | ✓ |
 | Focus rank + quality analytics | — | ✓ |
 | 1 streak freeze / month | — | ✓ |
-| Accountability partner | — | ✓ |
 
 Pro: **$4/mo** (monthly) or **$39/yr** (save 20% · ~$3.25/mo). Billing is managed via Stripe Checkout + Customer Portal. Plan state is stored on the `profiles` table and updated via webhook.
 
@@ -350,7 +347,7 @@ const svg = require('fs').readFileSync('./public/icon.svg');
 - [x] History screen — 16-week contribution heatmap, personal records
 - [x] Insights screen — hit rate, day-of-week chart, goal quality breakdown, focus rank, pattern callouts
 - [x] Milestones screen — earned/locked badges tied to streak and goal quality
-- [x] Settings screen — two-column desktop layout (notifications + billing left, account + profile right)
+- [x] Settings screen — two-column desktop layout (notifications + billing left, public profile right)
 - [x] Smart notifications — morning/midday/evening via Service Worker + Web Push API
 - [x] Public achievements page — `/u/[username]` with stats, 14-day heatmap, milestones, goals by area
 - [x] Leaderboard — `/leaderboard` ranked by current streak, top 50 public profiles

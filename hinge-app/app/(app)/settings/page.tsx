@@ -7,7 +7,6 @@ import {
   requestNotificationPermission,
   type NotificationPrefs,
 } from '@/lib/notifications'
-import AccountabilitySection from '@/components/settings/AccountabilitySection'
 import PublicProfileSection from '@/components/settings/PublicProfileSection'
 import BillingSection from '@/components/billing/BillingSection'
 import { useAppStore } from '@/lib/store'
@@ -317,9 +316,8 @@ export default function SettingsPage() {
         <BillingSection plan={plan} />
 
         </div>
-        {/* RIGHT COLUMN — account & profile */}
+        {/* RIGHT COLUMN — profile */}
         <div>
-          <AccountabilitySection />
           <PublicProfileSection />
         </div>
       </div>
