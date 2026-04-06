@@ -1,6 +1,5 @@
 import { localDateStr } from './dateUtils'
-
-const ANCHOR_KEY = 'hinge_weekly_anchor'
+import { createClient } from './supabase/client'
 
 export interface WeeklyAnchor {
   text: string
@@ -17,29 +16,40 @@ export function getCurrentWeekStart(): string {
   return localDateStr(monday)
 }
 
-export function getWeeklyAnchor(): WeeklyAnchor | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(ANCHOR_KEY)
-    if (!raw) return null
-    return JSON.parse(raw) as WeeklyAnchor
-  } catch {
-    return null
+export async function getWeeklyAnchor(): Promise<WeeklyAnchor | null> {
+  const supabase = createClient()
+  const weekStart = getCurrentWeekStart()
+
+  const { data, error } = await supabase
+    .from('weekly_anchors')
+    .select('text, week_start, created_at')
+    .eq('week_start', weekStart)
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  return {
+    text: data.text,
+    weekStart: data.week_start,
+    createdAt: data.created_at,
   }
 }
 
-export function setWeeklyAnchor(text: string): WeeklyAnchor {
-  const anchor: WeeklyAnchor = {
+export async function setWeeklyAnchor(text: string): Promise<WeeklyAnchor> {
+  const supabase = createClient()
+  const weekStart = getCurrentWeekStart()
+  const now = new Date().toISOString()
+
+  await supabase
+    .from('weekly_anchors')
+    .upsert(
+      { week_start: weekStart, text: text.trim(), updated_at: now },
+      { onConflict: 'user_id,week_start' }
+    )
+
+  return {
     text: text.trim(),
-    weekStart: getCurrentWeekStart(),
-    createdAt: new Date().toISOString(),
+    weekStart,
+    createdAt: now,
   }
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(ANCHOR_KEY, JSON.stringify(anchor))
-    } catch {
-      // ignore
-    }
-  }
-  return anchor
 }

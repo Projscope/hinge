@@ -9,7 +9,7 @@ import { AREA_TAGS } from '@/lib/types'
 import type { AreaTag } from '@/lib/types'
 import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
-import { getWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
+import { getWeeklyAnchor } from '@/lib/weeklyAnchor'
 import { localDateStr } from '@/lib/dateUtils'
 import { getNotificationPrefs } from '@/lib/notifications'
 
@@ -83,10 +83,9 @@ export default function SetupPage() {
   const [weeklyAnchorText, setWeeklyAnchorText] = useState<string | null>(null)
 
   useEffect(() => {
-    const anchor = getWeeklyAnchor()
-    if (anchor && anchor.weekStart === getCurrentWeekStart()) {
-      setWeeklyAnchorText(anchor.text)
-    }
+    getWeeklyAnchor().then((anchor) => {
+      if (anchor) setWeeklyAnchorText(anchor.text)
+    })
   }, [])
 
   const canProceed = mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2

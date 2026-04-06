@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getWeeklyAnchor, setWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
+import { getWeeklyAnchor, setWeeklyAnchor } from '@/lib/weeklyAnchor'
 import type { WeeklyAnchor } from '@/lib/weeklyAnchor'
 
 export default function WeeklyAnchorBanner() {
@@ -12,13 +12,9 @@ export default function WeeklyAnchorBanner() {
 
   useEffect(() => {
     setMounted(true)
-    const loaded = getWeeklyAnchor()
-    // Reset if it's from a previous week
-    if (loaded && loaded.weekStart !== getCurrentWeekStart()) {
-      setAnchor(null)
-    } else {
+    getWeeklyAnchor().then((loaded) => {
       setAnchor(loaded)
-    }
+    })
   }, [])
 
   if (!mounted) return null
@@ -28,10 +24,10 @@ export default function WeeklyAnchorBanner() {
     setEditing(true)
   }
 
-  function handleSave() {
+  async function handleSave() {
     const text = draft.trim()
     if (!text) return
-    const saved = setWeeklyAnchor(text)
+    const saved = await setWeeklyAnchor(text)
     setAnchor(saved)
     setEditing(false)
   }
