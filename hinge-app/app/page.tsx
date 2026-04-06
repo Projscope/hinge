@@ -530,37 +530,33 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="py-10 sm:py-12 px-6 sm:px-8 border-t border-[var(--lk-border)]">
-        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center sm:justify-between gap-4 sm:gap-0">
+        <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-0">
           <p className="font-serif text-[18px] text-[var(--lk-ink)]">
             my<span className="text-gold">hinge</span>
           </p>
-          <div className="flex flex-col items-center gap-1.5 text-center">
-            <p className="text-[13px] text-[var(--lk-faint)]">
-              Stop managing tasks. Start finishing goals.
-            </p>
-            <Link href="/privacy" className="text-[12px] text-[var(--lk-faint)] no-underline hover:text-[var(--lk-muted)] transition-colors">
-              Privacy Policy
-            </Link>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <a
-              href="https://projscope.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 no-underline opacity-60 hover:opacity-100 transition-opacity"
-              title="A projscope.com product"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="https://projscope.com/favicon.ico" alt="projscope" width={16} height={16} className="rounded-sm" />
-              <span className="text-[12px] text-[var(--lk-muted)]">projscope.com</span>
-            </a>
-            <Link
-              href="/today"
-              className="text-[13px] font-medium text-[var(--lk-ink)] no-underline hover:text-gold transition-colors"
-            >
-              Open app →
-            </Link>
-          </div>
+          <p className="text-[13px] text-[var(--lk-faint)]">
+            Stop managing tasks. Start finishing goals.
+          </p>
+          <Link href="/privacy" className="text-[13px] text-[var(--lk-faint)] no-underline hover:text-[var(--lk-muted)] transition-colors">
+            Privacy Policy
+          </Link>
+          <a
+            href="https://projscope.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 no-underline opacity-60 hover:opacity-100 transition-opacity"
+            title="A projscope.com product"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://projscope.com/favicon.ico" alt="projscope" width={16} height={16} className="rounded-sm" />
+            <span className="text-[12px] text-[var(--lk-muted)]">projscope.com</span>
+          </a>
+          <Link
+            href="/today"
+            className="text-[13px] font-medium text-[var(--lk-ink)] no-underline hover:text-gold transition-colors"
+          >
+            Open app →
+          </Link>
         </div>
       </footer>
     </div>
