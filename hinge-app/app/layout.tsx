@@ -29,6 +29,14 @@ export const metadata: Metadata = {
   description:
     'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    shortcut: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -54,7 +62,6 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#0f0e0c" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="font-sans antialiased">{children}</body>
     </html>
