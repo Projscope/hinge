@@ -37,13 +37,16 @@ export async function getWeeklyAnchor(): Promise<WeeklyAnchor | null> {
 
 export async function setWeeklyAnchor(text: string): Promise<WeeklyAnchor> {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
   const weekStart = getCurrentWeekStart()
   const now = new Date().toISOString()
 
   await supabase
     .from('weekly_anchors')
     .upsert(
-      { week_start: weekStart, text: text.trim(), updated_at: now },
+      { user_id: user.id, week_start: weekStart, text: text.trim(), updated_at: now },
       { onConflict: 'user_id,week_start' }
     )
 
