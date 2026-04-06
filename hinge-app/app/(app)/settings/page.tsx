@@ -148,7 +148,9 @@ export default function SettingsPage() {
         <p className="text-[12px] text-ink-3 mt-0.5">Notifications &amp; preferences</p>
       </div>
 
-      <div className="px-8 pb-8 max-w-[520px]">
+      <div className="px-8 pb-8 lg:grid lg:grid-cols-2 lg:gap-8 lg:max-w-none max-w-[520px]">
+        {/* LEFT COLUMN — notifications */}
+        <div>
         {/* Permission status card */}
         <div
           style={{
@@ -312,14 +314,13 @@ export default function SettingsPage() {
           </p>
         )}
 
-        {/* Accountability partner section */}
-        <AccountabilitySection />
-
-        {/* Public profile section */}
-        <PublicProfileSection />
-
-        {/* Billing section */}
-        <BillingSection plan={plan} />
+        </div>
+        {/* RIGHT COLUMN — account, profile, billing */}
+        <div>
+          <AccountabilitySection />
+          <PublicProfileSection />
+          <BillingSection plan={plan} />
+        </div>
       </div>
     </div>
   )
