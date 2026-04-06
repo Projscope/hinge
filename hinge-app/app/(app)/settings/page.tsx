@@ -96,8 +96,13 @@ function TimeInput({ value, onChange, disabled }: TimeInputProps) {
   )
 }
 
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number)
+  return h * 60 + m
+}
+
 export default function SettingsPage() {
-  const { plan } = useAppStore()
+  const { plan, today } = useAppStore()
   const [prefs, setPrefs] = useState<NotificationPrefs>({
     morningEnabled: false,
     morningTime: '08:00',
@@ -298,6 +303,11 @@ export default function SettingsPage() {
               disabled={!prefs.eveningEnabled || !canToggle}
             />
           </div>
+          {today?.endTime && toMinutes(prefs.eveningTime) > toMinutes(today.endTime) && (
+            <p style={{ fontSize: '11px', color: '#c8922a', marginTop: '8px', lineHeight: 1.5 }}>
+              ⚠ Reminder ({prefs.eveningTime}) is after your day closes ({today.endTime}). It may fire too late to be useful.
+            </p>
+          )}
         </div>
 
         {/* Save feedback */}

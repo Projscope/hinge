@@ -11,6 +11,12 @@ import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { getWeeklyAnchor, getCurrentWeekStart } from '@/lib/weeklyAnchor'
 import { localDateStr } from '@/lib/dateUtils'
+import { getNotificationPrefs } from '@/lib/notifications'
+
+function toMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number)
+  return h * 60 + m
+}
 
 function todayDate(): string {
   return localDateStr()
@@ -57,6 +63,7 @@ export default function SetupPage() {
   const [mainGoal, setMainGoal] = useState('')
   const [task1, setTask1] = useState('')
   const [task2, setTask2] = useState('')
+  const eveningReminderTime = typeof window !== 'undefined' ? getNotificationPrefs().eveningTime : '20:00'
   const [endTime, setEndTime] = useState('18:00')
 
   // Area selection
@@ -628,14 +635,21 @@ export default function SetupPage() {
         </StepRow>
 
         {/* End time */}
-        <div className="mt-5 flex items-center gap-3 text-[13px] text-ink-3">
-          <span>Day ends at</span>
-          <input
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-            className="bg-bg-4 border border-[var(--border2)] text-ink text-[13px] rounded-[8px] px-3 py-1.5 outline-none focus:border-gold"
-          />
+        <div className="mt-5">
+          <div className="flex items-center gap-3 text-[13px] text-ink-3">
+            <span>Day ends at</span>
+            <input
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              className="bg-bg-4 border border-[var(--border2)] text-ink text-[13px] rounded-[8px] px-3 py-1.5 outline-none focus:border-gold"
+            />
+          </div>
+          {toMinutes(endTime) < toMinutes(eveningReminderTime) && (
+            <p className="mt-2 text-[11px] text-gold leading-relaxed">
+              ⚠ Your day closes ({endTime}) before the evening reminder ({eveningReminderTime}). Adjust either time in Settings.
+            </p>
+          )}
         </div>
 
         {/* Actions */}
