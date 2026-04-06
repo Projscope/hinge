@@ -6,11 +6,13 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const NAV_ITEMS = [
-  { href: '/today', icon: '◎', label: 'Today' },
-  { href: '/setup', icon: '⊕', label: 'Setup' },
-  { href: '/queue', icon: '☰', label: 'Queue' },
-  { href: '/snapshot', icon: '◈', label: 'Snapshot' },
-  { href: '/settings', icon: '⚙', label: 'Settings' },
+  { href: '/today',      icon: '◎',  label: 'Today' },
+  { href: '/setup',      icon: '⊕',  label: 'Setup' },
+  { href: '/queue',      icon: '☰',  label: 'Queue' },
+  { href: '/history',    icon: '📅', label: 'History' },
+  { href: '/insights',   icon: '📈', label: 'Insights' },
+  { href: '/milestones', icon: '🏅', label: 'Badges' },
+  { href: '/settings',   icon: '⚙',  label: 'Settings' },
 ]
 
 export default function BottomNav() {
@@ -26,34 +28,36 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="lg:hidden flex-shrink-0 bg-bg-2 border-t border-[var(--border)] flex">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`
-                flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 no-underline transition-colors
-                ${active ? 'text-gold' : 'text-ink-3'}
-              `}
-            >
-              <span className="text-[18px] leading-none">{item.icon}</span>
-              <span className={`text-[9px] font-medium tracking-wide ${active ? 'text-gold' : 'text-ink-4'}`}>
-                {item.label}
-              </span>
-            </Link>
-          )
-        })}
+      <nav className="lg:hidden flex-shrink-0 bg-bg-2 border-t border-[var(--border)] overflow-x-auto scrollbar-none">
+        <div className="flex min-w-max px-1">
+          {NAV_ITEMS.map((item) => {
+            const active = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  flex flex-col items-center justify-center gap-0.5 py-2.5 px-4 no-underline transition-colors
+                  ${active ? 'text-gold' : 'text-ink-3'}
+                `}
+              >
+                <span className="text-[18px] leading-none">{item.icon}</span>
+                <span className={`text-[9px] font-medium tracking-wide ${active ? 'text-gold' : 'text-ink-4'}`}>
+                  {item.label}
+                </span>
+              </Link>
+            )
+          })}
 
-        {/* Logout button */}
-        <button
-          onClick={() => setShowConfirm(true)}
-          className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-ink-3 hover:text-ink-2 transition-colors"
-        >
-          <span className="text-[18px] leading-none">↪</span>
-          <span className="text-[9px] font-medium tracking-wide text-ink-4">Logout</span>
-        </button>
+          {/* Logout button */}
+          <button
+            onClick={() => setShowConfirm(true)}
+            className="flex flex-col items-center justify-center gap-0.5 py-2.5 px-4 text-ink-3 hover:text-ink-2 transition-colors"
+          >
+            <span className="text-[18px] leading-none">↪</span>
+            <span className="text-[9px] font-medium tracking-wide text-ink-4">Logout</span>
+          </button>
+        </div>
       </nav>
 
       {/* Logout confirmation dialog */}
