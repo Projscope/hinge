@@ -1,5 +1,5 @@
 -- ============================================================
--- Hin.ge — initial schema
+-- myHinge — initial schema
 -- Run this in the Supabase SQL editor (or via supabase db push)
 -- ============================================================
 

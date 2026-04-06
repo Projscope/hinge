@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "myHinge — Next.js dev",
+      "name": "hinge-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "hinge-app", "run", "dev"],
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     }
   ]

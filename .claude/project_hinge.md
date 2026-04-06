@@ -1,10 +1,10 @@
 ---
-name: Hin.ge project context
-description: Full product context for Hin.ge daily focus app — concept, tech stack, design system, v1 scope
+name: myHinge project context
+description: Full product context for myHinge daily focus app — concept, tech stack, design system, v1 scope
 type: project
 ---
 
-App name: **Hin.ge** (dot intentional — "the day hinges on one thing")
+App name: **myHinge** (dot intentional — "the day hinges on one thing")
 Tagline: "Stop managing tasks. Start finishing goals."
 Status: Next.js app scaffolded at `C:\Development\Various\Hinge\hinge-app\`
 

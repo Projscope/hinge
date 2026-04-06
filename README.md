@@ -314,7 +314,7 @@ const svg = require('fs').readFileSync('./public/icon.svg');
 - [x] Auth flow — implicit (not PKCE) for cross-device magic link support
 - [x] Logout — confirmation dialog in sidebar (desktop) and bottom nav (mobile)
 - [x] PWA — installable on Android/iOS, offline caching, offline fallback page, manifest + icons
-- [x] Rebrand — Hin.ge → myhinge across all UI, emails, and URLs
+- [x] Rebrand — myHinge → myhinge across all UI, emails, and URLs
 - [x] Supabase backend — Postgres schema, RLS, magic-link auth, session middleware
 - [x] `end_day` atomic RPC — streak + goal verdict in a single DB transaction
 - [x] Netlify deploy — `@netlify/plugin-nextjs`, env vars via Netlify dashboard

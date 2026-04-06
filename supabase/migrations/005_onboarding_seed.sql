@@ -1,5 +1,5 @@
 -- ============================================================
--- Hin.ge — onboarding seed flags
+-- myHinge — onboarding seed flags
 -- ============================================================
 
 -- Track whether a user has been seeded with example queue items

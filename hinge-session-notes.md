@@ -1,4 +1,4 @@
-# Hin.ge — Complete Session Notes
+# myHinge — Complete Session Notes
 # Use this file to start a new Claude Code session with full context.
 # Paste the contents into your CLAUDE.md or use as a session primer.
 
@@ -6,7 +6,7 @@
 
 ## PROJECT IDENTITY
 
-**App name:** Hin.ge (the dot is intentional — "the day hinges on one thing")
+**App name:** myHinge (the dot is intentional — "the day hinges on one thing")
 **Tagline:** "Stop managing tasks. Start finishing goals."
 **Type:** Daily focus app — solo developer project, web-first then mobile
 **Status:** Concept finalized. Ready to build v1.
@@ -356,7 +356,7 @@ Streak logic:
 ## DESIGN LANGUAGE
 
 ### Visual identity
-- Name: Hin.ge (the dot is intentional)
+- Name: myHinge (the dot is intentional)
 - Typography: DM Serif Display (headings) + DM Sans (body)
 - Color palette:
   - Background: #0e0d0b (dark), #faf8f4 (light/cream)
