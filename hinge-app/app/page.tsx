@@ -542,9 +542,12 @@ export default function LandingPage() {
               href="https://projscope.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[12px] text-[var(--lk-faint)] no-underline hover:text-[var(--lk-muted)] transition-colors"
+              className="flex items-center gap-2 no-underline opacity-60 hover:opacity-100 transition-opacity"
+              title="A projscope.com product"
             >
-              A <span className="font-medium text-[var(--lk-muted)]">projscope.com</span> product
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="https://projscope.com/favicon.ico" alt="projscope" width={16} height={16} className="rounded-sm" />
+              <span className="text-[12px] text-[var(--lk-muted)]">projscope.com</span>
             </a>
             <Link
               href="/today"
