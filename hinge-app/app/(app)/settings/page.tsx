@@ -314,12 +314,13 @@ export default function SettingsPage() {
           </p>
         )}
 
+        <BillingSection plan={plan} />
+
         </div>
-        {/* RIGHT COLUMN — account, profile, billing */}
+        {/* RIGHT COLUMN — account & profile */}
         <div>
           <AccountabilitySection />
           <PublicProfileSection />
-          <BillingSection plan={plan} />
         </div>
       </div>
     </div>

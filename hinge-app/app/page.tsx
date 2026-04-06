@@ -15,6 +15,11 @@ export default function LandingPage() {
             </a>
           </li>
           <li className="hidden sm:block">
+            <a href="#install" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
+              Install
+            </a>
+          </li>
+          <li className="hidden sm:block">
             <a href="#pricing" className="text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors no-underline">
               Pricing
             </a>
@@ -281,6 +286,92 @@ export default function LandingPage() {
                   <p className="text-[14px] text-[var(--lk-muted)] leading-[1.65]">{f.desc}</p>
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INSTALL AS APP */}
+      <section id="install" className="py-16 sm:py-20 px-6 sm:px-8 bg-[var(--lk-bg,#faf8f4)]">
+        <div className="max-w-[1100px] mx-auto">
+          <p className="text-[11px] font-medium tracking-[0.12em] uppercase text-gold text-center mb-4">
+            No App Store needed
+          </p>
+          <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] text-center mb-4">
+            Install it like an app.
+          </h2>
+          <p className="text-[16px] font-light text-[var(--lk-muted)] text-center max-w-[500px] mx-auto mb-14 leading-[1.65]">
+            myhinge is a Progressive Web App. Add it to your home screen in seconds — it looks and feels like a native app, no download required.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-[760px] mx-auto">
+            {/* Android */}
+            <div className="bg-white border border-[var(--lk-border)] rounded-[16px] p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[28px]">🤖</span>
+                <div>
+                  <p className="font-serif text-[18px] text-[var(--lk-ink)]">Android</p>
+                  <p className="text-[12px] text-[var(--lk-faint)]">Chrome browser</p>
+                </div>
+              </div>
+              <ol className="space-y-4">
+                {[
+                  { step: '1', text: 'Open myhinge.app in Chrome' },
+                  { step: '2', text: 'Tap the ⋮ menu in the top-right corner' },
+                  { step: '3', text: 'Tap "Add to Home screen"' },
+                  { step: '4', text: 'Tap "Add" — done' },
+                ].map((s) => (
+                  <li key={s.step} className="flex items-start gap-3">
+                    <span className="w-[22px] h-[22px] rounded-full bg-[var(--lk-ink)] text-cream text-[11px] font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      {s.step}
+                    </span>
+                    <p className="text-[14px] text-[var(--lk-muted)] leading-snug">{s.text}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-5 text-[12px] text-[var(--lk-faint)] leading-relaxed">
+                You may also see a banner at the bottom of the page saying "Add myhinge to Home screen" — tap that too.
+              </p>
+            </div>
+
+            {/* iOS */}
+            <div className="bg-white border border-[var(--lk-border)] rounded-[16px] p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[28px]">🍎</span>
+                <div>
+                  <p className="font-serif text-[18px] text-[var(--lk-ink)]">iPhone / iPad</p>
+                  <p className="text-[12px] text-[var(--lk-faint)]">Safari browser</p>
+                </div>
+              </div>
+              <ol className="space-y-4">
+                {[
+                  { step: '1', text: 'Open myhinge.app in Safari (not Chrome)' },
+                  { step: '2', text: 'Tap the Share button at the bottom — the box with an arrow pointing up' },
+                  { step: '3', text: 'Scroll down and tap "Add to Home Screen"' },
+                  { step: '4', text: 'Tap "Add" — done' },
+                ].map((s) => (
+                  <li key={s.step} className="flex items-start gap-3">
+                    <span className="w-[22px] h-[22px] rounded-full bg-[var(--lk-ink)] text-cream text-[11px] font-semibold flex items-center justify-center flex-shrink-0 mt-0.5">
+                      {s.step}
+                    </span>
+                    <p className="text-[14px] text-[var(--lk-muted)] leading-snug">{s.text}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-5 text-[12px] text-[var(--lk-faint)] leading-relaxed">
+                Must use Safari on iOS — Chrome on iPhone does not support Add to Home Screen for PWAs.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-[13px] text-[var(--lk-faint)]">
+            {[
+              '⚡ Loads instantly — even offline',
+              '🔔 Full push notifications',
+              '📱 No App Store, no updates',
+              '🔒 Same secure login',
+            ].map((item) => (
+              <span key={item}>{item}</span>
             ))}
           </div>
         </div>
