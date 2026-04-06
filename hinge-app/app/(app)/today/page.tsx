@@ -13,6 +13,8 @@ import ComebackBanner from '@/components/overlays/ComebackBanner'
 import Pill from '@/components/ui/Pill'
 import Button from '@/components/ui/Button'
 import SectionTitle from '@/components/ui/SectionTitle'
+import Heatmap from '@/components/layout/Heatmap'
+import WeekDots from '@/components/layout/WeekDots'
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -38,11 +40,28 @@ export default function TodayPage() {
   if (!hydrated) return null
 
   if (!today) {
+    const now = new Date()
+    const monthName = now.toLocaleDateString('en-US', { month: 'long' })
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20">
-        <p className="font-serif text-[28px] text-ink mb-3">No goal set yet.</p>
-        <p className="text-ink-3 text-[14px] mb-6">Start your morning setup — it takes 60 seconds.</p>
-        <Button onClick={() => router.push('/setup')}>Start morning setup →</Button>
+      <div className="px-8 py-10">
+        {/* CTA */}
+        <div className="text-center mb-10">
+          <p className="font-serif text-[28px] text-ink mb-3">No goal set yet.</p>
+          <p className="text-ink-3 text-[14px] mb-6">Start your morning setup — it takes 60 seconds.</p>
+          <Button onClick={() => router.push('/setup')}>Start morning setup →</Button>
+        </div>
+
+        {/* Heatmap — visible here on mobile since right panel is desktop-only */}
+        <div className="lg:hidden">
+          <div className="mb-4">
+            <WeekDots history={history} today={null} />
+          </div>
+          <p className="text-[9px] uppercase tracking-[0.1em] text-ink-4 font-medium mb-2.5">
+            {monthName}
+          </p>
+          <Heatmap history={history} today={null} />
+          <p className="text-[10px] text-ink-4 mt-1.5">One miss in a sea of gold.</p>
+        </div>
       </div>
     )
   }
