@@ -537,12 +537,22 @@ export default function LandingPage() {
           <p className="text-[13px] text-[var(--lk-faint)] text-center">
             Stop managing tasks. Start finishing goals.
           </p>
-          <Link
-            href="/today"
-            className="text-[13px] font-medium text-[var(--lk-ink)] no-underline hover:text-gold transition-colors"
-          >
-            Open app →
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <a
+              href="https://projscope.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[12px] text-[var(--lk-faint)] no-underline hover:text-[var(--lk-muted)] transition-colors"
+            >
+              A <span className="font-medium text-[var(--lk-muted)]">projscope.com</span> product
+            </a>
+            <Link
+              href="/today"
+              className="text-[13px] font-medium text-[var(--lk-ink)] no-underline hover:text-gold transition-colors"
+            >
+              Open app →
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
