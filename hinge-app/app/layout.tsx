@@ -24,8 +24,14 @@ const dmMono = DM_Mono({
   display: 'swap',
 })
 
+const BASE_URL = 'https://myhinge.app'
+
 export const metadata: Metadata = {
-  title: 'myhinge — Stop managing tasks. Start finishing goals.',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'myhinge — Stop managing tasks. Start finishing goals.',
+    template: '%s — myhinge',
+  },
   description:
     'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
   manifest: '/manifest.json',
@@ -43,9 +49,29 @@ export const metadata: Metadata = {
     title: 'myhinge',
   },
   openGraph: {
-    title: 'myhinge',
-    description: 'Stop managing tasks. Start finishing goals.',
+    title: 'myhinge — Stop managing tasks. Start finishing goals.',
+    description: 'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
+    url: BASE_URL,
+    siteName: 'myhinge',
     type: 'website',
+    locale: 'en_US',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'myhinge — Stop managing tasks. Start finishing goals.',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'myhinge — Stop managing tasks. Start finishing goals.',
+    description: 'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: BASE_URL,
   },
 }
 

@@ -1,8 +1,55 @@
 import Link from 'next/link'
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      '@id': 'https://myhinge.app/#app',
+      name: 'myhinge',
+      url: 'https://myhinge.app',
+      description: 'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
+      applicationCategory: 'ProductivityApplication',
+      operatingSystem: 'Web, Android, iOS',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Free',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro Monthly',
+          price: '4.00',
+          priceCurrency: 'USD',
+          billingIncrement: 'P1M',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro Yearly',
+          price: '39.00',
+          priceCurrency: 'USD',
+          billingIncrement: 'P1Y',
+        },
+      ],
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://projscope.com/#org',
+      name: 'projscope',
+      url: 'https://projscope.com',
+    },
+  ],
+}
+
 export default function LandingPage() {
   return (
     <div className="bg-cream text-[var(--lk-ink)] font-sans min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* NAV */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-8 bg-[rgba(250,248,244,0.92)] backdrop-blur-md border-b border-[var(--lk-border)]">
         <Link href="/" className="font-serif text-[22px] tracking-tight text-[var(--lk-ink)] no-underline">
