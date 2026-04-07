@@ -11,7 +11,7 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  // Page URL for copy/link sharing
+  // Human-readable share page (used for copy + og fallback)
   const sharePageUrl = username
     ? `https://myhinge.app/share/${username}`
     : 'https://myhinge.app'
@@ -20,8 +20,10 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
 
   async function handleTwitter() {
     setLoading(true)
-    // Default to share page URL; will be replaced with the CDN image URL if generation succeeds
-    let tweetUrl = sharePageUrl
+
+    let pngUrl: string | null = null
+    let htmlUrl: string = sharePageUrl
+
     try {
       if (username) {
         const res = await fetch('/api/og/generate', {
@@ -30,13 +32,38 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
           body: JSON.stringify({ username }),
         })
         const data = await res.json()
-        // Use the direct Supabase CDN image URL so Twitter renders it without crawling our page
-        if (data?.url) tweetUrl = data.url
+        // generate returns { url: pngUrl, shareUrl: htmlUrl }
+        if (data?.url)      pngUrl  = data.url
+        if (data?.shareUrl) htmlUrl = data.shareUrl
       }
     } catch {
       // Non-fatal — fall back to share page URL
     }
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`
+
+    // --- Option 2: Web Share API with image file (mobile) ---
+    const canShare = typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator
+    if (canShare && pngUrl) {
+      try {
+        const blob = await fetch(pngUrl).then(r => r.blob())
+        const file = new File([blob], 'my-streak.png', { type: 'image/png' })
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `I'm on a ${streakCount}-day streak 🔥`,
+            text: tweetText,
+            files: [file],
+          })
+          setLoading(false)
+          return
+        }
+      } catch {
+        // User cancelled or not supported — fall through to Twitter intent
+      }
+    }
+
+    // --- Option 1: Twitter intent with Supabase-hosted HTML URL ---
+    // The HTML file has og:image meta tags pointing to the PNG on the same CDN.
+    // Twitter's bot reads plain HTML with no JS/SSR overhead.
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(htmlUrl)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setLoading(false)
   }

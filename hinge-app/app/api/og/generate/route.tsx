@@ -172,20 +172,53 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await imageResponse.arrayBuffer())
 
-  // Upload to Supabase Storage (public bucket: og-images)
-  const { error } = await supabase.storage
-    .from('og-images')
-    .upload(`${username}.png`, buffer, {
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const pngPath  = `${username}.png`
+  const htmlPath = `${username}.html`
+
+  // Derive the public PNG URL ahead of time (needed inside the HTML)
+  const pngPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${pngPath}`
+
+  // Minimal HTML page — no JS, just og/twitter meta tags + instant redirect
+  // Twitter's bot reads this directly from the trusted Supabase CDN
+  const displayTitle = profile.display_name || profile.username
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@myhinge">
+<meta name="twitter:title" content="${displayTitle} is on a ${streak}-day streak on myhinge 🔥">
+<meta name="twitter:description" content="One goal. Every day. No excuses. Think you can keep up?">
+<meta name="twitter:image" content="${pngPublicUrl}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="${displayTitle} is on a ${streak}-day streak on myhinge 🔥">
+<meta property="og:description" content="One goal. Every day. No excuses. Think you can keep up?">
+<meta property="og:image" content="${pngPublicUrl}">
+<meta property="og:url" content="https://myhinge.app/share/${username}">
+<meta http-equiv="refresh" content="0;url=https://myhinge.app/share/${username}">
+</head>
+<body></body>
+</html>`
+
+  // Upload PNG + HTML in parallel
+  const [pngUpload, htmlUpload] = await Promise.all([
+    supabase.storage.from('og-images').upload(pngPath, buffer, {
       contentType: 'image/png',
       upsert: true,
       cacheControl: '3600',
-    })
+    }),
+    supabase.storage.from('og-images').upload(htmlPath, Buffer.from(html), {
+      contentType: 'text/html; charset=utf-8',
+      upsert: true,
+      cacheControl: '0',
+    }),
+  ])
 
-  if (error) return Response.json({ error: error.message }, { status: 500 })
+  if (pngUpload.error) return Response.json({ error: pngUpload.error.message }, { status: 500 })
+  if (htmlUpload.error) return Response.json({ error: htmlUpload.error.message }, { status: 500 })
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('og-images')
-    .getPublicUrl(`${username}.png`)
+  const htmlPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${htmlPath}`
 
-  return Response.json({ url: publicUrl })
+  return Response.json({ url: pngPublicUrl, shareUrl: htmlPublicUrl })
 }
