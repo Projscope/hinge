@@ -10,67 +10,48 @@ interface ShareCardProps {
 export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [noUsername, setNoUsername] = useState(false)
 
-  // Human-readable share page (used for copy + og fallback)
-  const sharePageUrl = username
-    ? `https://myhinge.app/share/${username}`
-    : 'https://myhinge.app'
-
+  const sharePageUrl = username ? `https://myhinge.app/share/${username}` : null
   const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
 
   async function handleTwitter() {
+    // No username → prompt user to set one in Settings
+    if (!username) {
+      setNoUsername(true)
+      setTimeout(() => setNoUsername(false), 3500)
+      return
+    }
+
     setLoading(true)
 
-    let pngUrl: string | null = null
-    let htmlUrl: string = sharePageUrl
+    // Default to the share page; will be upgraded to the static CDN HTML URL
+    let tweetUrl: string = sharePageUrl!
 
     try {
-      if (username) {
-        const res = await fetch('/api/og/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
-        })
-        const data = await res.json()
-        // generate returns { url: pngUrl, shareUrl: htmlUrl }
-        if (data?.url)      pngUrl  = data.url
-        if (data?.shareUrl) htmlUrl = data.shareUrl
-      }
+      const res = await fetch('/api/og/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username }),
+      })
+      const data = await res.json()
+      // Prefer the static Supabase HTML URL — Twitter reads plain HTML with no
+      // JS/SSR overhead and renders the og:image card instantly
+      if (data?.shareUrl) tweetUrl = data.shareUrl
+      else if (data?.url)  tweetUrl = data.url
     } catch {
       // Non-fatal — fall back to share page URL
     }
 
-    // --- Option 2: Web Share API with image file (mobile) ---
-    const canShare = typeof navigator !== 'undefined' && 'share' in navigator && 'canShare' in navigator
-    if (canShare && pngUrl) {
-      try {
-        const blob = await fetch(pngUrl).then(r => r.blob())
-        const file = new File([blob], 'my-streak.png', { type: 'image/png' })
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: `I'm on a ${streakCount}-day streak 🔥`,
-            text: tweetText,
-            files: [file],
-          })
-          setLoading(false)
-          return
-        }
-      } catch {
-        // User cancelled or not supported — fall through to Twitter intent
-      }
-    }
-
-    // --- Option 1: Twitter intent with Supabase-hosted HTML URL ---
-    // The HTML file has og:image meta tags pointing to the PNG on the same CDN.
-    // Twitter's bot reads plain HTML with no JS/SSR overhead.
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(htmlUrl)}`
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setLoading(false)
   }
 
   async function handleCopy() {
+    const target = sharePageUrl ?? 'https://myhinge.app'
     try {
-      await navigator.clipboard.writeText(sharePageUrl)
+      await navigator.clipboard.writeText(target)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -116,7 +97,12 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         </button>
       </div>
 
-      {username && (
+      {noUsername && (
+        <p className="text-[9px] text-amber-400 mt-2 text-center">
+          Set your username in Settings → Profile to share
+        </p>
+      )}
+      {!noUsername && username && (
         <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
           myhinge.app/share/{username}
         </p>
