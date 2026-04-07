@@ -75,14 +75,11 @@ export async function GET(req: NextRequest) {
           {/* LEFT — streak + tagline + dots */}
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             {/* Streak number */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '8px' }}>
               <span style={{ fontSize: '120px', fontWeight: 800, color: GOLD, lineHeight: 1 }}>
                 {streak}
               </span>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '38px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>day</span>
-                <span style={{ fontSize: '38px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>streak 🔥</span>
-              </div>
+              <span style={{ fontSize: '38px', color: INK, fontWeight: 600, lineHeight: 1 }}>day streak 🔥</span>
             </div>
 
             {/* Motivational tagline */}
