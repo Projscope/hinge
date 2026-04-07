@@ -10,37 +10,31 @@ interface ShareCardProps {
 export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [noUsername, setNoUsername] = useState(false)
 
-  const sharePageUrl = username ? `https://myhinge.app/share/${username}` : null
+  const sharePageUrl = `https://myhinge.app${username ? `/share/${username}` : ''}`
   const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
 
   async function handleTwitter() {
-    // No username → prompt user to set one in Settings
-    if (!username) {
-      setNoUsername(true)
-      setTimeout(() => setNoUsername(false), 3500)
-      return
-    }
-
     setLoading(true)
 
-    // Default to the share page; will be upgraded to the static CDN HTML URL
-    let tweetUrl: string = sharePageUrl!
+    // Start with the share page URL; upgrade to the static CDN HTML URL if generation succeeds
+    let tweetUrl = sharePageUrl
 
-    try {
-      const res = await fetch('/api/og/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username }),
-      })
-      const data = await res.json()
-      // Prefer the static Supabase HTML URL — Twitter reads plain HTML with no
-      // JS/SSR overhead and renders the og:image card instantly
-      if (data?.shareUrl) tweetUrl = data.shareUrl
-      else if (data?.url)  tweetUrl = data.url
-    } catch {
-      // Non-fatal — fall back to share page URL
+    if (username) {
+      try {
+        const res = await fetch('/api/og/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
+        })
+        const data = await res.json()
+        // Use the Supabase-hosted HTML file — pure static HTML with og:image meta tags,
+        // no JS/SSR overhead. Twitter's bot reads it instantly from the CDN.
+        if (data?.shareUrl) tweetUrl = data.shareUrl
+        else if (data?.url)  tweetUrl = data.url
+      } catch {
+        // Non-fatal — fall back to share page URL
+      }
     }
 
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`
@@ -49,9 +43,8 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
   }
 
   async function handleCopy() {
-    const target = sharePageUrl ?? 'https://myhinge.app'
     try {
-      await navigator.clipboard.writeText(target)
+      await navigator.clipboard.writeText(sharePageUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -97,16 +90,9 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         </button>
       </div>
 
-      {noUsername && (
-        <p className="text-[9px] text-amber-400 mt-2 text-center">
-          Set your username in Settings → Profile to share
-        </p>
-      )}
-      {!noUsername && username && (
-        <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-          myhinge.app/share/{username}
-        </p>
-      )}
+      <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
+        {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
+      </p>
     </div>
   )
 }
