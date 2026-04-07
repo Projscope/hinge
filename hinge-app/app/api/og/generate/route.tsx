@@ -42,16 +42,16 @@ function renderImage(opts: {
 
         {/* Top row: logo + name */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '44px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex' }}>
-              <span style={{ fontSize: '22px', color: INK2, letterSpacing: '0.04em', fontWeight: 400 }}>my</span>
-              <span style={{ fontSize: '22px', color: GOLD, letterSpacing: '0.04em', fontWeight: 400 }}>hinge</span>
+              <span style={{ fontSize: '28px', color: INK2, letterSpacing: '0.04em', fontWeight: 400 }}>my</span>
+              <span style={{ fontSize: '28px', color: GOLD, letterSpacing: '0.04em', fontWeight: 400 }}>hinge</span>
             </div>
-            <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'rgba(200,146,42,0.1)', border: '1px solid rgba(200,146,42,0.2)', borderRadius: '4px', padding: '3px 8px' }}>
+            <span style={{ fontSize: '14px', color: INK4, letterSpacing: '0.12em', textTransform: 'uppercase', background: 'rgba(200,146,42,0.1)', border: '1px solid rgba(200,146,42,0.2)', borderRadius: '4px', padding: '4px 10px' }}>
               One goal. Every day.
             </span>
           </div>
-          {displayName ? <span style={{ fontSize: '16px', color: INK4 }}>{displayName}</span> : null}
+          {displayName ? <span style={{ fontSize: '22px', color: INK4 }}>{displayName}</span> : null}
         </div>
 
         {/* Main content */}
@@ -63,29 +63,29 @@ function renderImage(opts: {
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px', marginBottom: '8px' }}>
               <span style={{ fontSize: '120px', fontWeight: 800, color: GOLD, lineHeight: 1 }}>{streak}</span>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '30px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>day</span>
-                <span style={{ fontSize: '30px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>streak 🔥</span>
+                <span style={{ fontSize: '38px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>day</span>
+                <span style={{ fontSize: '38px', color: INK, fontWeight: 600, lineHeight: 1.2 }}>streak 🔥</span>
               </div>
             </div>
 
             {/* Motivational tagline */}
-            <span style={{ fontSize: '20px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
+            <span style={{ fontSize: '26px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
               No missed days. No shortcuts. Just results.
             </span>
           </div>
 
           {/* Right: rank + hit rate card */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: '260px', background: 'rgba(200,146,42,0.07)', border: '1px solid rgba(200,146,42,0.22)', borderRadius: '20px', padding: '32px 36px', gap: '22px' }}>
-            <span style={{ fontSize: '44px', lineHeight: 1 }}>{rankIcon}</span>
+            <span style={{ fontSize: '52px', lineHeight: 1 }}>{rankIcon}</span>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Current rank</span>
-              <span style={{ fontSize: '26px', fontWeight: 700, color: GOLD }}>{rankLabel}</span>
+              <span style={{ fontSize: '15px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Current rank</span>
+              <span style={{ fontSize: '32px', fontWeight: 700, color: GOLD }}>{rankLabel}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Hit rate</span>
+              <span style={{ fontSize: '15px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Hit rate</span>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                <span style={{ fontSize: '48px', fontWeight: 800, color: INK, lineHeight: 1 }}>{hitRate}</span>
-                <span style={{ fontSize: '22px', color: INK2 }}>%</span>
+                <span style={{ fontSize: '56px', fontWeight: 800, color: INK, lineHeight: 1 }}>{hitRate}</span>
+                <span style={{ fontSize: '26px', color: INK2 }}>%</span>
               </div>
             </div>
           </div>
@@ -93,11 +93,11 @@ function renderImage(opts: {
 
         {/* Bottom CTA */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '22px', marginTop: '28px' }}>
-          <span style={{ fontSize: '15px', color: INK2, fontWeight: 500 }}>
+          <span style={{ fontSize: '18px', color: INK2, fontWeight: 500 }}>
             Think you can keep up? Start your streak today.
           </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: GOLD, borderRadius: '8px', padding: '8px 18px' }}>
-            <span style={{ fontSize: '14px', color: BG, fontWeight: 700, letterSpacing: '0.02em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: GOLD, borderRadius: '8px', padding: '10px 22px' }}>
+            <span style={{ fontSize: '16px', color: BG, fontWeight: 700, letterSpacing: '0.02em' }}>
               myhinge.app →
             </span>
           </div>

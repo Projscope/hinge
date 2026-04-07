@@ -128,11 +128,11 @@ export default async function SharePage({ params }: Props) {
       </p>
 
       {/* FOMO headline */}
-      <h1 className="text-[rgba(245,242,234,0.95)] font-semibold text-[22px] leading-snug mb-2 max-w-sm">
+      <h1 className="font-semibold text-[22px] leading-snug mb-2 max-w-sm" style={{ color: 'rgba(245,242,234,0.95)' }}>
         {data.displayName} hasn&apos;t missed a day.<br />
         <span style={{ color: '#c8922a' }}>Can you keep up?</span>
       </h1>
-      <p className="text-[rgba(245,242,234,0.4)] text-[13px] mb-8 max-w-xs">
+      <p className="text-[13px] mb-8 max-w-xs" style={{ color: 'rgba(245,242,234,0.4)' }}>
         One goal. Every day. No excuses. Join {data.streak > 1 ? `${data.streak} days` : 'the streak'} in the making.
       </p>
 
@@ -153,13 +153,14 @@ export default async function SharePage({ params }: Props) {
       {/* Secondary CTA */}
       <Link
         href={`/u/${username}`}
-        className="w-full max-w-sm border border-[rgba(200,146,42,0.25)] text-[rgba(245,242,234,0.6)] text-[13px] font-medium py-3 px-6 rounded-[12px] no-underline text-center hover:border-[rgba(200,146,42,0.5)] hover:text-[rgba(245,242,234,0.85)] transition-all block mb-8"
+        className="w-full max-w-sm text-[13px] font-medium py-3 px-6 rounded-[12px] no-underline text-center transition-all block mb-8"
+        style={{ border: '1px solid rgba(200,146,42,0.25)', color: 'rgba(245,242,234,0.6)' }}
       >
         View {data.displayName}&apos;s full profile
       </Link>
 
       {/* Social proof */}
-      <p className="text-[rgba(245,242,234,0.2)] text-[11px] tracking-wide uppercase">
+      <p className="text-[11px] tracking-wide uppercase" style={{ color: 'rgba(245,242,234,0.2)' }}>
         One goal per day. Every day.
       </p>
     </div>
