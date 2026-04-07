@@ -1,10 +1,17 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
+import { headers } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
-const BASE_URL = 'https://myhinge.app'
+async function getBaseUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL
+  const headersList = await headers()
+  const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? 'myhinge.app'
+  const proto = headersList.get('x-forwarded-proto') ?? 'https'
+  return `${proto}://${host}`
+}
 
 const RANKS = [
   { min: 0,   max: 29,  label: 'Starter',         icon: '🌱' },
@@ -64,7 +71,7 @@ async function getShareData(username: string) {
   }
 }
 
-function buildOgUrl(data: NonNullable<Awaited<ReturnType<typeof getShareData>>>) {
+function buildOgUrl(data: NonNullable<Awaited<ReturnType<typeof getShareData>>>, baseUrl: string) {
   const p = new URLSearchParams({
     n: data.displayName,
     s: String(data.streak),
@@ -73,16 +80,16 @@ function buildOgUrl(data: NonNullable<Awaited<ReturnType<typeof getShareData>>>)
     ri: data.rankIcon,
     d: data.dots,
   })
-  return `${BASE_URL}/api/og/streak?${p.toString()}`
+  return `${baseUrl}/api/og/streak?${p.toString()}`
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
-  const data = await getShareData(username)
+  const [data, baseUrl] = await Promise.all([getShareData(username), getBaseUrl()])
 
   if (!data) return { title: 'Profile not found — myhinge' }
 
-  const ogImage = buildOgUrl(data)
+  const ogImage = buildOgUrl(data, baseUrl)
   const title = `${data.displayName} is on a ${data.streak}-day streak 🔥`
   const description = `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
 
@@ -92,7 +99,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/share/${username}`,
+      url: `${baseUrl}/share/${username}`,
       siteName: 'myhinge',
       images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
     },
@@ -117,7 +124,7 @@ export default async function SharePage({ params }: Props) {
     )
   }
 
-  const ogImageUrl = buildOgUrl(data)
+  const ogImageUrl = buildOgUrl(data, await getBaseUrl())
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] flex flex-col items-center justify-center px-6 text-center">
