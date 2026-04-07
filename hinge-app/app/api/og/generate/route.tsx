@@ -176,7 +176,8 @@ export async function POST(req: NextRequest) {
   const cacheBust = Date.now()
   const pngPath  = `${username}.png`
   const htmlPath = `${username}_${cacheBust}.html`
-  const pngPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${pngPath}?t=${cacheBust}`
+  // Clean PNG URL — no query params (Supabase Storage may reject unknown params)
+  const pngPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${pngPath}`
 
   // Minimal HTML page — no JS, just og/twitter meta tags + instant redirect.
   // Explicit width/height/type help Twitter render the image without fetching it first.
