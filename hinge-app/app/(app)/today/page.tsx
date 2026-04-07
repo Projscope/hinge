@@ -69,6 +69,13 @@ export default function TodayPage() {
           <Heatmap history={history} today={null} />
           <p className="text-[10px] text-ink-4 mt-1.5">One miss in a sea of gold.</p>
         </div>
+
+        {/* Share streak — mobile only, shown whenever there's a streak */}
+        {streaks.current >= 1 && (
+          <div className="lg:hidden mt-6">
+            <ShareCard streakCount={streaks.current} username={username} />
+          </div>
+        )}
       </div>
     )
   }
@@ -134,12 +141,6 @@ export default function TodayPage() {
         )}
 
         {today.completed && (
-          <div className="lg:hidden mt-4">
-            <ShareCard streakCount={streaks.current} username={username} />
-          </div>
-        )}
-
-        {today.completed && (
           <p className="text-center text-[12px] text-ink-3 mt-3">
             See how you stack up →{' '}
             <Link href="/leaderboard" className="text-gold underline-offset-2 hover:underline">
@@ -150,6 +151,13 @@ export default function TodayPage() {
 
         {/* Overflow log */}
         <OverflowLog items={todayOverflow} onAdd={addOverflow} disabled={today.completed} />
+
+        {/* Share streak — mobile only */}
+        {streaks.current >= 1 && (
+          <div className="lg:hidden mt-6">
+            <ShareCard streakCount={streaks.current} username={username} />
+          </div>
+        )}
       </div>
 
       {/* Comeback banner — shown when returning after a streak break */}
