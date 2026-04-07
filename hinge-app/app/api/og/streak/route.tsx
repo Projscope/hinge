@@ -8,9 +8,6 @@ const BG      = '#0f0e0c'
 const INK     = '#f5f2ea'
 const INK2    = 'rgba(245,242,234,0.65)'
 const INK4    = 'rgba(245,242,234,0.25)'
-const HIT_CLR = '#c8922a'
-const MISS    = 'rgba(192,57,43,0.7)'
-const EMPTY   = 'rgba(255,255,255,0.08)'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -21,15 +18,6 @@ export async function GET(req: NextRequest) {
   const hitRate     = parseInt(searchParams.get('r') ?? '0', 10)
   const rankLabel   = searchParams.get('rl') ?? 'Starter'
   const rankIcon    = searchParams.get('ri') ?? '🌱'
-  const dotsStr     = searchParams.get('d') ?? ''   // e.g. "hhmnhhmn..."
-
-  // Parse dots: h=hit, m=miss, n=none
-  const last14 = Array.from({ length: 14 }, (_, i) => {
-    const c = dotsStr[i] ?? 'n'
-    if (c === 'h') return 'hit'
-    if (c === 'm') return 'miss'
-    return 'none'
-  })
 
   return new ImageResponse(
     (
@@ -98,24 +86,9 @@ export async function GET(req: NextRequest) {
             </div>
 
             {/* Motivational tagline */}
-            <span style={{ fontSize: '17px', color: INK2, marginBottom: '24px', fontStyle: 'italic' }}>
+            <span style={{ fontSize: '20px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
               No missed days. No shortcuts. Just results.
             </span>
-
-            {/* Dot label */}
-            <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-              Last 14 days
-            </span>
-
-            {/* Dot grid */}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {last14.map((day, i) => (
-                <div key={i} style={{
-                  width: '34px', height: '34px', borderRadius: '8px',
-                  background: day === 'hit' ? HIT_CLR : day === 'miss' ? MISS : EMPTY,
-                }} />
-              ))}
-            </div>
           </div>
 
           {/* RIGHT — rank + hit rate card */}

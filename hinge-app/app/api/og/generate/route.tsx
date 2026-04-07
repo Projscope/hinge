@@ -27,9 +27,8 @@ function renderImage(opts: {
   hitRate: number
   rankLabel: string
   rankIcon: string
-  last14: ('hit' | 'miss' | 'none')[]
 }) {
-  const { displayName, streak, hitRate, rankLabel, rankIcon, last14 } = opts
+  const { displayName, streak, hitRate, rankLabel, rankIcon } = opts
 
   return new ImageResponse(
     (
@@ -70,21 +69,9 @@ function renderImage(opts: {
             </div>
 
             {/* Motivational tagline */}
-            <span style={{ fontSize: '17px', color: INK2, marginBottom: '24px', fontStyle: 'italic' }}>
+            <span style={{ fontSize: '20px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
               No missed days. No shortcuts. Just results.
             </span>
-
-            {/* Dot label */}
-            <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '10px' }}>
-              Last 14 days
-            </span>
-
-            {/* Dot grid */}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {last14.map((day, i) => (
-                <div key={i} style={{ width: '34px', height: '34px', borderRadius: '8px', background: day === 'hit' ? GOLD : day === 'miss' ? MISS : EMPTY }} />
-              ))}
-            </div>
           </div>
 
           {/* Right: rank + hit rate card */}
@@ -151,15 +138,6 @@ export async function POST(req: NextRequest) {
   const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
   const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
 
-  const last14 = Array.from({ length: 14 }, (_, i): 'hit' | 'miss' | 'none' => {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const dateStr = d.toISOString().slice(0, 10)
-    const entry = goals.find((g: { date: string; completed: boolean }) => g.date === dateStr)
-    if (!entry) return 'none'
-    return entry.completed ? 'hit' : 'miss'
-  })
-
   // Generate PNG
   const imageResponse = renderImage({
     displayName: profile.display_name || profile.username,
@@ -167,7 +145,6 @@ export async function POST(req: NextRequest) {
     hitRate,
     rankLabel: rank.label,
     rankIcon: rank.icon,
-    last14,
   })
 
   const buffer = Buffer.from(await imageResponse.arrayBuffer())

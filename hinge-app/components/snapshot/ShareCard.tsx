@@ -8,50 +8,17 @@ interface ShareCardProps {
 }
 
 export default function ShareCard({ streakCount, username }: ShareCardProps) {
-  const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [hint, setHint] = useState(false)
 
-  const sharePageUrl = `https://myhinge.app${username ? `/share/${username}` : ''}`
-  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n#myhinge`
+  const sharePageUrl = username
+    ? `https://myhinge.app/share/${username}`
+    : 'https://myhinge.app'
 
-  async function handleTwitter() {
-    setLoading(true)
+  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
 
-    if (username) {
-      try {
-        const res = await fetch('/api/og/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
-        })
-        const data = await res.json()
-
-        // Download the PNG via our same-origin proxy so the browser honours the
-        // `download` attribute. Direct Supabase CDN URL fails CORS in the browser.
-        if (data?.url) {
-          try {
-            const proxyUrl = `/api/og/download?u=${encodeURIComponent(username)}`
-            const a = document.createElement('a')
-            a.href = proxyUrl
-            a.download = `my-streak-${streakCount}.png`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            setHint(true)
-            setTimeout(() => setHint(false), 8000)
-          } catch {
-            // Download failed — still open Twitter
-          }
-        }
-      } catch {
-        // Non-fatal — open Twitter anyway without image
-      }
-    }
-
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+  function handleTwitter() {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(sharePageUrl)}`
     window.open(url, '_blank', 'noopener,noreferrer')
-    setLoading(false)
   }
 
   async function handleCopy() {
@@ -89,10 +56,9 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
       <div className="flex gap-1.5">
         <button
           onClick={handleTwitter}
-          disabled={loading}
-          className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans disabled:opacity-50"
+          className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
         >
-          {loading ? '…' : '𝕏 Share'}
+          𝕏 Share
         </button>
         <button
           onClick={handleCopy}
@@ -102,16 +68,9 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         </button>
       </div>
 
-      {hint && (
-        <p className="text-[9px] text-amber-400 mt-2 text-center leading-relaxed">
-          📎 Image downloaded — attach it to your tweet
-        </p>
-      )}
-      {!hint && (
-        <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-          {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
-        </p>
-      )}
+      <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
+        {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
+      </p>
     </div>
   )
 }
