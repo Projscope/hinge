@@ -1,15 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { getPublicProfile } from '@/lib/publicProfile'
 
 interface ShareCardProps {
   streakCount: number
   username?: string | null
 }
 
-export default function ShareCard({ streakCount, username }: ShareCardProps) {
+export default function ShareCard({ streakCount, username: usernameProp }: ShareCardProps) {
   const [copied, setCopied] = useState(false)
+  const [username, setUsername] = useState<string | null>(usernameProp ?? null)
+
+  // Always verify from DB — store value can be null if the public_profiles
+  // query silently failed (e.g. RLS shape mismatch).
+  useEffect(() => {
+    if (!username) {
+      getPublicProfile().then(p => { if (p?.username) setUsername(p.username) })
+    }
+  }, [username])
 
   const sharePageUrl = username
     ? `https://myhinge.app/share/${username}`
