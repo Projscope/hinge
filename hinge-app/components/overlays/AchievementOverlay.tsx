@@ -78,7 +78,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
   async function handleCopyStreakUrl() {
     if (!publicProfileUsername) return
     try {
-      await navigator.clipboard.writeText(`https://myhinge.app/u/${publicProfileUsername}`)
+      await navigator.clipboard.writeText(`https://my-hinge.netlify.app/u/${publicProfileUsername}`)
       setStreakUrlCopied(true)
       setTimeout(() => setStreakUrlCopied(false), 2000)
     } catch {

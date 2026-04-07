@@ -67,7 +67,7 @@ export default function PublicProfileSection() {
   }
 
   async function handleCopy() {
-    const url = `https://myhinge.app/u/${profile?.username ?? username}`
+    const url = `https://my-hinge.netlify.app/u/${profile?.username ?? username}`
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
