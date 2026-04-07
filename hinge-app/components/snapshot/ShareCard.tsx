@@ -27,15 +27,24 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         })
         const data = await res.json()
 
-        // Download the PNG directly to the user's device so they can attach it to the tweet.
-        // Twitter's crawler is unreliable for dynamic og:images — direct attachment is guaranteed.
+        // Download the PNG to the user's device so they can attach it to the tweet.
+        // Must fetch as blob first — the `download` attr is ignored for cross-origin URLs.
         if (data?.url) {
-          const a = document.createElement('a')
-          a.href = data.url
-          a.download = `my-streak-${streakCount}.png`
-          a.click()
-          setHint(true)
-          setTimeout(() => setHint(false), 8000)
+          try {
+            const blob = await fetch(data.url).then(r => r.blob())
+            const blobUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = blobUrl
+            a.download = `my-streak-${streakCount}.png`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            URL.revokeObjectURL(blobUrl)
+            setHint(true)
+            setTimeout(() => setHint(false), 8000)
+          } catch {
+            // Download failed — still open Twitter
+          }
         }
       } catch {
         // Non-fatal — open Twitter anyway without image
