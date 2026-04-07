@@ -70,13 +70,20 @@ async function getShareData(username: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
-  const data = await getShareData(username)
 
-  if (!data) return { title: 'Profile not found — myhinge' }
-
+  // og:image URL is purely derived from username — always include it regardless
+  // of whether the DB call succeeds. This prevents Twitter from seeing a page
+  // with no og:image when generateMetadata times out or returns null.
   const ogImage = storageOgUrl(username)
-  const title = `${data.displayName} is on a ${data.streak}-day streak 🔥`
-  const description = `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
+
+  // Try to enrich title/description from DB, but fall back gracefully
+  const data = await getShareData(username).catch(() => null)
+  const title = data
+    ? `${data.displayName} is on a ${data.streak}-day streak 🔥`
+    : `@${username}'s streak — myhinge`
+  const description = data
+    ? `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
+    : 'One goal per day. Every day.'
 
   return {
     title,
