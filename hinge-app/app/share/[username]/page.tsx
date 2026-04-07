@@ -126,7 +126,7 @@ export default async function SharePage({ params }: Props) {
         <span style={{ color: '#c8922a' }}>hinge</span>
       </p>
 
-      <div className="w-full max-w-sm rounded-[16px] overflow-hidden border border-[rgba(200,146,42,0.2)] mb-6">
+      <div className="w-full max-w-2xl rounded-[16px] overflow-hidden border border-[rgba(200,146,42,0.2)] mb-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={ogImageUrl} alt={`${data.displayName}'s streak`} className="w-full" />
       </div>
