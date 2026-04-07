@@ -10,6 +10,7 @@ import type { AreaTag } from '@/lib/types'
 import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { getWeeklyAnchor } from '@/lib/weeklyAnchor'
+import { getPublicProfile } from '@/lib/publicProfile'
 import { localDateStr } from '@/lib/dateUtils'
 import { getNotificationPrefs } from '@/lib/notifications'
 
@@ -81,10 +82,14 @@ export default function SetupPage() {
 
   // Weekly anchor
   const [weeklyAnchorText, setWeeklyAnchorText] = useState<string | null>(null)
+  const [displayName, setDisplayName] = useState<string | null>(null)
 
   useEffect(() => {
     getWeeklyAnchor().then((anchor) => {
       if (anchor) setWeeklyAnchorText(anchor.text)
+    })
+    getPublicProfile().then((p) => {
+      if (p?.displayName) setDisplayName(p.displayName)
     })
   }, [])
 
@@ -322,7 +327,10 @@ export default function SetupPage() {
       <div className="px-8 pt-7 mb-5 flex items-start justify-between">
         <div>
           <h1 className="font-serif text-[26px] text-ink leading-tight">
-            {greeting}, <em className="italic text-gold">Slava.</em>
+            {displayName
+              ? <>{greeting}, <em className="italic text-gold">{displayName}.</em></>
+              : <>{greeting}.</>
+            }
           </h1>
           <p className="text-[12px] text-ink-3 mt-0.5">
             60 seconds. Sets the tone for everything.
