@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '@/components/layout/Sidebar'
 import RightPanel from '@/components/layout/RightPanel'
 import BottomNav from '@/components/layout/BottomNav'
+import WalkthroughModal from '@/components/onboarding/WalkthroughModal'
 import { useAppStore } from '@/lib/store'
 import { initNotifications } from '@/lib/notifications'
 import { updatePublicSnapshot } from '@/lib/publicSnapshot'
@@ -11,6 +12,8 @@ import { getPublicProfile } from '@/lib/publicProfile'
 import { localDateStr } from '@/lib/dateUtils'
 import { seedOnboardingQueue } from '@/lib/goalQueue'
 import { FOCUS_RANKS } from '@/lib/types'
+
+const WALKTHROUGH_KEY = 'hinge_walkthrough_seen'
 
 function calcHitRate(history: { completed: boolean }[]): number {
   if (history.length === 0) return 0
@@ -21,11 +24,26 @@ function calcHitRate(history: { completed: boolean }[]): number {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { streaks, history, today, plan, hydrated } = useAppStore()
   const hitRate = calcHitRate(history.slice(0, 30))
+  const [showWalkthrough, setShowWalkthrough] = useState(false)
 
   useEffect(() => {
     initNotifications()
     seedOnboardingQueue()
   }, [])
+
+  // Show walkthrough once for brand-new users (no history, no today goal)
+  useEffect(() => {
+    if (!hydrated) return
+    const seen = localStorage.getItem(WALKTHROUGH_KEY)
+    if (!seen && history.length === 0 && !today) {
+      setShowWalkthrough(true)
+    }
+  }, [hydrated, history.length, today])
+
+  function dismissWalkthrough() {
+    localStorage.setItem(WALKTHROUGH_KEY, '1')
+    setShowWalkthrough(false)
+  }
 
   // Keep public snapshot in sync whenever streaks or history change
   useEffect(() => {
@@ -112,6 +130,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Bottom nav — mobile only */}
       <BottomNav />
+
+      {/* First-time walkthrough */}
+      {showWalkthrough && <WalkthroughModal onDismiss={dismissWalkthrough} />}
     </div>
   )
 }
