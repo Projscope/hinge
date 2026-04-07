@@ -8,15 +8,21 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import Toast from '@/components/ui/Toast'
 import AchievementOverlay from '@/components/overlays/AchievementOverlay'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
+import { getPublicProfile } from '@/lib/publicProfile'
 
 export default function SnapshotPage() {
   const router = useRouter()
   const { today, streaks, history, endDay, hydrated } = useAppStore()
   const [toast, setToast] = useState<string | null>(null)
   const [showAchievement, setShowAchievement] = useState(false)
+  const [username, setUsername] = useState<string | null>(null)
   const dismiss = useCallback(() => setToast(null), [])
+
+  useEffect(() => {
+    getPublicProfile().then((p) => { if (p) setUsername(p.username) })
+  }, [])
 
   if (!hydrated) return null
 
@@ -116,7 +122,7 @@ export default function SnapshotPage() {
         {/* Streak share card */}
         <ShareCard
           streakCount={streaks.current}
-          onShare={(target) => setToast(`${target} — share coming soon!`)}
+          username={username}
         />
 
         {/* Reset note */}

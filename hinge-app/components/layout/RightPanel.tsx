@@ -4,8 +4,6 @@ import type { DailyGoal, Streaks, Plan } from '@/lib/types'
 import WeekDots from './WeekDots'
 import Heatmap from './Heatmap'
 import ShareCard from '@/components/snapshot/ShareCard'
-import Toast from '@/components/ui/Toast'
-import { useState, useCallback } from 'react'
 
 interface RightPanelProps {
   streaks: Streaks
@@ -28,8 +26,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function RightPanel({ streaks, history, today, plan, hitRate }: RightPanelProps) {
-  const [toast, setToast] = useState<string | null>(null)
-  const dismiss = useCallback(() => setToast(null), [])
 
   const now = new Date()
   const monthName = now.toLocaleDateString('en-US', { month: 'long' })
@@ -116,12 +112,10 @@ export default function RightPanel({ streaks, history, today, plan, hitRate }: R
           <SectionLabel>Day {streaks.current} milestone</SectionLabel>
           <ShareCard
             streakCount={streaks.current}
-            onShare={(target) => setToast(`${target} — coming soon!`)}
           />
         </>
       )}
 
-      {toast && <Toast message={toast} onDone={dismiss} />}
     </aside>
   )
 }
