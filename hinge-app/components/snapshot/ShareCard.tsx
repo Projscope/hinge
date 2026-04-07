@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 interface ShareCardProps {
   streakCount: number
@@ -53,24 +54,34 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         Next milestone: Day {streakCount < 7 ? 7 : streakCount < 30 ? 30 : streakCount < 100 ? 100 : 365}
       </p>
 
-      <div className="flex gap-1.5">
-        <button
-          onClick={handleTwitter}
-          className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
+      {username ? (
+        <>
+          <div className="flex gap-1.5">
+            <button
+              onClick={handleTwitter}
+              className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
+            >
+              𝕏 Share
+            </button>
+            <button
+              onClick={handleCopy}
+              className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
+            >
+              {copied ? '✓ Copied' : '🔗 Copy'}
+            </button>
+          </div>
+          <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
+            myhinge.app/share/{username}
+          </p>
+        </>
+      ) : (
+        <Link
+          href="/settings"
+          className="block text-center text-[10px] text-gold border border-[rgba(200,146,42,0.3)] rounded-[6px] py-1.5 hover:bg-[rgba(200,146,42,0.08)] transition-all"
         >
-          𝕏 Share
-        </button>
-        <button
-          onClick={handleCopy}
-          className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
-        >
-          {copied ? '✓ Copied' : '🔗 Copy'}
-        </button>
-      </div>
-
-      <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-        {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
-      </p>
+          Set username to share your streak →
+        </Link>
+      )}
     </div>
   )
 }
