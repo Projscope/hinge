@@ -24,6 +24,7 @@ function defaultState(): AppState {
     overflow: [],
     freezeUsedThisMonth: false,
     walkthroughSeen: false,
+    username: null,
   }
 }
 
@@ -84,8 +85,9 @@ export function useAppStore() {
       const today = todayDate()
 
       // Fire all reads in parallel
-      const [profileRes, goalRes, historyRes, streaksRes] = await Promise.all([
+      const [profileRes, publicProfileRes, goalRes, historyRes, streaksRes] = await Promise.all([
         supabase.from('profiles').select('plan, freeze_used_this_month, walkthrough_seen').eq('id', user.id).single(),
+        supabase.from('public_profiles').select('username').eq('user_id', user.id).maybeSingle(),
         supabase.from('daily_goals').select('*').eq('user_id', user.id).eq('date', today).maybeSingle(),
         supabase.from('daily_goals').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
         supabase.from('streaks').select('*').eq('user_id', user.id).maybeSingle(),
@@ -117,6 +119,7 @@ export function useAppStore() {
         overflow,
         freezeUsedThisMonth: profileRes.data?.freeze_used_this_month ?? false,
         walkthroughSeen: profileRes.data?.walkthrough_seen ?? false,
+        username: (publicProfileRes.data?.username as string) ?? null,
       })
       setHydrated(true)
     }
@@ -280,6 +283,7 @@ export function useAppStore() {
     todayOverflow,
     plan: state.plan,
     walkthroughSeen: state.walkthroughSeen,
+    username: state.username,
     setTodayGoal,
     toggleTask,
     addOverflow,

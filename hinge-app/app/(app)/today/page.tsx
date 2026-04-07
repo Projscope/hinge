@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
@@ -16,7 +16,6 @@ import SectionTitle from '@/components/ui/SectionTitle'
 import Heatmap from '@/components/layout/Heatmap'
 import WeekDots from '@/components/layout/WeekDots'
 import ShareCard from '@/components/snapshot/ShareCard'
-import { getPublicProfile } from '@/lib/publicProfile'
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -36,13 +35,8 @@ function timeLeft(endTime: string): string {
 
 export default function TodayPage() {
   const router = useRouter()
-  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks } = useAppStore()
+  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks, username } = useAppStore()
   const [showComeback, setShowComeback] = useState(true)
-  const [username, setUsername] = useState<string | null>(null)
-
-  useEffect(() => {
-    getPublicProfile().then((p) => { if (p?.username) setUsername(p.username) })
-  }, [])
 
   if (!hydrated) return null
 

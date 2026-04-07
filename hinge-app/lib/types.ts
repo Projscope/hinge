@@ -37,6 +37,7 @@ export interface AppState {
   overflow: OverflowItem[]
   freezeUsedThisMonth: boolean
   walkthroughSeen: boolean
+  username: string | null
 }
 
 // Goal quality scoring result
