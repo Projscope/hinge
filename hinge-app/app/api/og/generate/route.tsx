@@ -27,8 +27,9 @@ function renderImage(opts: {
   hitRate: number
   rankLabel: string
   rankIcon: string
+  days14: string
 }) {
-  const { displayName, streak, hitRate, rankLabel, rankIcon } = opts
+  const { displayName, streak, hitRate, rankLabel, rankIcon, days14 } = opts
 
   return new ImageResponse(
     (
@@ -69,6 +70,16 @@ function renderImage(opts: {
             <span style={{ fontSize: '26px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
               No missed days. No shortcuts. Just results.
             </span>
+
+            {/* Last 14 days squares */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+              {days14.split('').map((d, i) => (
+                <div key={i} style={{
+                  width: '28px', height: '28px', borderRadius: '6px',
+                  background: d === '1' ? GOLD : d === '0' ? MISS : EMPTY,
+                }} />
+              ))}
+            </div>
           </div>
 
           {/* Right: rank + hit rate card */}
@@ -135,6 +146,13 @@ export async function POST(req: NextRequest) {
   const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
   const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
 
+  // Build last-14 string oldest→newest: '1'=hit, '0'=miss, '-'=no data
+  const last14 = Array.from({ length: 14 }, (_, i) => {
+    const g = goals[13 - i]
+    if (!g) return '-'
+    return g.completed ? '1' : '0'
+  }).join('')
+
   // Generate PNG
   const imageResponse = renderImage({
     displayName: profile.display_name || profile.username,
@@ -142,6 +160,7 @@ export async function POST(req: NextRequest) {
     hitRate,
     rankLabel: rank.label,
     rankIcon: rank.icon,
+    days14: last14,
   })
 
   const buffer = Buffer.from(await imageResponse.arrayBuffer())

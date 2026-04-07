@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
   const hitRate     = parseInt(searchParams.get('r') ?? '0', 10)
   const rankLabel   = searchParams.get('rl') ?? 'Starter'
   const rankIcon    = searchParams.get('ri') ?? '🌱'
+  // d = 14-char string: '1'=hit, '0'=miss, '-'=empty
+  const days14      = (searchParams.get('d') ?? '--------------').slice(0, 14).padEnd(14, '-')
 
   return new ImageResponse(
     (
@@ -86,6 +88,16 @@ export async function GET(req: NextRequest) {
             <span style={{ fontSize: '26px', color: INK2, marginTop: '16px', fontStyle: 'italic' }}>
               No missed days. No shortcuts. Just results.
             </span>
+
+            {/* Last 14 days squares */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '24px' }}>
+              {days14.split('').map((d, i) => (
+                <div key={i} style={{
+                  width: '28px', height: '28px', borderRadius: '6px',
+                  background: d === '1' ? GOLD : d === '0' ? 'rgba(192,57,43,0.7)' : 'rgba(255,255,255,0.08)',
+                }} />
+              ))}
+            </div>
           </div>
 
           {/* RIGHT — rank + hit rate card */}
