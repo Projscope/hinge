@@ -37,7 +37,7 @@ const STEPS = [
 ]
 
 interface Props {
-  onDismiss: () => void
+  onDismiss: () => void | Promise<void>
 }
 
 export default function WalkthroughModal({ onDismiss }: Props) {
@@ -46,9 +46,9 @@ export default function WalkthroughModal({ onDismiss }: Props) {
   const current = STEPS[step]
   const isLast = step === STEPS.length - 1
 
-  function handleNext() {
+  async function handleNext() {
     if (isLast) {
-      onDismiss()
+      await onDismiss()
       router.push('/setup')
     } else {
       setStep((s) => s + 1)
