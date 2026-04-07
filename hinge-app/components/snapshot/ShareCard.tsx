@@ -22,7 +22,7 @@ export default function ShareCard({ streakCount, username: usernameProp }: Share
   }, [username])
 
   const sharePageUrl = username
-    ? `https://myhinge.app/share/${username}?v=3`
+    ? `https://myhinge.app/share/${username}?v=4`
     : 'https://myhinge.app'
 
   const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`

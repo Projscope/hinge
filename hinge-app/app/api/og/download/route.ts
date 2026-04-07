@@ -19,8 +19,8 @@ export async function GET(req: NextRequest) {
   return new Response(buffer, {
     headers: {
       'Content-Type': 'image/png',
-      'Content-Disposition': `attachment; filename="my-streak.png"`,
-      'Cache-Control': 'no-store',
+      'Content-Disposition': 'inline',
+      'Cache-Control': 'public, max-age=3600',
     },
   })
 }

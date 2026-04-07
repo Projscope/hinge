@@ -6,9 +6,10 @@ export const dynamic = 'force-dynamic'
 
 const BASE_URL = 'https://myhinge.app'
 
-// Static CDN URL — Twitter can always fetch this without hitting a serverless function
+// Serve the OG image through our own domain proxy — Twitter can reach myhinge.app
+// (proven: it reads HTML from it) but can't fetch images directly from Supabase CDN.
 const storageOgUrl = (username: string) =>
-  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/og-images/${username}.png`
+  `${BASE_URL}/api/og/download?u=${encodeURIComponent(username)}`
 
 const RANKS = [
   { min: 0,   max: 29,  label: 'Starter',         icon: '🌱' },
