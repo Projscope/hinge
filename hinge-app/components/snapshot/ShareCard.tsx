@@ -13,7 +13,7 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [hint, setHint] = useState(false)
 
   const sharePageUrl = `https://myhinge.app${username ? `/share/${username}` : ''}`
-  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n${sharePageUrl}`
+  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n#myhinge`
 
   async function handleTwitter() {
     setLoading(true)
