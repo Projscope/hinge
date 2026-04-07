@@ -173,14 +173,14 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await imageResponse.arrayBuffer())
 
   const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const cacheBust = Date.now()
   const pngPath  = `${username}.png`
-  const htmlPath = `${username}.html`
+  const htmlPath = `${username}_${cacheBust}.html`
+  const pngPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${pngPath}?t=${cacheBust}`
 
-  // Derive the public PNG URL ahead of time (needed inside the HTML)
-  const pngPublicUrl = `${SUPABASE_URL}/storage/v1/object/public/og-images/${pngPath}`
-
-  // Minimal HTML page — no JS, just og/twitter meta tags + instant redirect
-  // Twitter's bot reads this directly from the trusted Supabase CDN
+  // Minimal HTML page — no JS, just og/twitter meta tags + instant redirect.
+  // Explicit width/height/type help Twitter render the image without fetching it first.
+  // Twitter's bot reads this directly from the trusted Supabase CDN.
   const displayTitle = profile.display_name || profile.username
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -191,10 +191,15 @@ export async function POST(req: NextRequest) {
 <meta name="twitter:title" content="${displayTitle} is on a ${streak}-day streak on myhinge 🔥">
 <meta name="twitter:description" content="One goal. Every day. No excuses. Think you can keep up?">
 <meta name="twitter:image" content="${pngPublicUrl}">
+<meta name="twitter:image:width" content="1200">
+<meta name="twitter:image:height" content="630">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${displayTitle} is on a ${streak}-day streak on myhinge 🔥">
 <meta property="og:description" content="One goal. Every day. No excuses. Think you can keep up?">
 <meta property="og:image" content="${pngPublicUrl}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="https://myhinge.app/share/${username}">
 <meta http-equiv="refresh" content="0;url=https://myhinge.app/share/${username}">
 </head>
