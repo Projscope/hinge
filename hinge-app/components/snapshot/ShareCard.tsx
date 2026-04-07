@@ -32,6 +32,11 @@ export default function ShareCard({ streakCount, username: usernameProp }: Share
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
+  function handleLinkedIn() {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(sharePageUrl)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
+  }
+
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(sharePageUrl)
@@ -71,13 +76,19 @@ export default function ShareCard({ streakCount, username: usernameProp }: Share
               onClick={handleTwitter}
               className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
             >
-              𝕏 Share
+              𝕏
+            </button>
+            <button
+              onClick={handleLinkedIn}
+              className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
+            >
+              in
             </button>
             <button
               onClick={handleCopy}
               className="flex-1 bg-[rgba(255,255,255,0.05)] border border-[var(--border)] rounded-[6px] py-1.5 text-[10px] text-ink-3 hover:bg-[rgba(255,255,255,0.1)] hover:text-ink transition-all font-sans"
             >
-              {copied ? '✓ Copied' : '🔗 Copy'}
+              {copied ? '✓' : '🔗'}
             </button>
           </div>
           <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
