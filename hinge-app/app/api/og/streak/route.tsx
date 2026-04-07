@@ -2,8 +2,7 @@ import { ImageResponse } from 'next/og'
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
 
-export const runtime = 'edge'
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 const GOLD    = '#c8922a'
 const BG      = '#0f0e0c'
@@ -196,7 +195,8 @@ export async function GET(req: NextRequest) {
       width: 1200,
       height: 630,
       headers: {
-        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'Content-Type': 'image/png',
       },
     }
   )
