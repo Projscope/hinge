@@ -120,35 +120,48 @@ export default async function SharePage({ params }: Props) {
   const ogImageUrl = storageOgUrl(username)
 
   return (
-    <div className="min-h-screen bg-[#0f0e0c] flex flex-col items-center justify-center px-6 text-center">
-      <p className="font-serif text-[22px] mb-8">
-        <span style={{ color: 'rgba(245,242,234,0.7)' }}>my</span>
+    <div className="min-h-screen bg-[#0f0e0c] flex flex-col items-center justify-center px-6 py-16 text-center">
+      {/* Logo */}
+      <p className="font-serif text-[20px] mb-6 tracking-wide">
+        <span style={{ color: 'rgba(245,242,234,0.6)' }}>my</span>
         <span style={{ color: '#c8922a' }}>hinge</span>
       </p>
 
-      <div className="w-full max-w-2xl rounded-[16px] overflow-hidden border border-[rgba(200,146,42,0.2)] mb-6">
+      {/* FOMO headline */}
+      <h1 className="text-[rgba(245,242,234,0.95)] font-semibold text-[22px] leading-snug mb-2 max-w-sm">
+        {data.displayName} hasn&apos;t missed a day.<br />
+        <span style={{ color: '#c8922a' }}>Can you keep up?</span>
+      </h1>
+      <p className="text-[rgba(245,242,234,0.4)] text-[13px] mb-8 max-w-xs">
+        One goal. Every day. No excuses. Join {data.streak > 1 ? `${data.streak} days` : 'the streak'} in the making.
+      </p>
+
+      {/* OG image */}
+      <div className="w-full max-w-2xl rounded-[16px] overflow-hidden border border-[rgba(200,146,42,0.25)] mb-8 shadow-[0_0_60px_rgba(200,146,42,0.08)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={ogImageUrl} alt={`${data.displayName}'s streak`} className="w-full" />
       </div>
 
-      <p className="text-[rgba(245,242,234,0.5)] text-[14px] mb-6">
-        {data.displayName} is on a {data.streak}-day streak on myhinge.
-      </p>
+      {/* Primary CTA */}
+      <Link
+        href="/"
+        className="w-full max-w-sm bg-[#c8922a] text-[#0f0e0c] text-[15px] font-bold py-4 px-8 rounded-[12px] no-underline text-center hover:opacity-90 active:scale-[0.98] transition-all mb-3 block"
+      >
+        Start your streak — it&apos;s free →
+      </Link>
 
-      <div className="flex flex-col gap-3 w-full max-w-[220px]">
-        <Link
-          href={`/u/${username}`}
-          className="bg-[#c8922a] text-[#0f0e0c] text-[13px] font-semibold py-3 px-6 rounded-[10px] no-underline text-center hover:opacity-90 transition-opacity"
-        >
-          View full profile →
-        </Link>
-        <Link
-          href="/"
-          className="text-[rgba(245,242,234,0.4)] text-[12px] no-underline hover:text-[rgba(245,242,234,0.7)] transition-colors"
-        >
-          What is myhinge?
-        </Link>
-      </div>
+      {/* Secondary CTA */}
+      <Link
+        href={`/u/${username}`}
+        className="w-full max-w-sm border border-[rgba(200,146,42,0.25)] text-[rgba(245,242,234,0.6)] text-[13px] font-medium py-3 px-6 rounded-[12px] no-underline text-center hover:border-[rgba(200,146,42,0.5)] hover:text-[rgba(245,242,234,0.85)] transition-all block mb-8"
+      >
+        View {data.displayName}&apos;s full profile
+      </Link>
+
+      {/* Social proof */}
+      <p className="text-[rgba(245,242,234,0.2)] text-[11px] tracking-wide uppercase">
+        One goal per day. Every day.
+      </p>
     </div>
   )
 }
