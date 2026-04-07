@@ -202,9 +202,10 @@ export async function POST(req: NextRequest) {
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://myhinge.app/share/${username}">
-<meta http-equiv="refresh" content="0;url=https://myhinge.app/share/${username}">
 </head>
-<body></body>
+<body>
+<script>window.location.replace('https://myhinge.app/share/${username}')</script>
+</body>
 </html>`
 
   // Upload PNG + HTML in parallel
