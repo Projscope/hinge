@@ -23,6 +23,7 @@ function defaultState(): AppState {
     history: [],
     overflow: [],
     freezeUsedThisMonth: false,
+    walkthroughSeen: false,
   }
 }
 
@@ -84,7 +85,7 @@ export function useAppStore() {
 
       // Fire all reads in parallel
       const [profileRes, goalRes, historyRes, streaksRes] = await Promise.all([
-        supabase.from('profiles').select('plan, freeze_used_this_month').eq('id', user.id).single(),
+        supabase.from('profiles').select('plan, freeze_used_this_month, walkthrough_seen').eq('id', user.id).single(),
         supabase.from('daily_goals').select('*').eq('user_id', user.id).eq('date', today).maybeSingle(),
         supabase.from('daily_goals').select('*').eq('user_id', user.id).order('date', { ascending: false }).limit(100),
         supabase.from('streaks').select('*').eq('user_id', user.id).maybeSingle(),
@@ -115,6 +116,7 @@ export function useAppStore() {
         history: (historyRes.data ?? []).map(mapGoal),
         overflow,
         freezeUsedThisMonth: profileRes.data?.freeze_used_this_month ?? false,
+        walkthroughSeen: profileRes.data?.walkthrough_seen ?? false,
       })
       setHydrated(true)
     }
@@ -258,6 +260,13 @@ export function useAppStore() {
     [supabase, state.today]
   )
 
+  const markWalkthroughSeen = useCallback(async () => {
+    setState((prev) => ({ ...prev, walkthroughSeen: true }))
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('profiles').update({ walkthrough_seen: true }).eq('id', user.id)
+  }, [supabase])
+
   const todayOverflow = state.overflow.filter(
     (o) => o.dailyGoalId === state.today?.id
   )
@@ -270,9 +279,11 @@ export function useAppStore() {
     history: state.history,
     todayOverflow,
     plan: state.plan,
+    walkthroughSeen: state.walkthroughSeen,
     setTodayGoal,
     toggleTask,
     addOverflow,
     endDay,
+    markWalkthroughSeen,
   }
 }

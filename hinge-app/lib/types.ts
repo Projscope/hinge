@@ -36,6 +36,7 @@ export interface AppState {
   history: DailyGoal[]
   overflow: OverflowItem[]
   freezeUsedThisMonth: boolean
+  walkthroughSeen: boolean
 }
 
 // Goal quality scoring result
