@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
           borderTop: '1px solid rgba(255,255,255,0.07)',
           paddingTop: '22px', marginTop: '28px',
         }}>
-          <span style={{ fontSize: '18px', color: INK2, fontWeight: 500 }}>
+          <span style={{ fontSize: '24px', color: INK2, fontWeight: 500 }}>
             Think you can keep up? Start your streak today.
           </span>
           <div style={{ display: 'flex', alignItems: 'center', background: GOLD, borderRadius: '8px', padding: '10px 22px' }}>
