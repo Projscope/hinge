@@ -2,39 +2,89 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
+export const dynamic = 'force-dynamic'
+
 const BASE_URL = 'https://myhinge.app'
+
+const RANKS = [
+  { min: 0,   max: 29,  label: 'Starter',         icon: '🌱' },
+  { min: 30,  max: 49,  label: 'Builder',          icon: '🔨' },
+  { min: 50,  max: 64,  label: 'Momentum Maker',   icon: '⚡' },
+  { min: 65,  max: 79,  label: 'Consistency King', icon: '🎯' },
+  { min: 80,  max: 89,  label: 'Deep Work Monk',   icon: '🧘' },
+  { min: 90,  max: 100, label: 'Untouchable',      icon: '💎' },
+]
 
 interface Props {
   params: Promise<{ username: string }>
 }
 
-async function getProfile(username: string) {
+async function getShareData(username: string) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
-  const { data } = await supabase
+
+  const { data: profile } = await supabase
     .from('public_profiles')
-    .select('display_name, username')
+    .select('user_id, display_name, username')
     .eq('username', username.toLowerCase())
     .eq('is_public', true)
     .maybeSingle()
 
-  return data
+  if (!profile) return null
+
+  const [streakRes, goalsRes] = await Promise.all([
+    supabase.from('streaks').select('current').eq('user_id', profile.user_id).maybeSingle(),
+    supabase.from('daily_goals').select('date, completed').eq('user_id', profile.user_id).order('date', { ascending: false }).limit(30),
+  ])
+
+  const streak = streakRes.data?.current ?? 0
+  const goals  = goalsRes.data ?? []
+  const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
+  const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
+  const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
+
+  const last14 = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    const dateStr = d.toISOString().slice(0, 10)
+    const entry = goals.find((g: { date: string }) => g.date === dateStr) as { completed: boolean } | undefined
+    if (!entry) return 'n'
+    return entry.completed ? 'h' : 'm'
+  }).join('')
+
+  return {
+    displayName: profile.display_name || profile.username,
+    streak,
+    hitRate,
+    rankLabel: rank.label,
+    rankIcon: rank.icon,
+    dots: last14,
+  }
+}
+
+function buildOgUrl(data: NonNullable<Awaited<ReturnType<typeof getShareData>>>) {
+  const p = new URLSearchParams({
+    n: data.displayName,
+    s: String(data.streak),
+    r: String(data.hitRate),
+    rl: data.rankLabel,
+    ri: data.rankIcon,
+    d: data.dots,
+  })
+  return `${BASE_URL}/api/og/streak?${p.toString()}`
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
-  const profile = await getProfile(username)
+  const data = await getShareData(username)
 
-  if (!profile) {
-    return { title: 'Profile not found — myhinge' }
-  }
+  if (!data) return { title: 'Profile not found — myhinge' }
 
-  const displayName = profile.display_name || profile.username
-  const ogImage = `${BASE_URL}/api/og/streak?u=${username}`
-  const title = `${displayName} is on a streak 🔥`
-  const description = 'One goal per day. Every day. See their streak on myhinge.'
+  const ogImage = buildOgUrl(data)
+  const title = `${data.displayName} is on a ${data.streak}-day streak 🔥`
+  const description = `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
 
   return {
     title,
@@ -45,7 +95,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${BASE_URL}/share/${username}`,
       siteName: 'myhinge',
       images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
-      type: 'profile',
     },
     twitter: {
       card: 'summary_large_image',
@@ -58,9 +107,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SharePage({ params }: Props) {
   const { username } = await params
-  const profile = await getProfile(username)
+  const data = await getShareData(username)
 
-  if (!profile) {
+  if (!data) {
     return (
       <div className="min-h-screen bg-[#0f0e0c] flex items-center justify-center">
         <p className="text-[rgba(245,242,234,0.4)] text-[15px]">Profile not found.</p>
@@ -68,28 +117,22 @@ export default async function SharePage({ params }: Props) {
     )
   }
 
-  const displayName = profile.display_name || profile.username
+  const ogImageUrl = buildOgUrl(data)
 
   return (
     <div className="min-h-screen bg-[#0f0e0c] flex flex-col items-center justify-center px-6 text-center">
-      {/* Logo */}
       <p className="font-serif text-[22px] mb-8">
         <span style={{ color: 'rgba(245,242,234,0.7)' }}>my</span>
         <span style={{ color: '#c8922a' }}>hinge</span>
       </p>
 
-      {/* Card preview */}
       <div className="w-full max-w-sm rounded-[16px] overflow-hidden border border-[rgba(200,146,42,0.2)] mb-6">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`/api/og/streak?u=${username}`}
-          alt={`${displayName}'s streak`}
-          className="w-full"
-        />
+        <img src={ogImageUrl} alt={`${data.displayName}'s streak`} className="w-full" />
       </div>
 
       <p className="text-[rgba(245,242,234,0.5)] text-[14px] mb-6">
-        {displayName} is building a daily streak on myhinge.
+        {data.displayName} is on a {data.streak}-day streak on myhinge.
       </p>
 
       <div className="flex flex-col gap-3 w-full max-w-[220px]">

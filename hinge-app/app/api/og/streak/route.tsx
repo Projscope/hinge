@@ -1,8 +1,7 @@
 import { ImageResponse } from 'next/og'
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 const GOLD    = '#c8922a'
 const BG      = '#0f0e0c'
@@ -13,62 +12,23 @@ const HIT_CLR = '#c8922a'
 const MISS    = 'rgba(192,57,43,0.7)'
 const EMPTY   = 'rgba(255,255,255,0.08)'
 
-const RANKS = [
-  { min: 0,   max: 29,  label: 'Starter',         icon: '🌱' },
-  { min: 30,  max: 49,  label: 'Builder',          icon: '🔨' },
-  { min: 50,  max: 64,  label: 'Momentum Maker',   icon: '⚡' },
-  { min: 65,  max: 79,  label: 'Consistency King', icon: '🎯' },
-  { min: 80,  max: 89,  label: 'Deep Work Monk',   icon: '🧘' },
-  { min: 90,  max: 100, label: 'Untouchable',      icon: '💎' },
-]
-
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
-  const username = searchParams.get('u')
-  if (!username) return new Response('Missing username', { status: 400 })
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  // All data passed as URL params — no DB calls, instant render
+  const displayName = searchParams.get('n') ?? ''
+  const streak      = parseInt(searchParams.get('s') ?? '0', 10)
+  const hitRate     = parseInt(searchParams.get('r') ?? '0', 10)
+  const rankLabel   = searchParams.get('rl') ?? 'Starter'
+  const rankIcon    = searchParams.get('ri') ?? '🌱'
+  const dotsStr     = searchParams.get('d') ?? ''   // e.g. "hhmnhhmn..."
 
-  // 1. Resolve user_id from username
-  const { data: profileData } = await supabase
-    .from('public_profiles')
-    .select('user_id, display_name, username')
-    .eq('username', username.toLowerCase())
-    .eq('is_public', true)
-    .maybeSingle()
-
-  if (!profileData) return new Response('Not found', { status: 404 })
-
-  const userId = profileData.user_id
-  const displayName = profileData.display_name || profileData.username
-
-  // 2. Fetch streak + last 30 goals in parallel
-  const [streakRes, goalsRes] = await Promise.all([
-    supabase.from('streaks').select('current, personal_best').eq('user_id', userId).maybeSingle(),
-    supabase.from('daily_goals').select('date, completed').eq('user_id', userId).order('date', { ascending: false }).limit(30),
-  ])
-
-  const streak = streakRes.data?.current ?? 0
-  const goals  = goalsRes.data ?? []
-
-  // 3. Hit rate from last 30
-  const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
-  const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
-
-  // 4. Rank
-  const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
-
-  // 5. Last 14 days dot grid
+  // Parse dots: h=hit, m=miss, n=none
   const last14 = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    const dateStr = d.toISOString().slice(0, 10)
-    const entry = goals.find((g: { date: string; completed: boolean }) => g.date === dateStr)
-    if (!entry) return 'none'
-    return entry.completed ? 'hit' : 'miss'
+    const c = dotsStr[i] ?? 'n'
+    if (c === 'h') return 'hit'
+    if (c === 'm') return 'miss'
+    return 'none'
   })
 
   return new ImageResponse(
@@ -91,30 +51,30 @@ export async function GET(req: NextRequest) {
           background: `linear-gradient(90deg, ${GOLD} 0%, transparent 70%)`,
         }} />
 
-        {/* Subtle radial glow top-right */}
+        {/* Radial glow top-right */}
         <div style={{
           position: 'absolute', top: '-80px', right: '-80px',
           width: '480px', height: '480px', borderRadius: '50%',
           background: `radial-gradient(circle, rgba(200,146,42,0.10) 0%, transparent 65%)`,
         }} />
 
-        {/* ── TOP ROW: logo + display name ── */}
+        {/* TOP ROW: logo + display name */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0px' }}>
+          <div style={{ display: 'flex' }}>
             <span style={{ fontSize: '20px', color: INK2, letterSpacing: '0.04em' }}>my</span>
             <span style={{ fontSize: '20px', color: GOLD,  letterSpacing: '0.04em' }}>hinge</span>
           </div>
-          {/* Display name */}
-          <span style={{ fontSize: '18px', color: INK4 }}>{displayName}</span>
+          {displayName ? (
+            <span style={{ fontSize: '18px', color: INK4 }}>{displayName}</span>
+          ) : null}
         </div>
 
-        {/* ── MAIN CONTENT ── */}
+        {/* MAIN CONTENT */}
         <div style={{ display: 'flex', flex: 1, gap: '80px', alignItems: 'flex-start' }}>
 
           {/* LEFT — streak + dots */}
           <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-            {/* Streak */}
+            {/* Streak number */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px', marginBottom: '10px' }}>
               <span style={{ fontSize: '112px', fontWeight: 800, color: GOLD, lineHeight: 1 }}>
                 {streak}
@@ -125,12 +85,12 @@ export async function GET(req: NextRequest) {
               </div>
             </div>
 
-            {/* 14-day dot grid label */}
+            {/* Dot label */}
             <span style={{ fontSize: '12px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
               Last 14 days
             </span>
 
-            {/* Dots */}
+            {/* Dot grid */}
             <div style={{ display: 'flex', gap: '8px' }}>
               {last14.map((day, i) => (
                 <div key={i} style={{
@@ -141,7 +101,7 @@ export async function GET(req: NextRequest) {
             </div>
           </div>
 
-          {/* RIGHT — rank + hit rate */}
+          {/* RIGHT — rank + hit rate card */}
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
             minWidth: '260px',
@@ -151,20 +111,17 @@ export async function GET(req: NextRequest) {
             padding: '32px 36px',
             gap: '24px',
           }}>
-            {/* Rank icon */}
-            <span style={{ fontSize: '48px', lineHeight: 1 }}>{rank.icon}</span>
+            <span style={{ fontSize: '48px', lineHeight: 1 }}>{rankIcon}</span>
 
-            {/* Rank label */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 Current rank
               </span>
               <span style={{ fontSize: '26px', fontWeight: 700, color: GOLD }}>
-                {rank.label}
+                {rankLabel}
               </span>
             </div>
 
-            {/* Hit rate */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 Hit rate
@@ -179,7 +136,7 @@ export async function GET(req: NextRequest) {
           </div>
         </div>
 
-        {/* ── BOTTOM: site URL ── */}
+        {/* BOTTOM: site URL */}
         <div style={{
           display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
           borderTop: '1px solid rgba(255,255,255,0.06)',
@@ -194,10 +151,6 @@ export async function GET(req: NextRequest) {
     {
       width: 1200,
       height: 630,
-      headers: {
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
-        'Content-Type': 'image/png',
-      },
     }
   )
 }
