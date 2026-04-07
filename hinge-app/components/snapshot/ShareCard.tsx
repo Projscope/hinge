@@ -27,19 +27,17 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         })
         const data = await res.json()
 
-        // Download the PNG to the user's device so they can attach it to the tweet.
-        // Must fetch as blob first — the `download` attr is ignored for cross-origin URLs.
+        // Download the PNG via our same-origin proxy so the browser honours the
+        // `download` attribute. Direct Supabase CDN URL fails CORS in the browser.
         if (data?.url) {
           try {
-            const blob = await fetch(data.url).then(r => r.blob())
-            const blobUrl = URL.createObjectURL(blob)
+            const proxyUrl = `/api/og/download?u=${encodeURIComponent(username)}`
             const a = document.createElement('a')
-            a.href = blobUrl
+            a.href = proxyUrl
             a.download = `my-streak-${streakCount}.png`
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
-            URL.revokeObjectURL(blobUrl)
             setHint(true)
             setTimeout(() => setHint(false), 8000)
           } catch {
