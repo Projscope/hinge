@@ -11,34 +11,39 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const shareUrl = username
-    ? `https://myhinge.app/share/${username}?v=2`
+  // Page URL for copy/link sharing
+  const sharePageUrl = username
+    ? `https://myhinge.app/share/${username}`
     : 'https://myhinge.app'
 
   const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
 
   async function handleTwitter() {
     setLoading(true)
+    // Default to share page URL; will be replaced with the CDN image URL if generation succeeds
+    let tweetUrl = sharePageUrl
     try {
-      // Pre-generate and upload the OG image to Supabase Storage before opening Twitter
       if (username) {
-        await fetch('/api/og/generate', {
+        const res = await fetch('/api/og/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username }),
         })
+        const data = await res.json()
+        // Use the direct Supabase CDN image URL so Twitter renders it without crawling our page
+        if (data?.url) tweetUrl = data.url
       }
     } catch {
-      // Non-fatal — open Twitter anyway
+      // Non-fatal — fall back to share page URL
     }
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setLoading(false)
   }
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(shareUrl)
+      await navigator.clipboard.writeText(sharePageUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -86,7 +91,7 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
 
       {username && (
         <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-          myhinge.app/share/{username}?v=2
+          myhinge.app/share/{username}
         </p>
       )}
     </div>
