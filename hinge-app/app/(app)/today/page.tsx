@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
@@ -15,6 +15,8 @@ import Button from '@/components/ui/Button'
 import SectionTitle from '@/components/ui/SectionTitle'
 import Heatmap from '@/components/layout/Heatmap'
 import WeekDots from '@/components/layout/WeekDots'
+import ShareCard from '@/components/snapshot/ShareCard'
+import { getPublicProfile } from '@/lib/publicProfile'
 
 function formatDate(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -36,6 +38,11 @@ export default function TodayPage() {
   const router = useRouter()
   const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks } = useAppStore()
   const [showComeback, setShowComeback] = useState(true)
+  const [username, setUsername] = useState<string | null>(null)
+
+  useEffect(() => {
+    getPublicProfile().then((p) => { if (p?.username) setUsername(p.username) })
+  }, [])
 
   if (!hydrated) return null
 
@@ -124,6 +131,12 @@ export default function TodayPage() {
           <p className="text-[12px] text-ink-3 text-center mt-1 mb-2">
             Day closed · come back tomorrow for a fresh start
           </p>
+        )}
+
+        {today.completed && (
+          <div className="lg:hidden mt-4">
+            <ShareCard streakCount={streaks.current} username={username} />
+          </div>
         )}
 
         {today.completed && (
