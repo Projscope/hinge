@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { DM_Serif_Display, DM_Sans, DM_Mono } from 'next/font/google'
+import SwRegister from '@/components/SwRegister'
 import './globals.css'
 
 const dmSerif = DM_Serif_Display({
@@ -89,7 +90,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#0f0e0c" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <SwRegister />
+      </body>
     </html>
   )
 }
