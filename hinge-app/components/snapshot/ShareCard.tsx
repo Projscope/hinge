@@ -10,15 +10,13 @@ interface ShareCardProps {
 export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [hint, setHint] = useState(false)
 
   const sharePageUrl = `https://myhinge.app${username ? `/share/${username}` : ''}`
-  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
+  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n${sharePageUrl}`
 
   async function handleTwitter() {
     setLoading(true)
-
-    // Start with the share page URL; upgrade to the static CDN HTML URL if generation succeeds
-    let tweetUrl = sharePageUrl
 
     if (username) {
       try {
@@ -28,16 +26,23 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
           body: JSON.stringify({ username }),
         })
         const data = await res.json()
-        // Use the Supabase-hosted HTML file — pure static HTML with og:image meta tags,
-        // no JS/SSR overhead. Twitter's bot reads it instantly from the CDN.
-        if (data?.shareUrl) tweetUrl = data.shareUrl
-        else if (data?.url)  tweetUrl = data.url
+
+        // Download the PNG directly to the user's device so they can attach it to the tweet.
+        // Twitter's crawler is unreliable for dynamic og:images — direct attachment is guaranteed.
+        if (data?.url) {
+          const a = document.createElement('a')
+          a.href = data.url
+          a.download = `my-streak-${streakCount}.png`
+          a.click()
+          setHint(true)
+          setTimeout(() => setHint(false), 8000)
+        }
       } catch {
-        // Non-fatal — fall back to share page URL
+        // Non-fatal — open Twitter anyway without image
       }
     }
 
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(tweetUrl)}`
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
     window.open(url, '_blank', 'noopener,noreferrer')
     setLoading(false)
   }
@@ -90,9 +95,16 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
         </button>
       </div>
 
-      <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-        {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
-      </p>
+      {hint && (
+        <p className="text-[9px] text-amber-400 mt-2 text-center leading-relaxed">
+          📎 Image downloaded — attach it to your tweet
+        </p>
+      )}
+      {!hint && (
+        <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
+          {username ? `myhinge.app/share/${username}` : 'myhinge.app'}
+        </p>
+      )}
     </div>
   )
 }
