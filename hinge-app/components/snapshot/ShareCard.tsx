@@ -12,7 +12,7 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
   const [copied, setCopied] = useState(false)
 
   const shareUrl = username
-    ? `https://myhinge.app/share/${username}`
+    ? `https://myhinge.app/share/${username}?v=2`
     : 'https://myhinge.app'
 
   const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
@@ -86,7 +86,7 @@ export default function ShareCard({ streakCount, username }: ShareCardProps) {
 
       {username && (
         <p className="text-[9px] text-[rgba(255,255,255,0.18)] mt-2 text-center truncate">
-          myhinge.app/share/{username}
+          myhinge.app/share/{username}?v=2
         </p>
       )}
     </div>
