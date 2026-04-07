@@ -5,9 +5,9 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'WebApplication',
-      '@id': 'https://my-hinge.netlify.app/#app',
+      '@id': 'https://myhinge.app/#app',
       name: 'myhinge',
-      url: 'https://my-hinge.netlify.app',
+      url: 'https://myhinge.app',
       description: 'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
       applicationCategory: 'ProductivityApplication',
       operatingSystem: 'Web, Android, iOS',

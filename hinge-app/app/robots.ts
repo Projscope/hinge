@@ -22,6 +22,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://my-hinge.netlify.app/sitemap.xml',
+    sitemap: 'https://myhinge.app/sitemap.xml',
   }
 }

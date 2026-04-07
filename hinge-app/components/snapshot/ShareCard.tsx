@@ -6,7 +6,7 @@ interface ShareCardProps {
 }
 
 export default function ShareCard({ streakCount, username }: ShareCardProps) {
-  const shareUrl = username ? `https://my-hinge.netlify.app/share/${username}` : 'https://my-hinge.netlify.app'
+  const shareUrl = username ? `https://myhinge.app/share/${username}` : 'https://myhinge.app'
 
   const tweetText = username
     ? `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`

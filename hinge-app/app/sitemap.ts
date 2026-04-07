@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = 'https://my-hinge.netlify.app'
+const BASE_URL = 'https://myhinge.app'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

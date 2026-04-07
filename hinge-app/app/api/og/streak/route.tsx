@@ -3,74 +3,66 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest } from 'next/server'
 
 export const runtime = 'edge'
-
-// Cache for 1 hour, stale for 24 hours
 export const revalidate = 3600
 
-const GOLD = '#c8922a'
-const BG = '#0f0e0c'
-const BG2 = '#16140f'
-const INK = '#f5f2ea'
-const INK3 = 'rgba(245,242,234,0.45)'
-const MISS = 'rgba(192,57,43,0.6)'
+const GOLD    = '#c8922a'
+const BG      = '#0f0e0c'
+const INK     = '#f5f2ea'
+const INK2    = 'rgba(245,242,234,0.65)'
+const INK4    = 'rgba(245,242,234,0.25)'
+const HIT_CLR = '#c8922a'
+const MISS    = 'rgba(192,57,43,0.7)'
+const EMPTY   = 'rgba(255,255,255,0.08)'
+
+const RANKS = [
+  { min: 0,   max: 29,  label: 'Starter',         icon: '🌱' },
+  { min: 30,  max: 49,  label: 'Builder',          icon: '🔨' },
+  { min: 50,  max: 64,  label: 'Momentum Maker',   icon: '⚡' },
+  { min: 65,  max: 79,  label: 'Consistency King', icon: '🎯' },
+  { min: 80,  max: 89,  label: 'Deep Work Monk',   icon: '🧘' },
+  { min: 90,  max: 100, label: 'Untouchable',      icon: '💎' },
+]
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const username = searchParams.get('u')
+  if (!username) return new Response('Missing username', { status: 400 })
 
-  if (!username) {
-    return new Response('Missing username', { status: 400 })
-  }
-
-  // Fetch public data via anon key (RLS allows public profiles)
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
-  // Get profile + streaks in parallel
-  const [profileRes, streakRes, goalsRes] = await Promise.all([
-    supabase
-      .from('public_profiles')
-      .select('display_name, username, user_id')
-      .eq('username', username.toLowerCase())
-      .eq('is_public', true)
-      .maybeSingle(),
-    supabase
-      .from('streaks')
-      .select('current, personal_best')
-      .eq('user_id',
-        supabase
-          .from('public_profiles')
-          .select('user_id')
-          .eq('username', username.toLowerCase())
-          .single()
-      )
-      .maybeSingle(),
-    supabase
-      .from('daily_goals')
-      .select('date, completed')
-      .order('date', { ascending: false })
-      .limit(14),
-  ])
+  // 1. Resolve user_id from username
+  const { data: profileData } = await supabase
+    .from('public_profiles')
+    .select('user_id, display_name, username')
+    .eq('username', username.toLowerCase())
+    .eq('is_public', true)
+    .maybeSingle()
 
-  if (!profileRes.data) {
-    return new Response('Not found', { status: 404 })
-  }
+  if (!profileData) return new Response('Not found', { status: 404 })
 
-  const profile = profileRes.data
-  const userId = profile.user_id
+  const userId = profileData.user_id
+  const displayName = profileData.display_name || profileData.username
 
-  // Re-fetch streak and goals with the actual user_id
-  const [streakRes2, goalsRes2] = await Promise.all([
+  // 2. Fetch streak + last 30 goals in parallel
+  const [streakRes, goalsRes] = await Promise.all([
     supabase.from('streaks').select('current, personal_best').eq('user_id', userId).maybeSingle(),
-    supabase.from('daily_goals').select('date, completed').eq('user_id', userId).order('date', { ascending: false }).limit(14),
+    supabase.from('daily_goals').select('date, completed').eq('user_id', userId).order('date', { ascending: false }).limit(30),
   ])
 
-  const streak = streakRes2.data?.current ?? 0
-  const goals = goalsRes2.data ?? []
+  const streak = streakRes.data?.current ?? 0
+  const goals  = goalsRes.data ?? []
 
-  // Build last 14 days
+  // 3. Hit rate from last 30
+  const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
+  const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
+
+  // 4. Rank
+  const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
+
+  // 5. Last 14 days dot grid
   const last14 = Array.from({ length: 14 }, (_, i) => {
     const d = new Date()
     d.setDate(d.getDate() - i)
@@ -79,22 +71,6 @@ export async function GET(req: NextRequest) {
     if (!entry) return 'none'
     return entry.completed ? 'hit' : 'miss'
   })
-
-  // Determine rank
-  const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
-  const hitRate = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
-
-  const RANKS = [
-    { min: 0,  max: 29,  label: 'Starter',          icon: '🌱' },
-    { min: 30, max: 49,  label: 'Builder',           icon: '🔨' },
-    { min: 50, max: 64,  label: 'Momentum Maker',    icon: '⚡' },
-    { min: 65, max: 79,  label: 'Consistency King',  icon: '🎯' },
-    { min: 80, max: 89,  label: 'Deep Work Monk',    icon: '🧘' },
-    { min: 90, max: 100, label: 'Untouchable',       icon: '💎' },
-  ]
-  const rank = RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? RANKS[0]
-
-  const displayName = profile.display_name || profile.username
 
   return new ImageResponse(
     (
@@ -105,117 +81,114 @@ export async function GET(req: NextRequest) {
           background: BG,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          padding: '72px 96px',
+          padding: '64px 80px 48px',
           position: 'relative',
           fontFamily: 'sans-serif',
         }}
       >
-        {/* Gold top accent bar */}
+        {/* Gold gradient top border */}
         <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0,
-          height: '4px',
-          background: `linear-gradient(90deg, ${GOLD}, transparent)`,
+          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+          background: `linear-gradient(90deg, ${GOLD} 0%, transparent 70%)`,
         }} />
 
-        {/* Radial glow */}
+        {/* Subtle radial glow top-right */}
         <div style={{
-          position: 'absolute',
-          top: '-100px',
-          right: '-100px',
-          width: '500px',
-          height: '500px',
-          background: `radial-gradient(circle, rgba(200,146,42,0.12) 0%, transparent 70%)`,
-          borderRadius: '50%',
+          position: 'absolute', top: '-80px', right: '-80px',
+          width: '480px', height: '480px', borderRadius: '50%',
+          background: `radial-gradient(circle, rgba(200,146,42,0.10) 0%, transparent 65%)`,
         }} />
 
-        {/* myhinge logo */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '48px' }}>
-          <span style={{ fontSize: '18px', color: INK3, letterSpacing: '0.05em' }}>my</span>
-          <span style={{ fontSize: '18px', color: GOLD, letterSpacing: '0.05em' }}>hinge</span>
+        {/* ── TOP ROW: logo + display name ── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '48px' }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0px' }}>
+            <span style={{ fontSize: '20px', color: INK2, letterSpacing: '0.04em' }}>my</span>
+            <span style={{ fontSize: '20px', color: GOLD,  letterSpacing: '0.04em' }}>hinge</span>
+          </div>
+          {/* Display name */}
+          <span style={{ fontSize: '18px', color: INK4 }}>{displayName}</span>
         </div>
 
-        {/* Display name */}
-        <div style={{
-          fontSize: '22px',
-          color: INK3,
-          marginBottom: '12px',
-          letterSpacing: '0.01em',
-        }}>
-          {displayName}
-        </div>
+        {/* ── MAIN CONTENT ── */}
+        <div style={{ display: 'flex', flex: 1, gap: '80px', alignItems: 'flex-start' }}>
 
-        {/* Streak number */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: '16px',
-          marginBottom: '24px',
-        }}>
-          <span style={{
-            fontSize: '96px',
-            color: GOLD,
-            fontWeight: 700,
-            lineHeight: 1,
+          {/* LEFT — streak + dots */}
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            {/* Streak */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '14px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '112px', fontWeight: 800, color: GOLD, lineHeight: 1 }}>
+                {streak}
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '28px', color: INK, fontWeight: 600 }}>day</span>
+                <span style={{ fontSize: '28px', color: INK, fontWeight: 600 }}>streak 🔥</span>
+              </div>
+            </div>
+
+            {/* 14-day dot grid label */}
+            <span style={{ fontSize: '12px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
+              Last 14 days
+            </span>
+
+            {/* Dots */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {last14.map((day, i) => (
+                <div key={i} style={{
+                  width: '32px', height: '32px', borderRadius: '8px',
+                  background: day === 'hit' ? HIT_CLR : day === 'miss' ? MISS : EMPTY,
+                }} />
+              ))}
+            </div>
+          </div>
+
+          {/* RIGHT — rank + hit rate */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+            minWidth: '260px',
+            background: 'rgba(200,146,42,0.07)',
+            border: '1px solid rgba(200,146,42,0.2)',
+            borderRadius: '20px',
+            padding: '32px 36px',
+            gap: '24px',
           }}>
-            {streak}
-          </span>
-          <span style={{
-            fontSize: '32px',
-            color: INK,
-            fontWeight: 500,
-          }}>
-            day streak 🔥
-          </span>
+            {/* Rank icon */}
+            <span style={{ fontSize: '48px', lineHeight: 1 }}>{rank.icon}</span>
+
+            {/* Rank label */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Current rank
+              </span>
+              <span style={{ fontSize: '26px', fontWeight: 700, color: GOLD }}>
+                {rank.label}
+              </span>
+            </div>
+
+            {/* Hit rate */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '11px', color: INK4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                Hit rate
+              </span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                <span style={{ fontSize: '48px', fontWeight: 800, color: INK, lineHeight: 1 }}>
+                  {hitRate}
+                </span>
+                <span style={{ fontSize: '22px', color: INK2 }}>%</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Rank badge */}
+        {/* ── BOTTOM: site URL ── */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          background: 'rgba(200,146,42,0.12)',
-          border: `1px solid rgba(200,146,42,0.3)`,
-          borderRadius: '100px',
-          padding: '8px 20px',
-          marginBottom: '40px',
+          display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          paddingTop: '20px', marginTop: '32px',
         }}>
-          <span style={{ fontSize: '22px' }}>{rank.icon}</span>
-          <span style={{ fontSize: '18px', color: GOLD, fontWeight: 600 }}>{rank.label}</span>
-          <span style={{ fontSize: '14px', color: INK3, marginLeft: '4px' }}>· {hitRate}% hit rate</span>
-        </div>
-
-        {/* 14-day dot grid */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {last14.map((day, i) => (
-            <div
-              key={i}
-              style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '8px',
-                background:
-                  day === 'hit'  ? GOLD :
-                  day === 'miss' ? MISS :
-                  'rgba(255,255,255,0.07)',
-              }}
-            />
-          ))}
-          <span style={{ fontSize: '13px', color: INK3, marginLeft: '8px' }}>last 14 days</span>
-        </div>
-
-        {/* Bottom right: myhinge.app */}
-        <div style={{
-          position: 'absolute',
-          bottom: '40px',
-          right: '96px',
-          fontSize: '16px',
-          color: INK3,
-          letterSpacing: '0.04em',
-        }}>
-          myhinge.app
+          <span style={{ fontSize: '15px', color: INK4, letterSpacing: '0.06em' }}>
+            myhinge.app
+          </span>
         </div>
       </div>
     ),

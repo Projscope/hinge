@@ -25,7 +25,7 @@ const dmMono = DM_Mono({
   display: 'swap',
 })
 
-const BASE_URL = 'https://my-hinge.netlify.app'
+const BASE_URL = 'https://myhinge.app'
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

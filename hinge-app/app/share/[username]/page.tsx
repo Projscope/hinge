@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 
-const BASE_URL = 'https://my-hinge.netlify.app'
+const BASE_URL = 'https://myhinge.app'
 
 interface Props {
   params: Promise<{ username: string }>

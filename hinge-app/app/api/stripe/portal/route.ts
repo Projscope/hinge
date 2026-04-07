@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No billing account found' }, { status: 404 })
   }
 
-  const origin = request.headers.get('origin') ?? 'https://my-hinge.netlify.app'
+  const origin = request.headers.get('origin') ?? 'https://myhinge.app'
 
   const session = await getStripe().billingPortal.sessions.create({
     customer: customerId,

@@ -48,7 +48,15 @@
       "Bash(cat -n /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/history/page.tsx)",
       "Bash(cat -n /c/Development/Tests/hinge/hinge-app/app/\\\\\\(app\\\\\\)/insights/page.tsx)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
-      "Bash(node scripts/migrate.mjs)"
+      "Bash(node scripts/migrate.mjs)",
+      "Bash(ls /c/Development/Tests/hinge/*.md)",
+      "Bash(ls /c/Development/Tests/hinge/hinge-app/*.md)",
+      "Bash(find /c/Development/Tests/hinge/hinge-app -type f \\\\\\(-name *email* -o -name *mail* \\\\\\))",
+      "Bash(find /c/Development/Tests/hinge -name *.sql -o -name schema*)",
+      "Bash(grep -r process.env /c/Development/Tests/hinge/hinge-app/lib /c/Development/Tests/hinge/hinge-app/app --include=*.ts --include=*.tsx)",
+      "Bash(ls /c/Development/Tests/hinge/hinge-app/public/icon* /c/Development/Tests/hinge/hinge-app/public/favicon*)",
+      "Bash(find /c/Development/Tests/hinge/hinge-app -type f \\\\\\(-name *.sql -o -name *migration* -o -name *schema* \\\\\\))",
+      "Bash(xargs sed:*)"
     ]
   }
 }

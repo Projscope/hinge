@@ -42,7 +42,7 @@ export async function POST(request: Request) {
       .eq('id', user.id)
   }
 
-  const origin = request.headers.get('origin') ?? 'https://my-hinge.netlify.app'
+  const origin = request.headers.get('origin') ?? 'https://myhinge.app'
 
   const session = await getStripe().checkout.sessions.create({
     customer: customerId,
