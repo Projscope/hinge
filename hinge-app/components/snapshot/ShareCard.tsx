@@ -7,9 +7,10 @@ import { getPublicProfile } from '@/lib/publicProfile'
 interface ShareCardProps {
   streakCount: number
   username?: string | null
+  achieved?: boolean
 }
 
-export default function ShareCard({ streakCount, username: usernameProp }: ShareCardProps) {
+export default function ShareCard({ streakCount, username: usernameProp, achieved }: ShareCardProps) {
   const [copied, setCopied] = useState(false)
   const [username, setUsername] = useState<string | null>(usernameProp ?? null)
 
@@ -25,7 +26,9 @@ export default function ShareCard({ streakCount, username: usernameProp }: Share
     ? `https://myhinge.app/share/${username}?v=4`
     : 'https://myhinge.app'
 
-  const tweetText = `I'm on a ${streakCount}-day streak on myhinge 🔥\nOne goal. Every day. No excuses.\n`
+  const tweetText = achieved
+    ? `Today's goal: achieved ✅\n${streakCount} day${streakCount === 1 ? '' : 's'} in a row 🔥 No missed days. No shortcuts.\n`
+    : `${streakCount} day${streakCount === 1 ? '' : 's'} streak on myhinge 🔥\nOne goal per day. No excuses.\n`
 
   function handleTwitter() {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(sharePageUrl)}`

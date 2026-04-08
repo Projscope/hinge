@@ -123,6 +123,7 @@ export default function SnapshotPage() {
         <ShareCard
           streakCount={streaks.current}
           username={username}
+          achieved={today.completed}
         />
 
         {/* Reset note */}
