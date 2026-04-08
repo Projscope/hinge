@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import LandingCTA from '@/components/landing/LandingCTA'
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -72,12 +73,7 @@ export default function LandingPage() {
             </a>
           </li>
           <li>
-            <Link
-              href="/today"
-              className="text-[13px] font-medium bg-[var(--lk-ink)] text-cream px-[18px] py-2 rounded-[6px] no-underline hover:opacity-85 transition-opacity"
-            >
-              Start free →
-            </Link>
+            <LandingCTA variant="nav" />
           </li>
         </ul>
       </nav>
@@ -98,19 +94,7 @@ export default function LandingPage() {
             That&apos;s the whole system.
           </p>
           <div className="flex items-center gap-4 flex-wrap">
-            <Link
-              href="/setup"
-              className="inline-flex items-center gap-2 bg-[var(--lk-ink)] text-cream px-7 py-[14px] rounded-[8px] text-[15px] font-medium no-underline hover:opacity-85 transition-opacity"
-            >
-              Start for free
-              <span>→</span>
-            </Link>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center gap-2 text-sm text-[var(--lk-muted)] hover:text-[var(--lk-ink)] no-underline border-b border-[var(--lk-border)] pb-px transition-colors"
-            >
-              See how it works ↓
-            </a>
+            <LandingCTA variant="hero" />
           </div>
           <div className="mt-10 flex items-center gap-4 text-[13px] text-[var(--lk-faint)]">
             <span className="w-[6px] h-[6px] rounded-full bg-teal flex-shrink-0" />
@@ -493,12 +477,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/today"
-                className="mt-8 block text-center py-3 rounded-[8px] border border-[var(--lk-border)] text-[14px] font-medium text-[var(--lk-muted)] no-underline hover:border-[var(--lk-muted)] hover:text-[var(--lk-ink)] transition-colors"
-              >
-                Start free
-              </Link>
+              <LandingCTA variant="pricing-free" />
             </div>
 
             {/* Pro Monthly */}
@@ -528,12 +507,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/today"
-                className="mt-8 block text-center py-3 rounded-[8px] bg-[var(--lk-ink)] text-cream text-[14px] font-medium no-underline hover:opacity-85 transition-opacity"
-              >
-                Get started →
-              </Link>
+              <LandingCTA variant="pricing-pro" />
             </div>
 
             {/* Pro Yearly */}
@@ -560,12 +534,7 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-              <Link
-                href="/today"
-                className="mt-8 block text-center py-3 rounded-[8px] bg-gold text-black text-[14px] font-semibold no-underline hover:opacity-90 transition-opacity"
-              >
-                Get started →
-              </Link>
+              <LandingCTA variant="pricing-yearly" />
             </div>
           </div>
 
