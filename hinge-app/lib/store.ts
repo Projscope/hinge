@@ -282,8 +282,18 @@ export function useAppStore() {
             .eq('user_id', user.id)
         }
       }
+
+      // Regenerate OG image so the share card reflects the new streak immediately.
+      // Fire-and-forget — don't block the UI on this.
+      if (state.username) {
+        fetch('/api/og/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: state.username }),
+        }).catch(() => { /* non-critical */ })
+      }
     },
-    [supabase, state.today]
+    [supabase, state.today, state.username]
   )
 
   const markWalkthroughSeen = useCallback(async () => {
