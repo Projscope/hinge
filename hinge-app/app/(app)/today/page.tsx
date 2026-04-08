@@ -64,12 +64,10 @@ export default function TodayPage() {
           <p className="text-[10px] text-ink-4 mt-1.5">One miss in a sea of gold.</p>
         </div>
 
-        {/* Share streak — mobile only, shown whenever there's a streak */}
-        {streaks.current >= 1 && (
-          <div className="lg:hidden mt-6">
-            <ShareCard streakCount={streaks.current} username={username} />
-          </div>
-        )}
+        {/* Share streak — mobile only */}
+        <div className="lg:hidden mt-6">
+          <ShareCard streakCount={streaks.current} username={username} />
+        </div>
       </div>
     )
   }
@@ -112,11 +110,9 @@ export default function TodayPage() {
         <GoalHero goal={today} />
 
         {/* Share streak — mobile only, shown right after hero */}
-        {streaks.current >= 1 && (
-          <div className="lg:hidden mb-4">
-            <ShareCard streakCount={streaks.current} username={username} />
-          </div>
-        )}
+        <div className="lg:hidden mb-4">
+          <ShareCard streakCount={streaks.current} username={username} />
+        </div>
 
         {/* Support tasks */}
         <SectionTitle>Support tasks</SectionTitle>
