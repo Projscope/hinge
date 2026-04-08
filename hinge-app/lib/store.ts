@@ -15,6 +15,8 @@ function defaultStreaks(): Streaks {
   return { current: 0, personalBest: 0, lastActiveDate: null }
 }
 
+const CLOSED_KEY = (id: string) => `day_closed:${id}`
+
 function defaultState(): AppState {
   return {
     plan: 'free',
@@ -25,6 +27,7 @@ function defaultState(): AppState {
     freezeUsedThisMonth: false,
     walkthroughSeen: false,
     username: null,
+    dayEnded: false,
   }
 }
 
@@ -94,6 +97,9 @@ export function useAppStore() {
       ])
 
       const todayGoal = goalRes.data ? mapGoal(goalRes.data) : null
+      const dayEnded = todayGoal
+        ? todayGoal.completed === true || localStorage.getItem(CLOSED_KEY(todayGoal.id)) === '1'
+        : false
 
       // Load overflow items for today's goal (if it exists)
       let overflow: OverflowItem[] = []
@@ -120,6 +126,7 @@ export function useAppStore() {
         freezeUsedThisMonth: profileRes.data?.freeze_used_this_month ?? false,
         walkthroughSeen: profileRes.data?.walkthrough_seen ?? false,
         username: (publicProfileRes.data?.username as string) ?? null,
+        dayEnded,
       })
       setHydrated(true)
     }
@@ -234,6 +241,9 @@ export function useAppStore() {
     async (completed: boolean) => {
       if (!state.today) return
 
+      // Mark as closed in localStorage so dayEnded survives a refresh
+      localStorage.setItem(CLOSED_KEY(state.today.id), '1')
+
       // Optimistic update
       setState((prev) => {
         if (!prev.today) return prev
@@ -251,6 +261,7 @@ export function useAppStore() {
           today: finishedGoal,
           streaks: newStreaks,
           history: [finishedGoal, ...prev.history.filter((g) => g.date !== finishedGoal.date)],
+          dayEnded: true,
         }
       })
 
@@ -284,6 +295,7 @@ export function useAppStore() {
     plan: state.plan,
     walkthroughSeen: state.walkthroughSeen,
     username: state.username,
+    dayEnded: state.dayEnded,
     setTodayGoal,
     toggleTask,
     addOverflow,

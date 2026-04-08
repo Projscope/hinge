@@ -38,6 +38,8 @@ export interface AppState {
   freezeUsedThisMonth: boolean
   walkthroughSeen: boolean
   username: string | null
+  /** true once endDay() is called — survives refresh via localStorage */
+  dayEnded: boolean
 }
 
 // Goal quality scoring result

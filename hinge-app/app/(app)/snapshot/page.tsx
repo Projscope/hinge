@@ -14,7 +14,7 @@ import { getPublicProfile } from '@/lib/publicProfile'
 
 export default function SnapshotPage() {
   const router = useRouter()
-  const { today, streaks, history, endDay, hydrated } = useAppStore()
+  const { today, streaks, history, endDay, hydrated, dayEnded } = useAppStore()
   const [toast, setToast] = useState<string | null>(null)
   const [showAchievement, setShowAchievement] = useState(false)
   const [username, setUsername] = useState<string | null>(null)
@@ -37,7 +37,7 @@ export default function SnapshotPage() {
   }
 
   const bothDone = today.task1Done && today.task2Done
-  const alreadyEnded = today.completed
+  const alreadyEnded = dayEnded
 
   function handleEnd(completed: boolean) {
     endDay(completed)

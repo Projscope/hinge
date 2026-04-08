@@ -35,7 +35,7 @@ function timeLeft(endTime: string): string {
 
 export default function TodayPage() {
   const router = useRouter()
-  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks, username } = useAppStore()
+  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks, username, dayEnded } = useAppStore()
   const [showComeback, setShowComeback] = useState(true)
 
   if (!hydrated) return null
@@ -84,9 +84,9 @@ export default function TodayPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 mt-1">
-          {today.completed ? (
+          {dayEnded ? (
             <Pill variant={today.completed ? 'teal' : 'neutral'}>
-              {today.completed ? '✓ Completed' : '● Active'}
+              {today.completed ? '✓ Completed' : '✗ Missed'}
             </Pill>
           ) : (
             <>
@@ -121,23 +121,23 @@ export default function TodayPage() {
           text={today.task1Text}
           done={today.task1Done}
           onToggle={() => toggleTask(1)}
-          disabled={today.completed}
+          disabled={dayEnded}
         />
         <TaskCard
           label="Support task 2 · involves another person"
           text={today.task2Text}
           done={today.task2Done}
           onToggle={() => toggleTask(2)}
-          disabled={today.completed}
+          disabled={dayEnded}
         />
 
-        {today.completed && (
+        {dayEnded && (
           <p className="text-[12px] text-ink-3 text-center mt-1 mb-2">
             Day closed · come back tomorrow for a fresh start
           </p>
         )}
 
-        {today.completed && (
+        {dayEnded && (
           <p className="text-center text-[12px] text-ink-3 mt-3">
             See how you stack up →{' '}
             <Link href="/leaderboard" className="text-gold underline-offset-2 hover:underline">
