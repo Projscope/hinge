@@ -24,12 +24,20 @@ export default function LandingCTA({ variant }: Props) {
 
   if (variant === 'nav') {
     return isGuest ? (
-      <Link
-        href="/today"
-        className="text-[13px] font-medium bg-[var(--lk-ink)] text-cream px-[18px] py-2 rounded-[6px] no-underline hover:opacity-85 transition-opacity"
-      >
-        Start free →
-      </Link>
+      <div className="flex items-center gap-3">
+        <Link
+          href="/login"
+          className="text-[13px] text-[var(--lk-muted)] hover:text-[var(--lk-ink)] no-underline transition-colors"
+        >
+          Log in
+        </Link>
+        <Link
+          href="/today"
+          className="text-[13px] font-medium bg-[var(--lk-ink)] text-cream px-[18px] py-2 rounded-[6px] no-underline hover:opacity-85 transition-opacity"
+        >
+          Start free →
+        </Link>
+      </div>
     ) : (
       <Link
         href="/today"
@@ -55,6 +63,12 @@ export default function LandingCTA({ variant }: Props) {
         >
           See how it works ↓
         </a>
+        <Link
+          href="/login"
+          className="w-full text-[13px] text-[var(--lk-faint)] hover:text-[var(--lk-muted)] no-underline transition-colors mt-1"
+        >
+          Already have an account? <span className="underline underline-offset-2">Log in →</span>
+        </Link>
       </>
     ) : (
       <Link
