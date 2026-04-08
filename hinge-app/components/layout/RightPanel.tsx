@@ -11,6 +11,7 @@ interface RightPanelProps {
   today: DailyGoal | null
   plan: Plan
   hitRate: number
+  username?: string | null
 }
 
 function Divider() {
@@ -25,7 +26,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function RightPanel({ streaks, history, today, plan, hitRate }: RightPanelProps) {
+export default function RightPanel({ streaks, history, today, plan, hitRate, username }: RightPanelProps) {
 
   const now = new Date()
   const monthName = now.toLocaleDateString('en-US', { month: 'long' })
@@ -112,6 +113,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate }: R
           <SectionLabel>Day {streaks.current} milestone</SectionLabel>
           <ShareCard
             streakCount={streaks.current}
+            username={username}
           />
         </>
       )}

@@ -20,7 +20,7 @@ function calcHitRate(history: { completed: boolean }[]): number {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const { streaks, history, today, plan, hydrated, walkthroughSeen, markWalkthroughSeen } = useAppStore()
+  const { streaks, history, today, plan, hydrated, walkthroughSeen, markWalkthroughSeen, username } = useAppStore()
   const hitRate = calcHitRate(history.slice(0, 30))
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Right panel — desktop only */}
         <div className="hidden lg:contents">
-          <RightPanel streaks={streaks} history={history} today={today} plan={plan} hitRate={hitRate} />
+          <RightPanel streaks={streaks} history={history} today={today} plan={plan} hitRate={hitRate} username={username} />
         </div>
       </div>
 
