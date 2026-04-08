@@ -56,9 +56,9 @@ export default function Heatmap({ history, today }: HeatmapProps) {
               className={`h-4 rounded-[3px] transition-transform hover:scale-110 cursor-pointer
                 ${isFuture ? 'bg-[rgba(255,255,255,0.03)]' : ''}
                 ${!isFuture && !hit && !miss ? 'bg-[rgba(255,255,255,0.05)]' : ''}
-                ${hit ? 'bg-gold' : ''}
-                ${miss ? 'bg-[rgba(192,57,43,0.35)] border border-[rgba(192,57,43,0.2)]' : ''}
-                ${isToday && !hit ? 'bg-[rgba(34,160,133,0.5)] border border-[rgba(34,160,133,0.3)]' : ''}
+                ${hit ? 'bg-[rgba(42,184,126,1)]' : ''}
+                ${miss ? 'bg-[rgba(192,57,43,0.5)] border border-[rgba(192,57,43,0.3)]' : ''}
+                ${isToday && !hit && !miss ? 'bg-[rgba(200,146,42,0.4)] border border-[rgba(200,146,42,0.3)]' : ''}
               `}
             />
           )

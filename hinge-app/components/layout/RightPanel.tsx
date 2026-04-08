@@ -103,7 +103,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
       {/* Heatmap */}
       <SectionLabel>{monthName}</SectionLabel>
       <Heatmap history={history} today={today} />
-      <p className="text-[10px] text-ink-4 mt-1.5">One miss in a sea of gold.</p>
+      <p className="text-[10px] text-ink-4 mt-1.5">🟢 achieved &nbsp;🔴 missed</p>
 
       <Divider />
 
