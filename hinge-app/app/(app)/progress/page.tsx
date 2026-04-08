@@ -175,8 +175,8 @@ export default function ProgressPage() {
       </div>
 
       {/* Tab switcher */}
-      <div className="px-8 mb-5">
-        <div className="flex bg-bg-3 border border-[var(--border)] rounded-[10px] p-1 gap-1">
+      <div className="mb-5">
+        <div className="flex bg-bg-3 border border-[var(--border)] rounded-none p-1 gap-1">
           {TABS.map((tab) => (
             <button
               key={tab.id}
