@@ -111,6 +111,13 @@ export default function TodayPage() {
         {/* Goal hero */}
         <GoalHero goal={today} />
 
+        {/* Share streak — mobile only, shown right after hero */}
+        {streaks.current >= 1 && (
+          <div className="lg:hidden mb-4">
+            <ShareCard streakCount={streaks.current} username={username} />
+          </div>
+        )}
+
         {/* Support tasks */}
         <SectionTitle>Support tasks</SectionTitle>
         <TaskCard
@@ -146,12 +153,6 @@ export default function TodayPage() {
         {/* Overflow log */}
         <OverflowLog items={todayOverflow} onAdd={addOverflow} disabled={today.completed} />
 
-        {/* Share streak — mobile only */}
-        {streaks.current >= 1 && (
-          <div className="lg:hidden mt-6">
-            <ShareCard streakCount={streaks.current} username={username} />
-          </div>
-        )}
       </div>
 
       {/* Comeback banner — shown when returning after a streak break */}
