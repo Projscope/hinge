@@ -34,7 +34,14 @@ export default function ShareCard({ streakCount, username: usernameProp }: Share
 
   function handleLinkedIn() {
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(sharePageUrl)}`
-    window.open(url, '_blank', 'noopener,noreferrer')
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    if (isMobile) {
+      // Direct navigation triggers universal links (iOS) / app links (Android)
+      // so the OS hands off to the LinkedIn app if installed
+      window.location.href = url
+    } else {
+      window.open(url, '_blank', 'noopener,noreferrer')
+    }
   }
 
   async function handleCopy() {
