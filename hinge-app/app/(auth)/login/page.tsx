@@ -16,7 +16,8 @@ export default function LoginPage() {
     setError(null)
 
     const supabase = createClient()
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin
+    // Always redirect to production — branch preview URLs must never end up in emails
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://myhinge.app'
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
