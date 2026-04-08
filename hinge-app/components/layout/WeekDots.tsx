@@ -44,9 +44,9 @@ export default function WeekDots({ history, today }: WeekDotsProps) {
             <div key={date} className="text-center">
               <div
                 className={`w-[22px] h-[22px] rounded-full mx-auto mb-0.5 transition-colors
-                  ${isToday && !hit ? 'bg-teal-bright' : ''}
-                  ${hit ? 'bg-gold' : ''}
-                  ${miss && !isToday ? 'bg-[rgba(192,57,43,0.3)] border border-[rgba(192,57,43,0.2)]' : ''}
+                  ${isToday && !hit && !miss ? 'bg-[rgba(200,146,42,0.4)] border border-[rgba(200,146,42,0.3)]' : ''}
+                  ${hit ? 'bg-[rgba(42,184,126,1)]' : ''}
+                  ${miss ? 'bg-[rgba(192,57,43,0.6)] border border-[rgba(192,57,43,0.4)]' : ''}
                   ${!hit && !miss && !isToday ? 'bg-[rgba(255,255,255,0.06)]' : ''}
                 `}
               />
