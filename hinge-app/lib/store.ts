@@ -270,6 +270,18 @@ export function useAppStore() {
         p_goal_id: state.today.id,
         p_completed: completed,
       })
+
+      // If missed, explicitly reset streak in DB — the RPC may not do this,
+      // causing the public share page to show a stale streak count.
+      if (!completed) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          await supabase
+            .from('streaks')
+            .update({ current: 0 })
+            .eq('user_id', user.id)
+        }
+      }
     },
     [supabase, state.today]
   )
