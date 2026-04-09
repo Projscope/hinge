@@ -23,8 +23,9 @@ myhinge is a daily focus app built around a single constraint: one main goal, tw
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v3 with a custom dark palette
 - **Backend:** Supabase (Postgres, Auth, RLS)
-- **Auth:** Magic link (email OTP) via Supabase Auth — implicit flow for cross-device support
-- **Storage:** Supabase for auth/goals/queue/public profiles · localStorage for settings/anchors
+- **Auth:** Magic link (email OTP) + Google OAuth via Supabase Auth — implicit flow for cross-device support
+- **OG Images:** `next/og` ImageResponse (1200×630 PNG) — stored in Supabase Storage, auto-regenerated on day close
+- **Storage:** Supabase for auth/goals/queue/public profiles · localStorage for settings/anchors/day state
 - **Fonts:** DM Serif Display, DM Sans, DM Mono (Google Fonts)
 - **Notifications:** Web Push API + Service Worker (`public/sw.js`)
 - **PWA:** Installable on Android/iOS — manifest, offline caching, offline fallback page
@@ -60,6 +61,10 @@ Fill in your values from the Supabase dashboard (**Settings > API**):
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+
+# Production URL — used for magic link + Google OAuth redirects
+# Must match the redirect allow-list in Supabase Authentication settings
+NEXT_PUBLIC_SITE_URL=https://myhinge.app
 
 # Only needed to run migrations via scripts/migrate.mjs
 SUPABASE_ACCESS_TOKEN=your-personal-access-token   # app.supabase.com/account/tokens
@@ -119,8 +124,10 @@ hinge-app/
     checkin/page.tsx                # Mid-day check-in (public — linked from notification)
     leaderboard/page.tsx            # Public streak leaderboard at /leaderboard
     u/[username]/page.tsx           # Public achievements page at /u/yourname
+    share/
+      [username]/page.tsx           # Social share page — FOMO headline + dual CTA (convert viewers → sign-ups)
     (auth)/
-      login/page.tsx                # Magic link sign-in form
+      login/page.tsx                # Sign-in: Google OAuth button + magic link email form
     auth/
       callback/route.ts             # Auth callback — exchanges code for session
     (app)/
@@ -134,18 +141,23 @@ hinge-app/
       milestones/page.tsx           # Badge milestones tied to streak + goal quality
       settings/page.tsx             # Notifications, accountability partner, public profile, billing
     api/
+      og/
+        streak/route.tsx            # GET — generate 1200×630 OG image via next/og (streak/rank/history squares)
+        generate/route.tsx          # POST — render + upload OG PNG to Supabase Storage for a username
       stripe/
         checkout/route.ts           # POST — create Stripe Checkout session (monthly/yearly)
         portal/route.ts             # POST — create Stripe Customer Portal session
         webhook/route.ts            # POST — handle Stripe events, update plan in DB
   components/
+    landing/
+      LandingCTA.tsx                # Auth-aware CTA — guest / logged-in / returning user variants
     layout/
       AppShell.tsx                  # Client shell — sidebar + right panel + bottom nav + onboarding seed
       Sidebar.tsx                   # Desktop left nav with logout
       RightPanel.tsx                # Desktop right stats panel (290px)
       BottomNav.tsx                 # Mobile bottom tab bar with logout
-      Heatmap.tsx                   # Monthly heatmap — hover shows "April 6, 2026"
-      WeekDots.tsx                  # 7-day week dots
+      Heatmap.tsx                   # Monthly heatmap — green hit / red miss / gold today; hover shows date
+      WeekDots.tsx                  # 7-day week dots — green hit / red miss
     billing/
       BillingSection.tsx            # Plan & billing card — upgrade toggle + portal button
       UpgradeButton.tsx             # Calls /api/stripe/checkout, redirects to Stripe
@@ -153,7 +165,7 @@ hinge-app/
       AchievementOverlay.tsx        # Full-screen overlay on goal completion
       ComebackBanner.tsx            # Bottom sheet after a ≥3-day gap
     snapshot/
-      ShareCard.tsx                 # Streak share card
+      ShareCard.tsx                 # Streak share card — Twitter/LinkedIn/copy; contextual achievement vs streak message
     today/
       StreakAtRisk.tsx              # Amber banner when day not closed near evening
       WeeklyAnchorBanner.tsx        # Gold banner for weekly focus phrase
@@ -170,7 +182,7 @@ hinge-app/
       Pill.tsx                      # Badge pill — gold / teal / red / neutral
       Toast.tsx                     # Auto-dismiss notification
   lib/
-    store.ts                        # App state — Supabase-backed Zustand store
+    store.ts                        # App state — Supabase-backed Zustand store; dayEnded flag persisted in localStorage
     types.ts                        # Shared types, FOCUS_RANKS, AREA_TAGS
     goalQuality.ts                  # Goal quality scoring (0–100)
     goalQueue.ts                    # Queue CRUD — Supabase-backed, tagged by area, onboarding seed
@@ -364,10 +376,23 @@ const svg = require('fs').readFileSync('./public/icon.svg');
 - [x] **Local timezone fix** — all date lookups now use device local date via `lib/dateUtils.ts` (was UTC, broke late-evening use for western timezones)
 - [x] Heatmap tooltip — hover shows full date in "Month Day, Year" format (e.g. April 6, 2026)
 - [x] Personal best streak — always visible (removed Pro gate)
+- [x] **Google OAuth** — "Continue with Google" button on login page alongside existing magic link; uses `supabase.auth.signInWithOAuth`
+- [x] **Auth-aware landing page** — `LandingCTA` client component: new visitor sees sign-up CTA, logged-in user sees "Continue your streak →", returning visitor (not logged in) sees "Log in" link + "Already have an account?" prompt
+- [x] **Share page** (`/share/[username]`) — redesigned for conversion: FOMO headline ("hasn't missed a day — can you keep up?"), primary gold CTA ("Start your streak — it's free →"), secondary outlined link to full profile
+- [x] **OG image pipeline** — `next/og` ImageResponse (1200×630); PNG uploaded to Supabase Storage `og-images` bucket; auto-regenerated (fire-and-forget) every time a day is closed via `endDay()`; includes streak, rank, hit rate, 14-day history squares
+- [x] **Contextual share message** — on achievement: "Today's goal: achieved ✅ · X day(s) in a row 🔥"; on streak-only: generic streak text
+- [x] **LinkedIn mobile universal link** — uses `window.location.href` on mobile (triggers native app) vs `window.open` on desktop
+- [x] **ShareCard always visible on Today (mobile)** — removed `streaks.current >= 1` gate; card appears above support tasks for immediate discoverability
+- [x] **dayEnded flag** — `boolean` in Zustand store, persisted to `localStorage` keyed by goal ID (`day_closed:{id}`); survives page refresh; prevents "End my day" button re-appearing after a miss
+- [x] **End-day idempotency** — closing a day (hit or miss) is permanent for the session; `dayEnded` hides the end-day button and disables task checkboxes; "✓ Completed" / "✗ Missed" pill shown instead
+- [x] **Streak DB reset on miss** — explicit `streaks.current = 0` write on miss so the share page reflects the reset immediately (was relying solely on the `end_day` RPC which didn't always update the streaks table)
+- [x] **Magic link redirect fix** — redirect URL hardcoded to `NEXT_PUBLIC_SITE_URL ?? 'https://myhinge.app'`; was using `window.location.origin` which pointed to branch-preview URLs on Netlify
+- [x] **Heatmap color scheme** — desktop right-panel heatmap and 7-day WeekDots now use green (achieved) / red (missed) / gold-pulse (today) — was showing gold/yellow for all states
+- [x] **Progress tab bar full-width on mobile** — removed horizontal padding, `rounded-none` so tabs span edge-to-edge on small screens
 
 ### Planned
 
 - [ ] Streak freeze — consume one freeze instead of losing streak
-- [ ] Share card image generation (og:image / canvas)
+- [ ] Share card image generation (og:image / canvas) — ⚠️ in progress, not yet complete
 - [ ] Team plan — shared goals, collab task tracking
 - [ ] iOS / Android native app (Capacitor)
