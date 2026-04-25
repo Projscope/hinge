@@ -6,7 +6,7 @@ import type { DailyGoal } from '@/lib/types'
 import Pill from '@/components/ui/Pill'
 import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
-import { FOCUS_RANKS } from '@/lib/types'
+import { FOCUS_RANKS, getGoalHeadline } from '@/lib/types'
 import PatternCallouts from '@/components/insights/PatternCallouts'
 
 // Mon=0 … Sun=6 (display order)
@@ -64,10 +64,10 @@ export default function InsightsPage() {
   // ── Goal quality split ───────────────────────────────────────────────────
   // Guard against null mainGoal values from the DB
   const scoredGoals = window30
-    .filter((g) => g.mainGoal && g.mainGoal.trim().length > 0)
+    .filter((g) => getGoalHeadline(g).trim().length > 0)
     .map((g) => ({
       ...g,
-      qualityScore: scoreGoalQuality(g.mainGoal).score,
+      qualityScore: scoreGoalQuality(getGoalHeadline(g)).score,
     }))
 
   const specificGoals = scoredGoals.filter((g) => g.qualityScore >= 70)

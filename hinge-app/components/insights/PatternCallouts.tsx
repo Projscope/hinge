@@ -1,7 +1,7 @@
 'use client'
 
 import type { DailyGoal, AreaTag } from '@/lib/types'
-import { AREA_TAGS } from '@/lib/types'
+import { AREA_TAGS, getGoalHeadline } from '@/lib/types'
 import { scoreGoalQuality } from '@/lib/goalQuality'
 import { localDateStr } from '@/lib/dateUtils'
 
@@ -103,8 +103,8 @@ export default function PatternCallouts({ history, streaks }: Props) {
 
   // 4. Goal quality
   const scoredGoals = history
-    .filter((g) => g.mainGoal && g.mainGoal.trim().length > 0)
-    .map((g) => ({ ...g, qualityScore: scoreGoalQuality(g.mainGoal).score }))
+    .filter((g) => getGoalHeadline(g).trim().length > 0)
+    .map((g) => ({ ...g, qualityScore: scoreGoalQuality(getGoalHeadline(g)).score }))
   const specificGoals = scoredGoals.filter((g) => g.qualityScore >= 70)
   const vagueGoals = scoredGoals.filter((g) => g.qualityScore < 35)
   if (specificGoals.length >= 3 && vagueGoals.length >= 3) {

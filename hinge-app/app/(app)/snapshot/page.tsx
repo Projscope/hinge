@@ -11,7 +11,7 @@ import AchievementOverlay from '@/components/overlays/AchievementOverlay'
 import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { getPublicProfile } from '@/lib/publicProfile'
-import { isGoalReadyToClose, TEMPLATES, AREA_TAGS, type MITTasks, type TimeBlockTasks, type LifeAreaTasks } from '@/lib/types'
+import { isGoalReadyToClose, TEMPLATES, AREA_TAGS, getGoalHeadline } from '@/lib/types'
 
 export default function SnapshotPage() {
   const router = useRouter()
@@ -47,41 +47,39 @@ export default function SnapshotPage() {
 
   const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 
-  // Build a readable task recap based on template
   function TaskRecap() {
-    if (today!.templateType === 'focus') {
+    const t = today!
+    if (t.templateType === 'focus') {
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          <p className={`text-[13px] flex items-center gap-2 ${today!.task1Done ? 'text-teal-bright' : 'text-ink-3'}`}>
-            {today!.task1Done ? '✓' : '○'} {today!.task1Text}
+          <p className={`text-[13px] flex items-center gap-2 ${t.task1Done ? 'text-teal-bright' : 'text-ink-3'}`}>
+            {t.task1Done ? '✓' : '○'} {t.task1Text}
           </p>
-          <p className={`text-[13px] flex items-center gap-2 ${today!.task2Done ? 'text-teal-bright' : 'text-ink-3'}`}>
-            {today!.task2Done ? '✓' : '○'} {today!.task2Text}
+          <p className={`text-[13px] flex items-center gap-2 ${t.task2Done ? 'text-teal-bright' : 'text-ink-3'}`}>
+            {t.task2Done ? '✓' : '○'} {t.task2Text}
           </p>
         </div>
       )
     }
-
-    if (today!.templateType === 'mit') {
-      const mit = today!.tasks as MITTasks | undefined
-      if (!mit) return null
+    if (t.templateType === 'mit') {
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          {mit.tasks.map((t, i) => (
-            <p key={i} className={`text-[13px] flex items-center gap-2 ${t.done ? 'text-teal-bright' : 'text-ink-3'}`}>
-              {t.done ? '✓' : '○'} {t.text}
+          {[{ text: t.task1Text, done: t.task1Done }, { text: t.task2Text, done: t.task2Done }, { text: t.task3Text, done: t.task3Done }].map((item, i) => (
+            <p key={i} className={`text-[13px] flex items-center gap-2 ${item.done ? 'text-teal-bright' : 'text-ink-3'}`}>
+              {item.done ? '✓' : '○'} {item.text}
             </p>
           ))}
         </div>
       )
     }
-
-    if (today!.templateType === 'timeblocks') {
-      const tb = today!.tasks as TimeBlockTasks | undefined
-      if (!tb) return null
+    if (t.templateType === 'timeblocks') {
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          {tb.blocks.map((b, i) => (
+          {[
+            { label: t.block1Label, intention: t.block1Intention, done: t.block1Done },
+            { label: t.block2Label, intention: t.block2Intention, done: t.block2Done },
+            { label: t.block3Label, intention: t.block3Intention, done: t.block3Done },
+          ].map((b, i) => (
             <p key={i} className={`text-[13px] flex items-center gap-2 ${b.done ? 'text-teal-bright' : 'text-ink-3'}`}>
               {b.done ? '✓' : '○'} <span className="text-ink-4 font-medium">{b.label}:</span> {b.intention}
             </p>
@@ -89,16 +87,20 @@ export default function SnapshotPage() {
         </div>
       )
     }
-
-    if (today!.templateType === 'lifeareas') {
-      const la = today!.tasks as LifeAreaTasks | undefined
-      if (!la) return null
-      const doneCount = la.areas.filter((a) => a.done).length
+    if (t.templateType === 'lifeareas') {
+      const areas = [
+        { key: 'work'     as const, intention: t.workIntention,     done: t.workDone },
+        { key: 'home'     as const, intention: t.homeIntention,     done: t.homeDone },
+        { key: 'family'   as const, intention: t.familyIntention,   done: t.familyDone },
+        { key: 'health'   as const, intention: t.healthIntention,   done: t.healthDone },
+        { key: 'personal' as const, intention: t.personalIntention, done: t.personalDone },
+      ]
+      const doneCount = areas.filter((a) => a.done).length
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          {la.areas.map((a) => (
-            <p key={a.tag} className={`text-[13px] flex items-center gap-2 ${a.done ? 'text-teal-bright' : 'text-ink-3'}`}>
-              {a.done ? '✓' : '○'} {AREA_TAGS[a.tag].icon} {AREA_TAGS[a.tag].label}: {a.intention || '—'}
+          {areas.map((a) => (
+            <p key={a.key} className={`text-[13px] flex items-center gap-2 ${a.done ? 'text-teal-bright' : 'text-ink-3'}`}>
+              {a.done ? '✓' : '○'} {AREA_TAGS[a.key].icon} {AREA_TAGS[a.key].label}: {a.intention || '—'}
             </p>
           ))}
           <p className="text-[11px] text-ink-4 pt-1">
@@ -107,7 +109,6 @@ export default function SnapshotPage() {
         </div>
       )
     }
-
     return null
   }
 
@@ -179,7 +180,7 @@ export default function SnapshotPage() {
         <Card className="mb-4">
           <p className="text-[10px] uppercase tracking-[0.1em] text-ink-3 font-medium mb-2.5">{templateLabel}</p>
           <p className="font-serif text-[17px] text-ink mb-3">
-            {today.dayIntention || today.mainGoal || '—'}
+            {getGoalHeadline(today) || '—'}
           </p>
           <TaskRecap />
         </Card>

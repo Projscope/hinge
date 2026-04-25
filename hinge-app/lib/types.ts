@@ -38,59 +38,67 @@ export const TEMPLATES: TemplateOption[] = [
   },
 ]
 
-// ── Template task shapes (stored as jsonb in DB for non-focus templates) ──────
+// ── Per-template goal shapes ───────────────────────────────────────────────────
 
-export interface MITTask {
-  text: string
-  done: boolean
-}
-
-export interface MITTasks {
-  tasks: [MITTask, MITTask, MITTask]
-}
-
-export interface TimeBlock {
-  label: string   // customizable, defaults to Morning/Afternoon/Evening
-  intention: string
-  done: boolean
-}
-
-export interface TimeBlockTasks {
-  blocks: [TimeBlock, TimeBlock, TimeBlock]
-}
-
-export interface LifeAreaItem {
-  tag: AreaTag
-  intention: string
-  done: boolean
-}
-
-export interface LifeAreaTasks {
-  areas: LifeAreaItem[]  // always 5, one per area
-}
-
-export type TemplateTasks = MITTasks | TimeBlockTasks | LifeAreaTasks
-
-// ── Core data types ───────────────────────────────────────────────────────────
-
-export interface DailyGoal {
+interface BaseGoal {
   id: string
-  date: string             // 'YYYY-MM-DD'
-  templateType: TemplateType
-  dayIntention?: string    // optional theme / framing across all templates
+  date: string          // 'YYYY-MM-DD'
+  dayIntention?: string
+  endTime: string       // 'HH:MM' 24h
+  completed: boolean
+  createdAt: string     // ISO
+}
+
+export interface FocusGoal extends BaseGoal {
+  templateType: 'focus'
   areaTag?: AreaTag
-  // Focus-specific fields (kept as dedicated columns for backward compat)
   mainGoal: string
   task1Text: string
   task1Done: boolean
   task2Text: string
   task2Done: boolean
-  // Non-focus template data (stored as jsonb)
-  tasks?: TemplateTasks
-  endTime: string          // 'HH:MM' 24h
-  completed: boolean
-  createdAt: string        // ISO
 }
+
+export interface MITGoal extends BaseGoal {
+  templateType: 'mit'
+  task1Text: string
+  task1Done: boolean
+  task2Text: string
+  task2Done: boolean
+  task3Text: string
+  task3Done: boolean
+}
+
+export interface TimeBlockGoal extends BaseGoal {
+  templateType: 'timeblocks'
+  block1Label: string
+  block1Intention: string
+  block1Done: boolean
+  block2Label: string
+  block2Intention: string
+  block2Done: boolean
+  block3Label: string
+  block3Intention: string
+  block3Done: boolean
+}
+
+export interface LifeAreaGoal extends BaseGoal {
+  templateType: 'lifeareas'
+  workIntention: string
+  workDone: boolean
+  homeIntention: string
+  homeDone: boolean
+  familyIntention: string
+  familyDone: boolean
+  healthIntention: string
+  healthDone: boolean
+  personalIntention: string
+  personalDone: boolean
+}
+
+export type DailyGoal = FocusGoal | MITGoal | TimeBlockGoal | LifeAreaGoal
+
+// ── Core types ────────────────────────────────────────────────────────────────
 
 export interface OverflowItem {
   id: string
@@ -116,27 +124,30 @@ export interface AppState {
   freezeUsedThisMonth: boolean
   walkthroughSeen: boolean
   username: string | null
-  /** true once endDay() is called — survives refresh via localStorage */
   dayEnded: boolean
 }
 
-// ── Completion helpers ────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Primary display text for a goal across all templates */
+export function getGoalHeadline(goal: DailyGoal): string {
+  if (goal.templateType === 'focus') {
+    return goal.dayIntention?.trim() || goal.mainGoal?.trim() || ''
+  }
+  return goal.dayIntention?.trim() || ''
+}
 
 export function isGoalReadyToClose(goal: DailyGoal): boolean {
   switch (goal.templateType) {
     case 'focus':
       return goal.task1Done && goal.task2Done
-    case 'mit': {
-      const mit = goal.tasks as MITTasks | undefined
-      return !!mit && mit.tasks.every((t) => t.done)
-    }
-    case 'timeblocks': {
-      const tb = goal.tasks as TimeBlockTasks | undefined
-      return !!tb && tb.blocks.every((b) => b.done)
-    }
+    case 'mit':
+      return goal.task1Done && goal.task2Done && goal.task3Done
+    case 'timeblocks':
+      return goal.block1Done && goal.block2Done && goal.block3Done
     case 'lifeareas': {
-      const la = goal.tasks as LifeAreaTasks | undefined
-      return !!la && la.areas.filter((a) => a.done).length >= 3
+      const done = [goal.workDone, goal.homeDone, goal.familyDone, goal.healthDone, goal.personalDone].filter(Boolean).length
+      return done >= 3
     }
   }
 }
@@ -148,19 +159,16 @@ export function templateProgress(goal: DailyGoal): number {
       return Math.round((done / 2) * 100)
     }
     case 'mit': {
-      const mit = goal.tasks as MITTasks | undefined
-      if (!mit) return 0
-      return Math.round((mit.tasks.filter((t) => t.done).length / 3) * 100)
+      const done = [goal.task1Done, goal.task2Done, goal.task3Done].filter(Boolean).length
+      return Math.round((done / 3) * 100)
     }
     case 'timeblocks': {
-      const tb = goal.tasks as TimeBlockTasks | undefined
-      if (!tb) return 0
-      return Math.round((tb.blocks.filter((b) => b.done).length / 3) * 100)
+      const done = [goal.block1Done, goal.block2Done, goal.block3Done].filter(Boolean).length
+      return Math.round((done / 3) * 100)
     }
     case 'lifeareas': {
-      const la = goal.tasks as LifeAreaTasks | undefined
-      if (!la) return 0
-      return Math.round((la.areas.filter((a) => a.done).length / 5) * 100)
+      const done = [goal.workDone, goal.homeDone, goal.familyDone, goal.healthDone, goal.personalDone].filter(Boolean).length
+      return Math.round((done / 5) * 100)
     }
   }
 }

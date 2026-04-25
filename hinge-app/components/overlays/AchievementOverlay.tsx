@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { DailyGoal } from '@/lib/types'
-import { FOCUS_RANKS } from '@/lib/types'
+import { FOCUS_RANKS, getGoalHeadline } from '@/lib/types'
 import { requestNotificationPermission, getNotificationPrefs, saveNotificationPrefs } from '@/lib/notifications'
 import { addToQueue } from '@/lib/goalQueue'
 import { getPublicProfile } from '@/lib/publicProfile'
@@ -296,7 +296,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
                 lineHeight: 1.4,
               }}
             >
-              &ldquo;{goal.mainGoal}&rdquo;
+              &ldquo;{getGoalHeadline(goal)}&rdquo;
             </p>
             <div
               style={{

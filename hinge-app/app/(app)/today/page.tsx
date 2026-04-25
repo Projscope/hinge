@@ -7,7 +7,7 @@ import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
 import OverflowLog from '@/components/today/OverflowLog'
-import { AREA_TAGS, type MITTasks, type TimeBlockTasks, type LifeAreaTasks } from '@/lib/types'
+import { AREA_TAGS } from '@/lib/types'
 import StreakAtRisk from '@/components/today/StreakAtRisk'
 import WeeklyAnchorBanner from '@/components/today/WeeklyAnchorBanner'
 import ComebackBanner from '@/components/overlays/ComebackBanner'
@@ -60,19 +60,19 @@ const NO_GOAL_COPY: Record<TimePeriod, { heading: string; sub: string }> = {
 
 export default function TodayPage() {
   const router = useRouter()
-  const { today, todayOverflow, toggleTask, toggleTemplateItem, addOverflow, hydrated, history, streaks, username, dayEnded } = useAppStore()
+  const { today, todayOverflow, toggleTemplateItem, addOverflow, hydrated, history, streaks, username, dayEnded } = useAppStore()
   const [showComeback, setShowComeback] = useState(true)
 
   const timePeriod = useMemo(() => getTimePeriod(), [])
-  const bothTasksDone = today?.task1Done && today?.task2Done
 
-  // For non-focus templates, compute done state for evening CTA
   const templateAllDone = (() => {
     if (!today) return false
-    if (today.templateType === 'focus') return !!(today.task1Done && today.task2Done)
-    if (today.templateType === 'mit') return !!(today.tasks as MITTasks | undefined)?.tasks.every((t) => t.done)
-    if (today.templateType === 'timeblocks') return !!(today.tasks as TimeBlockTasks | undefined)?.blocks.every((b) => b.done)
-    if (today.templateType === 'lifeareas') return ((today.tasks as LifeAreaTasks | undefined)?.areas.filter((a) => a.done).length ?? 0) >= 3
+    if (today.templateType === 'focus') return today.task1Done && today.task2Done
+    if (today.templateType === 'mit') return today.task1Done && today.task2Done && today.task3Done
+    if (today.templateType === 'timeblocks') return today.block1Done && today.block2Done && today.block3Done
+    if (today.templateType === 'lifeareas') {
+      return [today.workDone, today.homeDone, today.familyDone, today.healthDone, today.personalDone].filter(Boolean).length >= 3
+    }
     return false
   })()
 
@@ -87,8 +87,6 @@ export default function TodayPage() {
 
     return (
       <div className="px-8 py-10 max-w-[680px]">
-
-        {/* Time-aware heading */}
         <div className="mb-8">
           <p className="text-[11px] font-medium tracking-[0.1em] uppercase text-gold mb-2">
             {formatDate(now)}
@@ -99,12 +97,10 @@ export default function TodayPage() {
           <p className="text-[14px] text-ink-3 leading-relaxed">{copy.sub}</p>
         </div>
 
-        {/* Setup CTA */}
         <Button onClick={() => router.push('/setup')} className="w-full mb-8">
           Start morning setup →
         </Button>
 
-        {/* Streak context */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-bg-3 border border-[var(--border)] rounded-[12px] px-4 py-3">
             {streaks.current === 0 ? (
@@ -134,7 +130,6 @@ export default function TodayPage() {
           )}
         </div>
 
-        {/* Queue nudge */}
         <div className="bg-bg-3 border border-[var(--border)] rounded-[12px] px-4 py-3 mb-8 flex items-center justify-between">
           <div>
             <p className="text-[12px] font-medium text-ink mb-0.5">Goal queue</p>
@@ -145,7 +140,6 @@ export default function TodayPage() {
           </Link>
         </div>
 
-        {/* Heatmap — mobile only (right panel handles desktop) */}
         <div className="lg:hidden">
           <div className="mb-4">
             <WeekDots history={history} today={null} />
@@ -167,7 +161,6 @@ export default function TodayPage() {
   // ── Goal set ────────────────────────────────────────────────────────────────
   return (
     <div>
-      {/* Page header */}
       <div className="px-8 pt-7 pb-0 flex items-start justify-between mb-5">
         <div>
           <h1 className="font-serif text-[26px] text-ink leading-tight">Today</h1>
@@ -193,16 +186,10 @@ export default function TodayPage() {
       </div>
 
       <div className="px-8 pb-8">
-        {/* Weekly anchor */}
         <WeeklyAnchorBanner />
-
-        {/* Streak at risk banner */}
         <StreakAtRisk today={today} />
-
-        {/* Goal hero */}
         <GoalHero goal={today} />
 
-        {/* Share streak — mobile only */}
         <div className="lg:hidden mb-4">
           <ShareCard streakCount={streaks.current} username={username} />
         </div>
@@ -238,55 +225,55 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Template-aware task rendering */}
+        {/* Focus */}
         {today.templateType === 'focus' && (
           <>
             <SectionTitle>Support tasks</SectionTitle>
-            <TaskCard label="Task 1 · unblocks goal" text={today.task1Text} done={today.task1Done} onToggle={() => toggleTask(1)} disabled={dayEnded} />
-            <TaskCard label="Task 2 · involves another person" text={today.task2Text} done={today.task2Done} onToggle={() => toggleTask(2)} disabled={dayEnded} />
+            <TaskCard label="Task 1 · unblocks goal" text={today.task1Text} done={today.task1Done} onToggle={() => toggleTemplateItem(0)} disabled={dayEnded} />
+            <TaskCard label="Task 2 · involves another person" text={today.task2Text} done={today.task2Done} onToggle={() => toggleTemplateItem(1)} disabled={dayEnded} />
           </>
         )}
 
-        {today.templateType === 'mit' && (() => {
-          const mit = today.tasks as MITTasks | undefined
-          if (!mit) return null
-          return (
-            <>
-              <SectionTitle>Most important tasks</SectionTitle>
-              {mit.tasks.map((t, i) => (
-                <TaskCard key={i} label={`Task ${i + 1}`} text={t.text} done={t.done} onToggle={() => toggleTemplateItem(i)} disabled={dayEnded} />
-              ))}
-            </>
-          )
-        })()}
+        {/* MIT */}
+        {today.templateType === 'mit' && (
+          <>
+            <SectionTitle>Most important tasks</SectionTitle>
+            <TaskCard label="Task 1" text={today.task1Text} done={today.task1Done} onToggle={() => toggleTemplateItem(0)} disabled={dayEnded} />
+            <TaskCard label="Task 2" text={today.task2Text} done={today.task2Done} onToggle={() => toggleTemplateItem(1)} disabled={dayEnded} />
+            <TaskCard label="Task 3" text={today.task3Text} done={today.task3Done} onToggle={() => toggleTemplateItem(2)} disabled={dayEnded} />
+          </>
+        )}
 
-        {today.templateType === 'timeblocks' && (() => {
-          const tb = today.tasks as TimeBlockTasks | undefined
-          if (!tb) return null
-          return (
-            <>
-              <SectionTitle>Time blocks</SectionTitle>
-              {tb.blocks.map((b, i) => (
-                <TaskCard key={i} label={b.label} text={b.intention} done={b.done} onToggle={() => toggleTemplateItem(i)} disabled={dayEnded} />
-              ))}
-            </>
-          )
-        })()}
+        {/* Time Blocks */}
+        {today.templateType === 'timeblocks' && (
+          <>
+            <SectionTitle>Time blocks</SectionTitle>
+            <TaskCard label={today.block1Label} text={today.block1Intention} done={today.block1Done} onToggle={() => toggleTemplateItem(0)} disabled={dayEnded} />
+            <TaskCard label={today.block2Label} text={today.block2Intention} done={today.block2Done} onToggle={() => toggleTemplateItem(1)} disabled={dayEnded} />
+            <TaskCard label={today.block3Label} text={today.block3Intention} done={today.block3Done} onToggle={() => toggleTemplateItem(2)} disabled={dayEnded} />
+          </>
+        )}
 
+        {/* Life Areas */}
         {today.templateType === 'lifeareas' && (() => {
-          const la = today.tasks as LifeAreaTasks | undefined
-          if (!la) return null
-          const doneCount = la.areas.filter((a) => a.done).length
+          const doneCount = [today.workDone, today.homeDone, today.familyDone, today.healthDone, today.personalDone].filter(Boolean).length
+          const areas = [
+            { key: 'work',     intention: today.workIntention,     done: today.workDone,     idx: 0 },
+            { key: 'home',     intention: today.homeIntention,     done: today.homeDone,     idx: 1 },
+            { key: 'family',   intention: today.familyIntention,   done: today.familyDone,   idx: 2 },
+            { key: 'health',   intention: today.healthIntention,   done: today.healthDone,   idx: 3 },
+            { key: 'personal', intention: today.personalIntention, done: today.personalDone, idx: 4 },
+          ] as const
           return (
             <>
               <SectionTitle>Life areas · {doneCount}/5 done · need 3</SectionTitle>
-              {la.areas.map((a, i) => (
+              {areas.map(({ key, intention, done, idx }) => (
                 <TaskCard
-                  key={a.tag}
-                  label={`${AREA_TAGS[a.tag].icon} ${AREA_TAGS[a.tag].label}`}
-                  text={a.intention}
-                  done={a.done}
-                  onToggle={() => toggleTemplateItem(i)}
+                  key={key}
+                  label={`${AREA_TAGS[key].icon} ${AREA_TAGS[key].label}`}
+                  text={intention}
+                  done={done}
+                  onToggle={() => toggleTemplateItem(idx)}
                   disabled={dayEnded}
                 />
               ))}
@@ -311,11 +298,9 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Overflow log */}
         <OverflowLog items={todayOverflow} onAdd={addOverflow} disabled={today.completed} />
       </div>
 
-      {/* Comeback banner */}
       {showComeback && (
         <ComebackBanner
           history={history}

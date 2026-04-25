@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useAppStore } from '@/lib/store'
 import { scoreGoalQuality } from '@/lib/goalQuality'
 import type { DailyGoal } from '@/lib/types'
+import { getGoalHeadline } from '@/lib/types'
 import Pill from '@/components/ui/Pill'
 import Card from '@/components/ui/Card'
 import SectionTitle from '@/components/ui/SectionTitle'
@@ -128,8 +129,8 @@ export default function ProgressPage() {
   })
   const dayInsight  = bestAndWorstDays(dayBars)
   const scoredGoals = window30
-    .filter((g) => g.mainGoal && g.mainGoal.trim().length > 0)
-    .map((g) => ({ ...g, qualityScore: scoreGoalQuality(g.mainGoal).score }))
+    .filter((g) => getGoalHeadline(g).trim().length > 0)
+    .map((g) => ({ ...g, qualityScore: scoreGoalQuality(getGoalHeadline(g)).score }))
   const specificGoals = scoredGoals.filter((g) => g.qualityScore >= 70)
   const vagueGoals    = scoredGoals.filter((g) => g.qualityScore < 35)
   const avgClarity      = scoredGoals.length > 0 ? Math.round(scoredGoals.reduce((s, g) => s + g.qualityScore, 0) / scoredGoals.length) : 0
@@ -143,10 +144,11 @@ export default function ProgressPage() {
 
   // ── Milestones data ───────────────────────────────────────────────────────
   const maxStreak = Math.max(streaks.current, streaks.personalBest)
-  const specificGoalCount = history.filter((g) => g.mainGoal.split(/\s+/).length >= 5).length
-  const collabTaskCount   = history.filter((g) =>
-    /\b(with|alex|team|review|pair|together|manager|colleague)\b/i.test(g.task1Text + g.task2Text)
-  ).length
+  const specificGoalCount = history.filter((g) => getGoalHeadline(g).split(/\s+/).length >= 5).length
+  const collabTaskCount   = history.filter((g) => {
+    const text = g.templateType === 'focus' || g.templateType === 'mit' ? g.task1Text + g.task2Text : ''
+    return /\b(with|alex|team|review|pair|together|manager|colleague)\b/i.test(text)
+  }).length
   function isEarned(m: typeof MILESTONE_DEFS[0]): boolean {
     if (m.special) {
       if (m.label === 'Sharp')    return specificGoalCount >= 10
@@ -223,7 +225,7 @@ export default function ProgressPage() {
                   >
                     <div>
                       <p className="text-[11px] text-ink-3 mb-0.5">{formatDate(goal.date)}</p>
-                      <p className="text-[14px] font-medium text-ink">{goal.mainGoal}</p>
+                      <p className="text-[14px] font-medium text-ink">{getGoalHeadline(goal)}</p>
                     </div>
                     <Pill variant={goal.completed ? 'teal' : 'red'}>
                       {goal.completed ? 'Hit ✓' : 'Missed'}
@@ -266,7 +268,7 @@ export default function ProgressPage() {
                   <div key={goal.id} className="bg-bg-3 border border-[var(--border)] rounded-[12px] px-4 py-3 mb-2 flex justify-between items-center">
                     <div>
                       <p className="text-[11px] text-ink-3 mb-0.5">{formatDate(goal.date)}</p>
-                      <p className="text-[14px] font-medium text-ink">{goal.mainGoal}</p>
+                      <p className="text-[14px] font-medium text-ink">{getGoalHeadline(goal)}</p>
                     </div>
                     <Pill variant={goal.completed ? 'teal' : 'red'}>{goal.completed ? 'Hit ✓' : 'Missed'}</Pill>
                   </div>

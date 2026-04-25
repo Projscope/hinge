@@ -4,6 +4,7 @@ import { useAppStore } from '@/lib/store'
 import Pill from '@/components/ui/Pill'
 import SectionTitle from '@/components/ui/SectionTitle'
 import Button from '@/components/ui/Button'
+import { getGoalHeadline } from '@/lib/types'
 import ContributionHeatmap from '@/components/history/ContributionHeatmap'
 import PersonalRecords from '@/components/history/PersonalRecords'
 
@@ -80,7 +81,7 @@ export default function HistoryPage() {
               >
                 <div>
                   <p className="text-[11px] text-ink-3 mb-0.5">{formatDate(goal.date)}</p>
-                  <p className="text-[14px] font-medium text-ink">{goal.mainGoal}</p>
+                  <p className="text-[14px] font-medium text-ink">{getGoalHeadline(goal)}</p>
                 </div>
                 <Pill variant={goal.completed ? 'teal' : goal.completed === false ? 'red' : 'neutral'}>
                   {goal.completed ? 'Hit ✓' : 'Missed'}
@@ -137,7 +138,7 @@ export default function HistoryPage() {
               >
                 <div>
                   <p className="text-[11px] text-ink-3 mb-0.5">{formatDate(goal.date)}</p>
-                  <p className="text-[14px] font-medium text-ink">{goal.mainGoal}</p>
+                  <p className="text-[14px] font-medium text-ink">{getGoalHeadline(goal)}</p>
                 </div>
                 <Pill variant={goal.completed ? 'teal' : 'red'}>
                   {goal.completed ? 'Hit ✓' : 'Missed'}

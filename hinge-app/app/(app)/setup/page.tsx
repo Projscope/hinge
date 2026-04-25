@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/lib/store'
 import GoalInput from '@/components/setup/GoalInput'
 import Button from '@/components/ui/Button'
-import { AREA_TAGS, TEMPLATES, type AreaTag, type TemplateType, type MITTasks, type TimeBlockTasks, type LifeAreaTasks } from '@/lib/types'
+import { AREA_TAGS, TEMPLATES, getGoalHeadline, type AreaTag, type TemplateType } from '@/lib/types'
 import { loadQueue, addToQueue, removeFromQueue } from '@/lib/goalQueue'
 import type { QueueItem } from '@/lib/goalQueue'
 import { getWeeklyAnchor } from '@/lib/weeklyAnchor'
@@ -150,69 +150,55 @@ export default function SetupPage() {
         endTime,
       })
     } else if (template === 'mit') {
-      const tasks: MITTasks = {
-        tasks: [
-          { text: mitTasks[0].trim(), done: false },
-          { text: mitTasks[1].trim(), done: false },
-          { text: mitTasks[2].trim(), done: false },
-        ],
-      }
       ok = await setTodayGoal({
         date: todayStr,
         templateType: 'mit',
         dayIntention: dayIntention.trim() || undefined,
-        mainGoal: '',
-        task1Text: '',
+        task1Text: mitTasks[0].trim(),
         task1Done: false,
-        task2Text: '',
+        task2Text: mitTasks[1].trim(),
         task2Done: false,
-        tasks,
+        task3Text: mitTasks[2].trim(),
+        task3Done: false,
         endTime,
       })
     } else if (template === 'timeblocks') {
-      const blocks: TimeBlockTasks = {
-        blocks: [
-          { label: blockLabels[0], intention: blockIntentions[0].trim(), done: false },
-          { label: blockLabels[1], intention: blockIntentions[1].trim(), done: false },
-          { label: blockLabels[2], intention: blockIntentions[2].trim(), done: false },
-        ],
-      }
       ok = await setTodayGoal({
         date: todayStr,
         templateType: 'timeblocks',
         dayIntention: dayIntention.trim() || undefined,
-        mainGoal: '',
-        task1Text: '',
-        task1Done: false,
-        task2Text: '',
-        task2Done: false,
-        tasks: blocks,
+        block1Label: blockLabels[0],
+        block1Intention: blockIntentions[0].trim(),
+        block1Done: false,
+        block2Label: blockLabels[1],
+        block2Intention: blockIntentions[1].trim(),
+        block2Done: false,
+        block3Label: blockLabels[2],
+        block3Intention: blockIntentions[2].trim(),
+        block3Done: false,
         endTime,
       })
     } else if (template === 'lifeareas') {
-      const areas: LifeAreaTasks = {
-        areas: AREA_ORDER.map((tag) => ({
-          tag,
-          intention: areaIntentions[tag].trim(),
-          done: false,
-        })),
-      }
       ok = await setTodayGoal({
         date: todayStr,
         templateType: 'lifeareas',
         dayIntention: dayIntention.trim() || undefined,
-        mainGoal: '',
-        task1Text: '',
-        task1Done: false,
-        task2Text: '',
-        task2Done: false,
-        tasks: areas,
+        workIntention: areaIntentions.work.trim(),
+        workDone: false,
+        homeIntention: areaIntentions.home.trim(),
+        homeDone: false,
+        familyIntention: areaIntentions.family.trim(),
+        familyDone: false,
+        healthIntention: areaIntentions.health.trim(),
+        healthDone: false,
+        personalIntention: areaIntentions.personal.trim(),
+        personalDone: false,
         endTime,
       })
     }
 
     if (!ok) {
-      setSaveError('Could not save your goal. The database may need a migration — check the console for details.')
+      setSaveError('Could not save your goal — please try again.')
       return
     }
 
@@ -248,7 +234,7 @@ export default function SetupPage() {
             {TEMPLATES.find((t) => t.type === today!.templateType)?.label ?? 'Today'}
           </p>
           <p className="font-serif text-[16px] text-ink leading-snug">
-            {today!.dayIntention || today!.mainGoal || '—'}
+            {getGoalHeadline(today!) || '—'}
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 'use client'
 
 import type { DailyGoal } from '@/lib/types'
-import { templateProgress, TEMPLATES } from '@/lib/types'
+import { templateProgress, TEMPLATES, getGoalHeadline } from '@/lib/types'
 
 interface GoalHeroProps {
   goal: DailyGoal
@@ -24,8 +24,7 @@ export default function GoalHero({ goal }: GoalHeroProps) {
   const remaining = timeRemaining(goal.endTime)
   const templateLabel = TEMPLATES.find((t) => t.type === goal.templateType)?.label ?? 'Focus Mode'
 
-  // Headline: day intention > mainGoal > template label
-  const headline = goal.dayIntention?.trim() || goal.mainGoal?.trim() || null
+  const headline = getGoalHeadline(goal) || null
 
   return (
     <div className="relative bg-bg-3 border border-[var(--border2)] rounded-[16px] px-7 py-6 mb-5 overflow-hidden">
@@ -35,7 +34,7 @@ export default function GoalHero({ goal }: GoalHeroProps) {
         <p className="text-[9px] uppercase tracking-[0.12em] text-gold font-semibold">
           {templateLabel}
         </p>
-        {goal.areaTag && (
+        {goal.templateType === 'focus' && goal.areaTag && (
           <span className="text-[9px] uppercase tracking-[0.1em] text-ink-4 font-medium">· {goal.areaTag}</span>
         )}
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import type { DailyGoal, Streaks, Plan } from '@/lib/types'
+import { getGoalHeadline } from '@/lib/types'
 import WeekDots from './WeekDots'
 import Heatmap from './Heatmap'
 import ShareCard from '@/components/snapshot/ShareCard'
@@ -36,8 +37,8 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
   const goalQualityStats = (() => {
     if (history.length < 3) return null
     const scored = history
-      .filter((g) => g.mainGoal?.trim())
-      .map((g) => ({ score: scoreGoalQuality(g.mainGoal).score, completed: g.completed }))
+      .filter((g) => getGoalHeadline(g).trim())
+      .map((g) => ({ score: scoreGoalQuality(getGoalHeadline(g)).score, completed: g.completed }))
     const specific = scored.filter((g) => g.score >= 70)
     const vague = scored.filter((g) => g.score < 35)
     if (specific.length === 0 || vague.length === 0) return null

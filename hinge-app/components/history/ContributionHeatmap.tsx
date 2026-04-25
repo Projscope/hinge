@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react'
 import type { DailyGoal } from '@/lib/types'
+import { getGoalHeadline } from '@/lib/types'
 import { localDateStr } from '@/lib/dateUtils'
 
 interface Props {
@@ -160,12 +161,12 @@ export default function ContributionHeatmap({ history, today }: Props) {
     let goalText = ''
     if (cell.isToday && cell.goal && !cell.goal.completed) {
       status = 'Active'
-      goalText = cell.goal.mainGoal.slice(0, 40)
+      goalText = getGoalHeadline(cell.goal).slice(0, 40)
     } else if (cell.goal) {
       status = cell.goal.completed ? 'Hit' : 'Miss'
-      goalText = cell.goal.mainGoal.slice(0, 40)
+      goalText = getGoalHeadline(cell.goal).slice(0, 40)
     }
-    const text = goalText ? `${dateLabel} · ${status}\n${goalText}${cell.goal && cell.goal.mainGoal.length > 40 ? '…' : ''}` : `${dateLabel} · ${status}`
+    const text = goalText ? `${dateLabel} · ${status}\n${goalText}${cell.goal && getGoalHeadline(cell.goal).length > 40 ? '…' : ''}` : `${dateLabel} · ${status}`
     const rect = (e.target as HTMLElement).getBoundingClientRect()
     setTooltip({ text, x: rect.left + rect.width / 2, y: rect.top - 8 })
   }

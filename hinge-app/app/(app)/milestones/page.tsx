@@ -56,15 +56,16 @@ export default function MilestonesPage() {
 
   const maxStreak = Math.max(streaks.current, streaks.personalBest)
 
-  // Special milestones
   const specificGoalCount = history.filter((g) => {
-    // simple heuristic: goals with a verb + over 5 words
-    const words = g.mainGoal.split(/\s+/)
-    return words.length >= 5
+    const headline = g.templateType === 'focus' ? g.mainGoal : (g.dayIntention ?? '')
+    return headline.split(/\s+/).length >= 5
   }).length
-  const collabTaskCount = history.filter((g) =>
-    /\b(with|alex|team|review|pair|together|manager|colleague)\b/i.test(g.task1Text + g.task2Text)
-  ).length
+  const collabTaskCount = history.filter((g) => {
+    const text = g.templateType === 'focus' || g.templateType === 'mit'
+      ? g.task1Text + g.task2Text
+      : ''
+    return /\b(with|alex|team|review|pair|together|manager|colleague)\b/i.test(text)
+  }).length
 
   function isEarned(m: typeof MILESTONE_DEFS[0]): boolean {
     if (m.special) {
