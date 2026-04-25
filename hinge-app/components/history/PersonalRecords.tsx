@@ -56,7 +56,7 @@ export default function PersonalRecords({ history, streaks }: Props) {
   // Best area — which areaTag has highest hit rate (min 3 goals)
   const areaMap = new Map<AreaTag, DailyGoal[]>()
   for (const g of history) {
-    if (!g.areaTag) continue
+    if (g.templateType !== 'focus' || !g.areaTag) continue
     if (!areaMap.has(g.areaTag)) areaMap.set(g.areaTag, [])
     areaMap.get(g.areaTag)!.push(g)
   }
