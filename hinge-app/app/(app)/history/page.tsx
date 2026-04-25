@@ -45,6 +45,11 @@ export default function HistoryPage() {
         <section className="mb-5">
           <SectionTitle>Activity</SectionTitle>
           <ContributionHeatmap history={history} today={today} />
+          {allGoals.length === 0 && (
+            <p className="text-[11px] text-ink-4 mt-2 leading-snug">
+              Each square is a day. Green means you hit it. Your history starts today.
+            </p>
+          )}
         </section>
 
         {/* Personal records */}
@@ -54,7 +59,15 @@ export default function HistoryPage() {
         </section>
 
         {recentGoals.length === 0 && (
-          <p className="text-ink-3 text-[14px]">No goals yet. Start your first morning setup.</p>
+          <div className="bg-bg-3 border border-[var(--border)] rounded-[12px] px-5 py-5 text-center">
+            <p className="font-serif text-[18px] text-ink mb-1.5">Your streak starts with one day.</p>
+            <p className="text-[13px] text-ink-3 mb-4 leading-relaxed">
+              Set your first goal and every day you complete will show up here.
+            </p>
+            <Button onClick={() => typeof window !== 'undefined' && (window.location.href = '/setup')}>
+              Start morning setup →
+            </Button>
+          </div>
         )}
 
         {recentGoals.length > 0 && (

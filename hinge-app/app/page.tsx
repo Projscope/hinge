@@ -9,7 +9,7 @@ const jsonLd = {
       '@id': 'https://myhinge.app/#app',
       name: 'myhinge',
       url: 'https://myhinge.app',
-      description: 'One goal per day. Two support tasks. Hard 3-slot limit. The day hinges on one thing.',
+      description: 'Choose your daily structure — Focus, MIT, Time Blocks, or Life Areas. One binary verdict at the end of every day.',
       applicationCategory: 'ProductivityApplication',
       operatingSystem: 'Web, Android, iOS',
       offers: [
@@ -89,9 +89,7 @@ export default function LandingPage() {
             What one thing, if done today, makes your <em className="italic text-gold">day?</em>
           </h1>
           <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.65] max-w-[420px] mb-10">
-            Not a to-do list. One goal that actually matters.
-            Two tasks to make it happen. At the end of the day — did you nail it?
-            That&apos;s the whole system.
+            Not a to-do list. Choose your structure each morning — one focused goal, three equal tasks, time blocks, or life areas. At the end of the day: did you nail it? That&apos;s the whole system.
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             <LandingCTA variant="hero" />
@@ -107,55 +105,41 @@ export default function LandingPage() {
           <div className="w-[280px] bg-[var(--lk-ink)] rounded-[36px] p-3 shadow-[0_40px_80px_rgba(15,14,12,0.25),0_8px_24px_rgba(15,14,12,0.12)] relative">
             <div className="w-[80px] h-[24px] bg-[var(--lk-ink)] rounded-b-[16px] mx-auto mb-2 relative z-10" />
             <div className="bg-cream rounded-[28px] overflow-hidden min-h-[520px]">
-              {/* Screen header */}
+              {/* Template picker screen */}
               <div className="p-5 pb-4 border-b border-[var(--lk-border)]">
                 <p className="text-[11px] font-medium tracking-[0.08em] uppercase text-[var(--lk-faint)] mb-1">
-                  Today · Work
+                  Morning setup
                 </p>
                 <p className="font-serif text-[17px] text-[var(--lk-ink)] leading-tight">
-                  Today&apos;s focus
+                  Choose today&apos;s structure
                 </p>
               </div>
-              {/* Screen body */}
-              <div className="p-5">
-                <div className="bg-[var(--lk-ink)] rounded-[16px] p-4 mb-3 text-cream">
-                  <p className="text-[10px] font-medium tracking-[0.1em] uppercase text-[rgba(250,248,244,0.5)] mb-1.5">
-                    Main goal
-                  </p>
-                  <p className="font-serif text-[15px] leading-[1.35] text-cream mb-3.5">
-                    Ship auth refactor to staging
-                  </p>
-                  <div className="h-[3px] bg-[rgba(250,248,244,0.15)] rounded-full overflow-hidden mb-1.5">
-                    <div className="h-full w-1/2 bg-gold rounded-full" />
+              <div className="p-4 flex flex-col gap-2">
+                {/* Focus — selected */}
+                <div className="bg-[var(--lk-ink)] rounded-[12px] p-3 text-cream">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className="text-[12px] font-semibold text-cream">Focus Mode</p>
+                    <span className="w-[6px] h-[6px] rounded-full bg-gold" />
                   </div>
-                  <p className="text-[10px] text-right text-[rgba(250,248,244,0.45)]">50%</p>
+                  <p className="text-[10px] text-[rgba(250,248,244,0.5)] leading-snug">1 goal · 2 support tasks</p>
                 </div>
-                {/* Tasks */}
-                <div className="divide-y divide-[var(--lk-border)]">
-                  <div className="flex items-start gap-2.5 py-2.5">
-                    <div className="w-[18px] h-[18px] rounded-full bg-teal border-teal border flex-shrink-0 mt-0.5 flex items-center justify-center">
-                      <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
-                        <path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <p className="text-[13px] text-[var(--lk-faint)] line-through leading-snug">
-                      Write tests for token refresh
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2.5 py-2.5">
-                    <div className="w-[18px] h-[18px] rounded-full border border-[var(--lk-border)] flex-shrink-0 mt-0.5" />
-                    <p className="text-[13px] text-[var(--lk-muted)] leading-snug">Get PR reviewed by Alex</p>
-                  </div>
+                {/* MIT */}
+                <div className="border border-[var(--lk-border)] rounded-[12px] p-3">
+                  <p className="text-[12px] font-semibold text-[var(--lk-ink)] mb-0.5">MIT</p>
+                  <p className="text-[10px] text-[var(--lk-faint)] leading-snug">3 most important tasks</p>
                 </div>
-              </div>
-              {/* Screen footer */}
-              <div className="px-5 pb-5">
-                <p className="text-[11px] text-[var(--lk-faint)] flex items-center gap-1.5 mb-2.5">
-                  <span className="w-[5px] h-[5px] rounded-full bg-gold inline-block" />
-                  4h 22m remaining · ends 6:00 PM
-                </p>
-                <button className="w-full py-3 bg-[var(--gold-faint)] border border-[var(--gold-light)] rounded-[10px] text-[13px] font-medium text-[#8a5c10]">
-                  End my day →
+                {/* Time Blocks */}
+                <div className="border border-[var(--lk-border)] rounded-[12px] p-3">
+                  <p className="text-[12px] font-semibold text-[var(--lk-ink)] mb-0.5">Time Blocks</p>
+                  <p className="text-[10px] text-[var(--lk-faint)] leading-snug">Morning · Afternoon · Evening</p>
+                </div>
+                {/* Life Areas */}
+                <div className="border border-[var(--lk-border)] rounded-[12px] p-3">
+                  <p className="text-[12px] font-semibold text-[var(--lk-ink)] mb-0.5">Life Areas</p>
+                  <p className="text-[10px] text-[var(--lk-faint)] leading-snug">Work · Health · Family · Personal · Home</p>
+                </div>
+                <button className="mt-1 w-full py-2.5 bg-[var(--gold-faint)] border border-[var(--gold-light)] rounded-[10px] text-[12px] font-medium text-[#8a5c10]">
+                  Continue →
                 </button>
               </div>
             </div>
@@ -180,7 +164,7 @@ export default function LandingPage() {
       <div className="border-y border-[var(--lk-border)] bg-white">
         <div className="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-4 text-center">
           {[
-            { icon: '🎯', label: 'One goal per day' },
+            { icon: '🗂️', label: '4 daily templates' },
             { icon: '☰', label: 'Goal queue' },
             { icon: '🏷️', label: 'Life area tags' },
             { icon: '🔥', label: 'Streak tracking' },
@@ -221,7 +205,7 @@ export default function LandingPage() {
                 num: '02',
                 title: 'Morning setup',
                 sub: '60 seconds',
-                desc: 'Pick from queue or type fresh. Add two scaffolding tasks. The app scores goal quality in real time and shows which areas you\'ve been neglecting.',
+                desc: 'Choose your daily template — Focus, MIT, Time Blocks, or Life Areas. Pick from queue or type fresh. The app scores goal quality in real time and shows which areas you\'ve been neglecting.',
                 accent: 'text-gold',
               },
               {
@@ -265,6 +249,11 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
+                icon: '🗂️',
+                title: 'Daily templates',
+                desc: 'Focus Mode, MIT, Time Blocks, or Life Areas — choose your structure each morning. Switch anytime. The discipline stays constant; the shape adapts to your day.',
+              },
+              {
                 icon: '☰',
                 title: 'Goal queue',
                 desc: 'Pre-load goals any time — tagged by life area. Morning setup becomes a one-tap pick, not a blank-page moment.',
@@ -303,11 +292,6 @@ export default function LandingPage() {
                 icon: '🌐',
                 title: 'Public streak page',
                 desc: 'Share your streak and rank at myhinge.app/u/yourname. Show the world your consistency without sharing the details.',
-              },
-              {
-                icon: '🤝',
-                title: 'Accountability partner',
-                desc: 'Add one person who gets notified when your streak is at risk. Social pressure, applied minimally.',
               },
             ].map((f) => (
               <div key={f.title} className="flex gap-4">
@@ -415,16 +399,16 @@ export default function LandingPage() {
             The philosophy
           </p>
           <h2 className="font-serif text-[clamp(28px,4vw,44px)] tracking-[-0.02em] text-[var(--lk-ink)] mb-6">
-            The app refuses a 4th task.
+            The constraint is the product.
           </h2>
           <p className="text-[17px] font-light text-[var(--lk-muted)] leading-[1.75] mb-10">
-            Not because it can&apos;t — because it won&apos;t. The constraint is the product.
-            Three slots forces the question you&apos;ve been avoiding: <em className="italic">what actually matters today?</em>
+            Every template has a hard limit. Focus Mode: one goal, two tasks. MIT: three equal tasks, nothing more. Time Blocks: three intentions, one per block. Life Areas: five areas, one each.
+            <br /><br />
+            You can&apos;t add a 6th area. You can&apos;t squeeze in a 4th task. The structure holds — because the question it forces is the same: <em className="italic">what actually matters today?</em>
           </p>
           <blockquote className="border-l-4 border-gold pl-5 text-left bg-[var(--gold-faint)] rounded-r-[12px] py-4 pr-5">
             <p className="text-[14px] text-[var(--lk-muted)] leading-[1.75] italic">
-              &ldquo;The support tasks are not a to-do list. They are the scaffolding
-              that makes your main goal reachable today.&rdquo;
+              &ldquo;Whatever the shape of your day — the structure is fixed. You choose it once each morning, then you commit to it.&rdquo;
             </p>
           </blockquote>
         </div>
@@ -451,6 +435,7 @@ export default function LandingPage() {
               <p className="text-[13px] text-[var(--lk-faint)] mb-6">Forever. No card required.</p>
               <ul className="space-y-2.5 text-[14px] text-[var(--lk-muted)]">
                 {[
+                  'All 4 daily templates',
                   'Full 3-screen daily loop',
                   'Goal queue + area tags',
                   'Goal quality scoring',
@@ -470,7 +455,6 @@ export default function LandingPage() {
                   'Pattern insights',
                   'Milestone share cards',
                   'Streak freeze',
-                  'Accountability partner',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2 opacity-40 line-through">
                     <span className="mt-0.5">—</span> {f}
@@ -499,7 +483,6 @@ export default function LandingPage() {
                   'Focus rank + quality analytics',
                   'Milestone badges + share cards',
                   '1 streak freeze per month',
-                  'Accountability partner',
                   'Priority support',
                 ].map((f) => (
                   <li key={f} className="flex items-start gap-2">

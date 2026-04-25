@@ -27,13 +27,8 @@ export default function SnapshotPage() {
   if (!hydrated) return null
 
   if (!today) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20">
-        <p className="font-serif text-[24px] text-ink mb-3">Nothing to snapshot yet.</p>
-        <p className="text-ink-3 text-[14px] mb-6">Set a goal first, then come back to end your day.</p>
-        <Button onClick={() => router.push('/setup')}>Start morning setup →</Button>
-      </div>
-    )
+    router.replace('/today')
+    return null
   }
 
   const bothDone = today.task1Done && today.task2Done

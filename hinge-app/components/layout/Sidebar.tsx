@@ -11,6 +11,7 @@ interface SidebarProps {
   streaks: Streaks
   plan: Plan
   hitRate: number
+  historyCount: number
 }
 
 const NAV_ITEMS = [
@@ -26,7 +27,7 @@ function getRank(hitRate: number) {
   return FOCUS_RANKS.find((r) => hitRate >= r.min && hitRate <= r.max) ?? FOCUS_RANKS[0]
 }
 
-export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
+export default function Sidebar({ streaks, plan, hitRate, historyCount }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const rank = getRank(hitRate)
@@ -83,23 +84,28 @@ export default function Sidebar({ streaks, plan, hitRate }: SidebarProps) {
       </nav>
 
       {/* Rank widget */}
-      <div
-        className="mx-3.5 mb-2 bg-[var(--gold-dim)] border border-[rgba(200,146,42,0.2)] rounded-[12px] px-3.5 py-3 cursor-pointer hover:bg-[rgba(200,146,42,0.2)] transition-colors"
-      >
-        <p className="text-[9px] uppercase tracking-[0.1em] text-[rgba(200,146,42,0.6)] font-medium mb-0.5">
-          Focus rank
-        </p>
-        <p className="font-serif text-[17px] text-gold">
-          {rank.label} {rank.icon}
-        </p>
-        <p className="text-[10px] text-ink-3 mt-0.5">{hitRate}% hit rate · 30-day avg</p>
-        <div className="h-[2px] bg-[rgba(255,255,255,0.08)] rounded-full mt-2 overflow-hidden">
-          <div
-            className="h-full bg-gold rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(100, rankProgress)}%` }}
-          />
+      {historyCount >= 3 ? (
+        <div className="mx-3.5 mb-2 bg-[var(--gold-dim)] border border-[rgba(200,146,42,0.2)] rounded-[12px] px-3.5 py-3 cursor-pointer hover:bg-[rgba(200,146,42,0.2)] transition-colors">
+          <p className="text-[9px] uppercase tracking-[0.1em] text-[rgba(200,146,42,0.6)] font-medium mb-0.5">
+            Focus rank
+          </p>
+          <p className="font-serif text-[17px] text-gold">
+            {rank.label} {rank.icon}
+          </p>
+          <p className="text-[10px] text-ink-3 mt-0.5">{hitRate}% hit rate · 30-day avg</p>
+          <div className="h-[2px] bg-[rgba(255,255,255,0.08)] rounded-full mt-2 overflow-hidden">
+            <div
+              className="h-full bg-gold rounded-full transition-all duration-500"
+              style={{ width: `${Math.min(100, rankProgress)}%` }}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mx-3.5 mb-2 bg-bg-3 border border-[var(--border)] rounded-[12px] px-3.5 py-3">
+          <p className="text-[9px] uppercase tracking-[0.1em] text-ink-4 font-medium mb-0.5">Focus rank</p>
+          <p className="text-[11px] text-ink-4 leading-snug">Unlocks after day 3 · {historyCount}/3 days</p>
+        </div>
+      )}
 
       {/* Upgrade CTA — free only */}
       {plan === 'free' && (

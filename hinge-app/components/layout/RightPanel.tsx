@@ -4,6 +4,7 @@ import type { DailyGoal, Streaks, Plan } from '@/lib/types'
 import WeekDots from './WeekDots'
 import Heatmap from './Heatmap'
 import ShareCard from '@/components/snapshot/ShareCard'
+import { scoreGoalQuality } from '@/lib/goalQuality'
 
 interface RightPanelProps {
   streaks: Streaks
@@ -31,8 +32,20 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
   const now = new Date()
   const monthName = now.toLocaleDateString('en-US', { month: 'long' })
 
-  const specificGoalHitRate = 91 // placeholder until real data
-  const vagueGoalHitRate = 44   // placeholder
+  // Compute real goal quality hit rates from history
+  const goalQualityStats = (() => {
+    if (history.length < 3) return null
+    const scored = history
+      .filter((g) => g.mainGoal?.trim())
+      .map((g) => ({ score: scoreGoalQuality(g.mainGoal).score, completed: g.completed }))
+    const specific = scored.filter((g) => g.score >= 70)
+    const vague = scored.filter((g) => g.score < 35)
+    if (specific.length === 0 || vague.length === 0) return null
+    const specificHitRate = Math.round((specific.filter((g) => g.completed).length / specific.length) * 100)
+    const vagueHitRate = Math.round((vague.filter((g) => g.completed).length / vague.length) * 100)
+    const multiplier = vagueHitRate > 0 ? (specificHitRate / vagueHitRate).toFixed(1) : null
+    return { specificHitRate, vagueHitRate, multiplier }
+  })()
 
   return (
     <aside className="bg-bg-2 overflow-y-auto px-5 py-6 app-scroll h-full">
@@ -80,23 +93,31 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
 
       {/* Goal quality mini */}
       <SectionLabel>Goal quality</SectionLabel>
-      <div className="bg-bg-3 border border-[var(--border)] rounded-[10px] px-3 py-2.5">
-        {[
-          { label: 'Specific', pct: specificGoalHitRate, color: 'bg-teal-bright', textColor: 'text-teal-bright' },
-          { label: 'Vague', pct: vagueGoalHitRate, color: 'bg-[rgba(192,57,43,0.7)]', textColor: 'text-[#e26b5e]' },
-        ].map(({ label, pct, color, textColor }) => (
-          <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0">
-            <span className="text-[10px] text-ink-3 min-w-[56px]">{label}</span>
-            <div className="flex-1 h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
-              <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+      {goalQualityStats ? (
+        <div className="bg-bg-3 border border-[var(--border)] rounded-[10px] px-3 py-2.5">
+          {[
+            { label: 'Specific', pct: goalQualityStats.specificHitRate, color: 'bg-teal-bright', textColor: 'text-teal-bright' },
+            { label: 'Vague', pct: goalQualityStats.vagueHitRate, color: 'bg-[rgba(192,57,43,0.7)]', textColor: 'text-[#e26b5e]' },
+          ].map(({ label, pct, color, textColor }) => (
+            <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0">
+              <span className="text-[10px] text-ink-3 min-w-[56px]">{label}</span>
+              <div className="flex-1 h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
+                <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+              </div>
+              <span className={`text-[11px] font-medium min-w-[28px] text-right ${textColor}`}>{pct}%</span>
             </div>
-            <span className={`text-[11px] font-medium min-w-[28px] text-right ${textColor}`}>{pct}%</span>
-          </div>
-        ))}
-        <p className="text-[10px] text-ink-3 mt-2 pt-2 border-t border-[var(--border)] leading-snug">
-          Specific goals hit <strong className="text-ink">2×</strong> more often.
+          ))}
+          {goalQualityStats.multiplier && (
+            <p className="text-[10px] text-ink-3 mt-2 pt-2 border-t border-[var(--border)] leading-snug">
+              Specific goals hit <strong className="text-ink">{goalQualityStats.multiplier}×</strong> more often.
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-[11px] text-ink-4 leading-snug">
+          Appears after your first 3 days.
         </p>
-      </div>
+      )}
 
       <Divider />
 

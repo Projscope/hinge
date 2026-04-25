@@ -98,7 +98,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 overflow-hidden flex flex-col lg:grid lg:grid-cols-app">
         {/* Sidebar — desktop only */}
         <div className="hidden lg:contents">
-          <Sidebar streaks={streaks} plan={plan} hitRate={hitRate} />
+          <Sidebar streaks={streaks} plan={plan} hitRate={hitRate} historyCount={history.length} />
         </div>
 
         <main className="flex-1 min-h-0 overflow-y-auto bg-bg app-scroll animate-fadeUp">

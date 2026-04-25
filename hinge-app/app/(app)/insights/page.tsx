@@ -105,15 +105,31 @@ export default function InsightsPage() {
       </div>
 
       {!hasEnoughData && (
-        <div className="mx-8 mb-5 bg-bg-3 border border-[var(--border)] rounded-[12px] px-4 py-4 text-center">
-          <p className="text-[13px] text-ink-3 leading-relaxed">
-            Complete at least 3 days to start seeing your patterns.
-            You have <strong className="text-ink">{window30.length}</strong> so far.
-          </p>
+        <div className="px-8 pb-8">
+          <div className="bg-bg-3 border border-[var(--border)] rounded-[12px] px-5 py-6 text-center">
+            <p className="font-serif text-[20px] text-ink mb-2">Patterns form at day 3.</p>
+            <p className="text-[13px] text-ink-3 leading-relaxed mb-5">
+              Your insights will appear once you have enough data to be meaningful.
+            </p>
+            {/* Progress indicator */}
+            <div className="max-w-[240px] mx-auto mb-2">
+              <div className="flex justify-between text-[10px] text-ink-4 mb-1.5">
+                <span>Progress</span>
+                <span>{window30.length} / 3 days</span>
+              </div>
+              <div className="h-1.5 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gold rounded-full transition-all"
+                  style={{ width: `${Math.min(100, (window30.length / 3) * 100)}%` }}
+                />
+              </div>
+            </div>
+            <p className="text-[11px] text-ink-4">{3 - window30.length} more day{3 - window30.length !== 1 ? 's' : ''} to go</p>
+          </div>
         </div>
       )}
 
-      <div className="px-8 pb-8">
+      {hasEnoughData && <div className="px-8 pb-8">
         {/* Pattern callouts */}
         <PatternCallouts history={history} streaks={streaks} />
 
@@ -247,7 +263,7 @@ export default function InsightsPage() {
             </button>
           </div>
         )}
-      </div>
+      </div>}
     </div>
   )
 }
