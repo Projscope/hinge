@@ -98,6 +98,11 @@ export interface LifeAreaGoal extends BaseGoal {
 
 export type DailyGoal = FocusGoal | MITGoal | TimeBlockGoal | LifeAreaGoal
 
+// Distributive omit — preserves discriminated union members (Omit on a union
+// collapses to shared keys only, losing template-specific fields like areaTag).
+type DistributiveOmit<T, K extends keyof any> = T extends unknown ? Omit<T, K> : never
+export type NewDailyGoal = DistributiveOmit<DailyGoal, 'id' | 'completed' | 'createdAt'>
+
 // ── Core types ────────────────────────────────────────────────────────────────
 
 export interface OverflowItem {
