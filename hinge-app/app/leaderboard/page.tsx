@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
       // Fetch streaks + total wins in parallel
       const [streaksRes, winsRes] = await Promise.all([
         supabase.from('streaks').select('user_id, current, personal_best').in('user_id', userIds),
-        supabase.from('daily_goals').select('user_id').in('user_id', userIds).eq('completed', true),
+        supabase.from('daily_goals_view').select('user_id').in('user_id', userIds).eq('completed', true),
       ])
 
       const streakMap = new Map<string, { current: number; personal_best: number }>()

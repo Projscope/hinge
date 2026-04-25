@@ -137,7 +137,7 @@ export async function POST(req: NextRequest) {
 
   const [streakRes, goalsRes] = await Promise.all([
     supabase.from('streaks').select('current').eq('user_id', profile.user_id).maybeSingle(),
-    supabase.from('daily_goals').select('date, completed').eq('user_id', profile.user_id).order('date', { ascending: false }).limit(30),
+    supabase.from('daily_goals_view').select('date, completed').eq('user_id', profile.user_id).order('date', { ascending: false }).limit(30),
   ])
 
   const streak = streakRes.data?.current ?? 0

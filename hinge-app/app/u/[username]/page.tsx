@@ -111,7 +111,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
       // 2. Fetch streaks + goals in parallel
       const [streaksRes, goalsRes] = await Promise.all([
         supabase.from('streaks').select('current, personal_best').eq('user_id', userId).maybeSingle(),
-        supabase.from('daily_goals').select('id, date, main_goal, area_tag, completed').eq('user_id', userId).order('date', { ascending: false }).limit(200),
+        supabase.from('daily_goals_view').select('id, date, main_goal, area_tag, completed').eq('user_id', userId).order('date', { ascending: false }).limit(200),
       ])
 
       setData({
