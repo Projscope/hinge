@@ -61,7 +61,7 @@ export default function SetupPage() {
   // ── Shared ──────────────────────────────────────────────────────────────────
   const [dayIntention, setDayIntention] = useState('')
   const eveningReminderTime = typeof window !== 'undefined' ? getNotificationPrefs().eveningTime : '20:00'
-  const [endTime, setEndTime] = useState('18:00')
+  const [endTime, setEndTime] = useState('23:59')
 
   // ── Focus fields ────────────────────────────────────────────────────────────
   const [mainGoal, setMainGoal] = useState('')
