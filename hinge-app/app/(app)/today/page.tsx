@@ -224,7 +224,12 @@ export default function TodayPage() {
         {!dayEnded && timePeriod === 'evening' && templateAllDone && (
           <div className="bg-[rgba(26,122,101,0.08)] border border-[rgba(26,122,101,0.3)] rounded-[12px] px-4 py-3 mb-4 flex items-center justify-between">
             <div>
-              <p className="text-[12px] font-medium text-teal-bright mb-0.5">Both tasks done ✓</p>
+              <p className="text-[12px] font-medium text-teal-bright mb-0.5">
+                {today.templateType === 'focus' ? 'Both tasks done ✓'
+                  : today.templateType === 'mit' ? 'All 3 tasks done ✓'
+                  : today.templateType === 'timeblocks' ? 'All blocks done ✓'
+                  : '3+ areas done ✓'}
+              </p>
               <p className="text-[11px] text-ink-4">Ready to close the day and lock in the streak?</p>
             </div>
             <Button size="sm" onClick={() => router.push('/snapshot')} className="flex-shrink-0 ml-4">

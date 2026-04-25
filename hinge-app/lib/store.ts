@@ -233,11 +233,11 @@ export function useAppStore() {
         const tasks = mit.tasks.map((t, i) => i === index ? { ...t, done: !t.done } : t) as MITTasks['tasks']
         updatedTasks = { tasks }
       } else if (goal.templateType === 'timeblocks') {
-        const tb = (goal.tasks as TimeBlockTasks) ?? { blocks: [] }
+        const tb = (goal.tasks as TimeBlockTasks) ?? { blocks: [{ label: 'Morning', intention: '', done: false }, { label: 'Afternoon', intention: '', done: false }, { label: 'Evening', intention: '', done: false }] as TimeBlockTasks['blocks'] }
         const blocks = tb.blocks.map((b, i) => i === index ? { ...b, done: !b.done } : b) as TimeBlockTasks['blocks']
         updatedTasks = { blocks }
       } else {
-        const la = (goal.tasks as LifeAreaTasks) ?? { areas: [] }
+        const la = (goal.tasks as LifeAreaTasks) ?? { areas: (['work', 'home', 'family', 'health', 'personal'] as const).map((tag) => ({ tag, intention: '', done: false })) }
         const areas = la.areas.map((a, i) => i === index ? { ...a, done: !a.done } : a)
         updatedTasks = { areas }
       }
