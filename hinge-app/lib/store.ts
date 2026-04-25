@@ -163,11 +163,11 @@ export function useAppStore() {
             area_tag: goal.areaTag ?? null,
             end_time: goal.endTime,
             completed: false,
-            // Focus-specific columns
-            main_goal: isFocus ? goal.mainGoal : null,
-            task1_text: isFocus ? goal.task1Text : null,
+            // Focus-specific columns (NOT NULL — use '' for non-focus templates)
+            main_goal: isFocus ? goal.mainGoal : '',
+            task1_text: isFocus ? goal.task1Text : '',
             task1_done: false,
-            task2_text: isFocus ? goal.task2Text : null,
+            task2_text: isFocus ? goal.task2Text : '',
             task2_done: false,
             // Non-focus template data
             tasks: isFocus ? null : goal.tasks ?? null,
