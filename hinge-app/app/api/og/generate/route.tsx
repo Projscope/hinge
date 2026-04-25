@@ -136,11 +136,16 @@ export async function POST(req: NextRequest) {
   if (!profile) return Response.json({ error: 'Not found' }, { status: 404 })
 
   const [streakRes, goalsRes] = await Promise.all([
-    supabase.from('streaks').select('current').eq('user_id', profile.user_id).maybeSingle(),
+    supabase.from('streaks').select('current, last_active_date').eq('user_id', profile.user_id).maybeSingle(),
     supabase.from('daily_goals_view').select('date, completed').eq('user_id', profile.user_id).order('date', { ascending: false }).limit(30),
   ])
 
-  const streak = streakRes.data?.current ?? 0
+  const rawStreak = streakRes.data?.current ?? 0
+  const lastActive = streakRes.data?.last_active_date as string | null ?? null
+  const yday = new Date(); yday.setDate(yday.getDate() - 1)
+  const ydayStr = yday.toISOString().slice(0, 10)
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const streak = (lastActive === todayStr || lastActive === ydayStr) ? rawStreak : 0
   const goals  = goalsRes.data ?? []
   const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
   const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
