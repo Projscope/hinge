@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from './supabase/client'
-import type { AppState, DailyGoal, OverflowItem, Streaks } from './types'
+import type { AppState, DailyGoal, OverflowItem, Streaks, TemplateTasks, MITTasks, TimeBlockTasks, LifeAreaTasks } from './types'
 import { localDateStr } from './dateUtils'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -36,12 +36,15 @@ function mapGoal(row: Record<string, unknown>): DailyGoal {
   return {
     id: row.id as string,
     date: row.date as string,
-    mainGoal: row.main_goal as string,
+    templateType: (row.template_type as DailyGoal['templateType']) ?? 'focus',
+    dayIntention: (row.day_intention as string) ?? undefined,
     areaTag: row.area_tag as DailyGoal['areaTag'],
-    task1Text: row.task1_text as string,
-    task1Done: row.task1_done as boolean,
-    task2Text: row.task2_text as string,
-    task2Done: row.task2_done as boolean,
+    mainGoal: (row.main_goal as string) ?? '',
+    task1Text: (row.task1_text as string) ?? '',
+    task1Done: (row.task1_done as boolean) ?? false,
+    task2Text: (row.task2_text as string) ?? '',
+    task2Done: (row.task2_done as boolean) ?? false,
+    tasks: (row.tasks as TemplateTasks) ?? undefined,
     endTime: row.end_time as string,
     completed: row.completed as boolean,
     createdAt: row.created_at as string,
@@ -87,7 +90,6 @@ export function useAppStore() {
 
       const today = todayDate()
 
-      // Fire all reads in parallel
       const [profileRes, publicProfileRes, goalRes, historyRes, streaksRes] = await Promise.all([
         supabase.from('profiles').select('plan, freeze_used_this_month, walkthrough_seen').eq('id', user.id).single(),
         supabase.from('public_profiles').select('username').eq('user_id', user.id).maybeSingle(),
@@ -101,7 +103,6 @@ export function useAppStore() {
         ? todayGoal.completed === true || localStorage.getItem(CLOSED_KEY(todayGoal.id)) === '1'
         : false
 
-      // Load overflow items for today's goal (if it exists)
       let overflow: OverflowItem[] = []
       if (todayGoal) {
         const { data: overflowRows } = await supabase
@@ -111,11 +112,6 @@ export function useAppStore() {
           .order('created_at', { ascending: false })
         overflow = (overflowRows ?? []).map(mapOverflow)
       }
-
-      // Midnight reset: if there's a goal from a previous day still in `today`
-      // and it wasn't completed, it was a miss. Archive it and reset streak.
-      // (The server-side check: today's query returns null for past dates, so
-      // this just means today is clean. Streak reset is handled by end_day RPC.)
 
       setState({
         plan: (profileRes.data?.plan as AppState['plan']) ?? 'free',
@@ -144,20 +140,27 @@ export function useAppStore() {
       } = await supabase.auth.getUser()
       if (!user) return
 
+      const isFocus = goal.templateType === 'focus'
+
       const { data, error } = await supabase
         .from('daily_goals')
         .upsert(
           {
             user_id: user.id,
             date: goal.date,
-            main_goal: goal.mainGoal,
+            template_type: goal.templateType,
+            day_intention: goal.dayIntention ?? null,
             area_tag: goal.areaTag ?? null,
-            task1_text: goal.task1Text,
-            task1_done: false,
-            task2_text: goal.task2Text,
-            task2_done: false,
             end_time: goal.endTime,
             completed: false,
+            // Focus-specific columns
+            main_goal: isFocus ? goal.mainGoal : null,
+            task1_text: isFocus ? goal.task1Text : null,
+            task1_done: false,
+            task2_text: isFocus ? goal.task2Text : null,
+            task2_done: false,
+            // Non-focus template data
+            tasks: isFocus ? null : goal.tasks ?? null,
           },
           { onConflict: 'user_id,date' }
         )
@@ -176,21 +179,20 @@ export function useAppStore() {
     [supabase]
   )
 
+  // Focus-only: toggle task1 or task2
   const toggleTask = useCallback(
     async (taskNum: 1 | 2) => {
-      if (!state.today) return
+      if (!state.today || state.today.templateType !== 'focus') return
 
       const field = taskNum === 1 ? 'task1Done' : 'task2Done'
       const dbField = taskNum === 1 ? 'task1_done' : 'task2_done'
       const newVal = !state.today[field]
 
-      // Optimistic update
       setState((prev) => {
         if (!prev.today) return prev
         return { ...prev, today: { ...prev.today, [field]: newVal } }
       })
 
-      // Persist in background — fire-and-forget, optimistic state already applied
       supabase
         .from('daily_goals')
         .update({ [dbField]: newVal })
@@ -198,6 +200,50 @@ export function useAppStore() {
         .then(() => {/* intentional no-op */})
     },
     [supabase, state.today]
+  )
+
+  // All templates: toggle a task/block/area by index
+  const toggleTemplateItem = useCallback(
+    async (index: number) => {
+      if (!state.today) return
+      const goal = state.today
+
+      if (goal.templateType === 'focus') {
+        // Route to toggleTask for focus
+        await toggleTask((index + 1) as 1 | 2)
+        return
+      }
+
+      // Build updated tasks jsonb
+      let updatedTasks: TemplateTasks
+
+      if (goal.templateType === 'mit') {
+        const mit = (goal.tasks as MITTasks) ?? { tasks: [{ text: '', done: false }, { text: '', done: false }, { text: '', done: false }] }
+        const tasks = mit.tasks.map((t, i) => i === index ? { ...t, done: !t.done } : t) as MITTasks['tasks']
+        updatedTasks = { tasks }
+      } else if (goal.templateType === 'timeblocks') {
+        const tb = (goal.tasks as TimeBlockTasks) ?? { blocks: [] }
+        const blocks = tb.blocks.map((b, i) => i === index ? { ...b, done: !b.done } : b) as TimeBlockTasks['blocks']
+        updatedTasks = { blocks }
+      } else {
+        const la = (goal.tasks as LifeAreaTasks) ?? { areas: [] }
+        const areas = la.areas.map((a, i) => i === index ? { ...a, done: !a.done } : a)
+        updatedTasks = { areas }
+      }
+
+      // Optimistic update
+      setState((prev) => {
+        if (!prev.today) return prev
+        return { ...prev, today: { ...prev.today, tasks: updatedTasks } }
+      })
+
+      supabase
+        .from('daily_goals')
+        .update({ tasks: updatedTasks })
+        .eq('id', goal.id)
+        .then(() => {/* intentional no-op */})
+    },
+    [supabase, state.today, toggleTask]
   )
 
   const addOverflow = useCallback(
@@ -217,10 +263,8 @@ export function useAppStore() {
         createdAt: new Date().toISOString(),
       }
 
-      // Optimistic update
       setState((prev) => ({ ...prev, overflow: [optimistic, ...prev.overflow] }))
 
-      // Persist and swap out the optimistic id
       const { data } = await supabase
         .from('overflow_items')
         .insert({ user_id: user.id, daily_goal_id: state.today!.id, text })
@@ -241,10 +285,8 @@ export function useAppStore() {
     async (completed: boolean) => {
       if (!state.today) return
 
-      // Mark as closed in localStorage so dayEnded survives a refresh
       localStorage.setItem(CLOSED_KEY(state.today.id), '1')
 
-      // Optimistic update
       setState((prev) => {
         if (!prev.today) return prev
         const finishedGoal = { ...prev.today, completed }
@@ -265,14 +307,11 @@ export function useAppStore() {
         }
       })
 
-      // Atomic DB update via RPC
       await supabase.rpc('end_day', {
         p_goal_id: state.today.id,
         p_completed: completed,
       })
 
-      // If missed, explicitly reset streak in DB — the RPC may not do this,
-      // causing the public share page to show a stale streak count.
       if (!completed) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
@@ -283,8 +322,6 @@ export function useAppStore() {
         }
       }
 
-      // Regenerate OG image so the share card reflects the new streak immediately.
-      // Fire-and-forget — don't block the UI on this.
       if (state.username) {
         fetch('/api/og/generate', {
           method: 'POST',
@@ -320,6 +357,7 @@ export function useAppStore() {
     dayEnded: state.dayEnded,
     setTodayGoal,
     toggleTask,
+    toggleTemplateItem,
     addOverflow,
     endDay,
     markWalkthroughSeen,

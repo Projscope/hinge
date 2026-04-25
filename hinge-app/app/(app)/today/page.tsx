@@ -7,6 +7,7 @@ import { useAppStore } from '@/lib/store'
 import GoalHero from '@/components/today/GoalHero'
 import TaskCard from '@/components/today/TaskCard'
 import OverflowLog from '@/components/today/OverflowLog'
+import { AREA_TAGS, type MITTasks, type TimeBlockTasks, type LifeAreaTasks } from '@/lib/types'
 import StreakAtRisk from '@/components/today/StreakAtRisk'
 import WeeklyAnchorBanner from '@/components/today/WeeklyAnchorBanner'
 import ComebackBanner from '@/components/overlays/ComebackBanner'
@@ -59,11 +60,21 @@ const NO_GOAL_COPY: Record<TimePeriod, { heading: string; sub: string }> = {
 
 export default function TodayPage() {
   const router = useRouter()
-  const { today, todayOverflow, toggleTask, addOverflow, hydrated, history, streaks, username, dayEnded } = useAppStore()
+  const { today, todayOverflow, toggleTask, toggleTemplateItem, addOverflow, hydrated, history, streaks, username, dayEnded } = useAppStore()
   const [showComeback, setShowComeback] = useState(true)
 
   const timePeriod = useMemo(() => getTimePeriod(), [])
   const bothTasksDone = today?.task1Done && today?.task2Done
+
+  // For non-focus templates, compute done state for evening CTA
+  const templateAllDone = (() => {
+    if (!today) return false
+    if (today.templateType === 'focus') return !!(today.task1Done && today.task2Done)
+    if (today.templateType === 'mit') return !!(today.tasks as MITTasks | undefined)?.tasks.every((t) => t.done)
+    if (today.templateType === 'timeblocks') return !!(today.tasks as TimeBlockTasks | undefined)?.blocks.every((b) => b.done)
+    if (today.templateType === 'lifeareas') return ((today.tasks as LifeAreaTasks | undefined)?.areas.filter((a) => a.done).length ?? 0) >= 3
+    return false
+  })()
 
   if (!hydrated) return null
 
@@ -210,7 +221,7 @@ export default function TodayPage() {
         )}
 
         {/* Evening ready-to-close prompt */}
-        {!dayEnded && timePeriod === 'evening' && bothTasksDone && (
+        {!dayEnded && timePeriod === 'evening' && templateAllDone && (
           <div className="bg-[rgba(26,122,101,0.08)] border border-[rgba(26,122,101,0.3)] rounded-[12px] px-4 py-3 mb-4 flex items-center justify-between">
             <div>
               <p className="text-[12px] font-medium text-teal-bright mb-0.5">Both tasks done ✓</p>
@@ -222,22 +233,61 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Support tasks */}
-        <SectionTitle>Support tasks</SectionTitle>
-        <TaskCard
-          label="Support task 1 · unblocks goal"
-          text={today.task1Text}
-          done={today.task1Done}
-          onToggle={() => toggleTask(1)}
-          disabled={dayEnded}
-        />
-        <TaskCard
-          label="Support task 2 · involves another person"
-          text={today.task2Text}
-          done={today.task2Done}
-          onToggle={() => toggleTask(2)}
-          disabled={dayEnded}
-        />
+        {/* Template-aware task rendering */}
+        {today.templateType === 'focus' && (
+          <>
+            <SectionTitle>Support tasks</SectionTitle>
+            <TaskCard label="Task 1 · unblocks goal" text={today.task1Text} done={today.task1Done} onToggle={() => toggleTask(1)} disabled={dayEnded} />
+            <TaskCard label="Task 2 · involves another person" text={today.task2Text} done={today.task2Done} onToggle={() => toggleTask(2)} disabled={dayEnded} />
+          </>
+        )}
+
+        {today.templateType === 'mit' && (() => {
+          const mit = today.tasks as MITTasks | undefined
+          if (!mit) return null
+          return (
+            <>
+              <SectionTitle>Most important tasks</SectionTitle>
+              {mit.tasks.map((t, i) => (
+                <TaskCard key={i} label={`Task ${i + 1}`} text={t.text} done={t.done} onToggle={() => toggleTemplateItem(i)} disabled={dayEnded} />
+              ))}
+            </>
+          )
+        })()}
+
+        {today.templateType === 'timeblocks' && (() => {
+          const tb = today.tasks as TimeBlockTasks | undefined
+          if (!tb) return null
+          return (
+            <>
+              <SectionTitle>Time blocks</SectionTitle>
+              {tb.blocks.map((b, i) => (
+                <TaskCard key={i} label={b.label} text={b.intention} done={b.done} onToggle={() => toggleTemplateItem(i)} disabled={dayEnded} />
+              ))}
+            </>
+          )
+        })()}
+
+        {today.templateType === 'lifeareas' && (() => {
+          const la = today.tasks as LifeAreaTasks | undefined
+          if (!la) return null
+          const doneCount = la.areas.filter((a) => a.done).length
+          return (
+            <>
+              <SectionTitle>Life areas · {doneCount}/5 done · need 3</SectionTitle>
+              {la.areas.map((a, i) => (
+                <TaskCard
+                  key={a.tag}
+                  label={`${AREA_TAGS[a.tag].icon} ${AREA_TAGS[a.tag].label}`}
+                  text={a.intention}
+                  done={a.done}
+                  onToggle={() => toggleTemplateItem(i)}
+                  disabled={dayEnded}
+                />
+              ))}
+            </>
+          )
+        })()}
 
         {/* Day ended state */}
         {dayEnded && (
