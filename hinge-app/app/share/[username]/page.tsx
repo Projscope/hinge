@@ -72,12 +72,6 @@ async function getShareData(username: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
 
-  // og:image URL is purely derived from username — always include it regardless
-  // of whether the DB call succeeds. This prevents Twitter from seeing a page
-  // with no og:image when generateMetadata times out or returns null.
-  const ogImage = storageOgUrl(username)
-
-  // Try to enrich title/description from DB, but fall back gracefully
   const data = await getShareData(username).catch(() => null)
   const title = data
     ? `${data.displayName} is on a ${data.streak}-day streak 🔥`
@@ -85,6 +79,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = data
     ? `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
     : 'One goal per day. Every day.'
+
+  // Embed live data in the OG image URL so LinkedIn cache-busts when streak changes.
+  // /api/og/streak is an edge function — all params in URL, no DB calls, instant render.
+  const ogImage = data
+    ? `${BASE_URL}/api/og/streak?n=${encodeURIComponent(data.displayName)}&s=${data.streak}&r=${data.hitRate}&rl=${encodeURIComponent(data.rankLabel)}&ri=${encodeURIComponent(data.rankIcon)}&d=${data.dots}`
+    : storageOgUrl(username)
 
   return {
     title,
