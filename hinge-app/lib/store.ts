@@ -144,11 +144,11 @@ export function useAppStore() {
   // ── actions ─────────────────────────────────────────────────────────────────
 
   const setTodayGoal = useCallback(
-    async (goal: Omit<DailyGoal, 'id' | 'completed' | 'createdAt'>) => {
+    async (goal: Omit<DailyGoal, 'id' | 'completed' | 'createdAt'>): Promise<boolean> => {
       const {
         data: { user },
       } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) return false
 
       const isFocus = goal.templateType === 'focus'
 
@@ -177,7 +177,7 @@ export function useAppStore() {
         .select()
         .single()
 
-      if (error || !data) return
+      if (error || !data) return false
 
       const newGoal = mapGoal(data)
       setState((prev) => ({
@@ -185,6 +185,7 @@ export function useAppStore() {
         today: newGoal,
         history: [newGoal, ...prev.history.filter((g) => g.date !== newGoal.date)],
       }))
+      return true
     },
     [supabase]
   )

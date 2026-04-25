@@ -84,6 +84,9 @@ export default function SetupPage() {
     work: '', home: '', family: '', health: '', personal: '',
   })
 
+  // ── Save error ──────────────────────────────────────────────────────────────
+  const [saveError, setSaveError] = useState<string | null>(null)
+
   // ── Queue form (goal-already-set view) ──────────────────────────────────────
   const [queueFormOpen, setQueueFormOpen] = useState(false)
   const [queueText, setQueueText] = useState('')
@@ -128,10 +131,13 @@ export default function SetupPage() {
 
   async function handleStart() {
     if (!canProceed) return
+    setSaveError(null)
+
+    let ok = false
 
     if (template === 'focus') {
       if (selectedQueueItemId) await removeFromQueue(selectedQueueItemId)
-      await setTodayGoal({
+      ok = await setTodayGoal({
         date: todayStr,
         templateType: 'focus',
         dayIntention: dayIntention.trim() || undefined,
@@ -151,7 +157,7 @@ export default function SetupPage() {
           { text: mitTasks[2].trim(), done: false },
         ],
       }
-      await setTodayGoal({
+      ok = await setTodayGoal({
         date: todayStr,
         templateType: 'mit',
         dayIntention: dayIntention.trim() || undefined,
@@ -171,7 +177,7 @@ export default function SetupPage() {
           { label: blockLabels[2], intention: blockIntentions[2].trim(), done: false },
         ],
       }
-      await setTodayGoal({
+      ok = await setTodayGoal({
         date: todayStr,
         templateType: 'timeblocks',
         dayIntention: dayIntention.trim() || undefined,
@@ -191,7 +197,7 @@ export default function SetupPage() {
           done: false,
         })),
       }
-      await setTodayGoal({
+      ok = await setTodayGoal({
         date: todayStr,
         templateType: 'lifeareas',
         dayIntention: dayIntention.trim() || undefined,
@@ -203,6 +209,11 @@ export default function SetupPage() {
         tasks: areas,
         endTime,
       })
+    }
+
+    if (!ok) {
+      setSaveError('Could not save your goal. The database may need a migration — check the console for details.')
+      return
     }
 
     router.push('/today')
@@ -502,7 +513,12 @@ export default function SetupPage() {
         </div>
 
         {/* ── Submit ───────────────────────────────────────────────────────── */}
-        <div className="flex gap-2.5 mt-6">
+        {saveError && (
+          <p className="mt-5 text-[12px] text-[rgba(192,57,43,0.9)] bg-[var(--danger-dim)] border border-[rgba(192,57,43,0.2)] rounded-[10px] px-4 py-2.5 leading-relaxed">
+            {saveError}
+          </p>
+        )}
+        <div className="flex gap-2.5 mt-4">
           <Button onClick={handleStart} disabled={!canProceed} className={!canProceed ? 'opacity-40 cursor-not-allowed' : ''}>
             Start my day →
           </Button>
