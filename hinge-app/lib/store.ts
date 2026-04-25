@@ -113,10 +113,20 @@ export function useAppStore() {
         overflow = (overflowRows ?? []).map(mapOverflow)
       }
 
+      const rawStreaks = mapStreaks(streaksRes.data)
+      const streaks = (() => {
+        if (!rawStreaks.lastActiveDate || rawStreaks.current === 0) return rawStreaks
+        const last = new Date(rawStreaks.lastActiveDate + 'T00:00:00')
+        const yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1)
+        yesterday.setHours(0, 0, 0, 0)
+        return last < yesterday ? { ...rawStreaks, current: 0 } : rawStreaks
+      })()
+
       setState({
         plan: (profileRes.data?.plan as AppState['plan']) ?? 'free',
         today: todayGoal,
-        streaks: mapStreaks(streaksRes.data),
+        streaks,
         history: (historyRes.data ?? []).map(mapGoal),
         overflow,
         freezeUsedThisMonth: profileRes.data?.freeze_used_this_month ?? false,
