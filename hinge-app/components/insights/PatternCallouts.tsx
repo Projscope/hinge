@@ -39,7 +39,7 @@ export default function PatternCallouts({ history, streaks }: Props) {
   // 1. Area imbalance
   const areaMap = new Map<AreaTag, DailyGoal[]>()
   for (const g of history) {
-    if (!g.areaTag) continue
+    if (g.templateType !== 'focus' || !g.areaTag) continue
     if (!areaMap.has(g.areaTag)) areaMap.set(g.areaTag, [])
     areaMap.get(g.areaTag)!.push(g)
   }

@@ -215,7 +215,12 @@ export function useAppStore() {
   // ── actions ─────────────────────────────────────────────────────────────────
 
   const setTodayGoal = useCallback(
-    async (goal: Omit<DailyGoal, 'id' | 'completed' | 'createdAt'>): Promise<boolean> => {
+    async (goal:
+      | Omit<FocusGoal,     'id' | 'completed' | 'createdAt'>
+      | Omit<MITGoal,       'id' | 'completed' | 'createdAt'>
+      | Omit<TimeBlockGoal, 'id' | 'completed' | 'createdAt'>
+      | Omit<LifeAreaGoal,  'id' | 'completed' | 'createdAt'>
+    ): Promise<boolean> => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return false
 
