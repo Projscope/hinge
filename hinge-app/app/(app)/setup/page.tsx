@@ -111,7 +111,7 @@ export default function SetupPage() {
     if (template === 'focus') return mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
     if (template === 'mit') return mitTasks.every((t) => t.trim().length > 2)
     if (template === 'timeblocks') return blockIntentions.every((b) => b.trim().length > 2)
-    if (template === 'lifeareas') return Object.values(areaIntentions).filter((v) => v.trim().length > 2).length >= 3
+    if (template === 'lifeareas') return dayIntention.trim().length > 2 && Object.values(areaIntentions).filter((v) => v.trim().length > 2).length >= 1
     return false
   })()
 
@@ -336,7 +336,10 @@ export default function SetupPage() {
         {/* ── Optional day intention (all templates) ──────────────────────── */}
         <div className="mb-5">
           <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-2">
-            Day theme <span className="normal-case tracking-normal text-ink-4 opacity-60">(optional)</span>
+            Day theme{' '}
+            {template === 'lifeareas'
+              ? <span className="normal-case tracking-normal text-gold opacity-90">required</span>
+              : <span className="normal-case tracking-normal text-ink-4 opacity-60">(optional)</span>}
           </p>
           <input
             type="text"
@@ -457,7 +460,7 @@ export default function SetupPage() {
         {template === 'lifeareas' && (
           <div>
             <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-1">One intention per area</p>
-            <p className="text-[11px] text-ink-4 mb-4">Day is complete when 3 or more areas are done.</p>
+            <p className="text-[11px] text-ink-4 mb-4">Fill in the areas relevant to today — at least one. Day is complete when 3 or more are done.</p>
             {AREA_ORDER.map((area) => {
               const { label, icon } = AREA_TAGS[area]
               const color = AREA_COLORS[area]
