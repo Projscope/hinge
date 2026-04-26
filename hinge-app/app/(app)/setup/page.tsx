@@ -110,7 +110,7 @@ export default function SetupPage() {
   const canProceed = (() => {
     if (template === 'focus') return mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
     if (template === 'mit') return dayIntention.trim().length > 2 && mitTasks.filter((t) => t.trim().length > 2).length >= 1
-    if (template === 'timeblocks') return blockIntentions.every((b) => b.trim().length > 2)
+    if (template === 'timeblocks') return dayIntention.trim().length > 2 && blockIntentions.filter((b) => b.trim().length > 2).length >= 1
     if (template === 'lifeareas') return dayIntention.trim().length > 2 && Object.values(areaIntentions).filter((v) => v.trim().length > 2).length >= 1
     return false
   })()
@@ -337,7 +337,7 @@ export default function SetupPage() {
         <div className="mb-5">
           <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-2">
             Day theme{' '}
-            {template === 'mit' || template === 'lifeareas'
+            {template === 'mit' || template === 'lifeareas' || template === 'timeblocks'
               ? <span className="normal-case tracking-normal text-gold opacity-90">required</span>
               : <span className="normal-case tracking-normal text-ink-4 opacity-60">(optional)</span>}
           </p>
@@ -435,7 +435,8 @@ export default function SetupPage() {
         {/* ── Time Blocks form ──────────────────────────────────────────────── */}
         {template === 'timeblocks' && (
           <div>
-            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-3">One intention per block</p>
+            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-1">One intention per block</p>
+            <p className="text-[11px] text-ink-4 mb-3">Fill in the blocks relevant to today — at least one. Others are optional.</p>
             {[0, 1, 2].map((i) => (
               <div key={i} className="mb-4">
                 <div className="flex items-center gap-2 mb-2">
