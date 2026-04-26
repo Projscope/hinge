@@ -109,7 +109,7 @@ export default function SetupPage() {
   // ── Validation ──────────────────────────────────────────────────────────────
   const canProceed = (() => {
     if (template === 'focus') return mainGoal.trim().length > 5 && task1.trim().length > 2 && task2.trim().length > 2
-    if (template === 'mit') return mitTasks.every((t) => t.trim().length > 2)
+    if (template === 'mit') return dayIntention.trim().length > 2 && mitTasks.filter((t) => t.trim().length > 2).length >= 1
     if (template === 'timeblocks') return blockIntentions.every((b) => b.trim().length > 2)
     if (template === 'lifeareas') return dayIntention.trim().length > 2 && Object.values(areaIntentions).filter((v) => v.trim().length > 2).length >= 1
     return false
@@ -337,7 +337,7 @@ export default function SetupPage() {
         <div className="mb-5">
           <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-2">
             Day theme{' '}
-            {template === 'lifeareas'
+            {template === 'mit' || template === 'lifeareas'
               ? <span className="normal-case tracking-normal text-gold opacity-90">required</span>
               : <span className="normal-case tracking-normal text-ink-4 opacity-60">(optional)</span>}
           </p>
@@ -412,7 +412,8 @@ export default function SetupPage() {
         {/* ── MIT form ─────────────────────────────────────────────────────── */}
         {template === 'mit' && (
           <div>
-            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-3">3 most important tasks</p>
+            <p className="text-[10px] uppercase tracking-[0.08em] text-ink-4 font-medium mb-1">Most important tasks</p>
+            <p className="text-[11px] text-ink-4 mb-3">Fill in the tasks you want to tackle today — at least one. Others are optional.</p>
             {[0, 1, 2].map((i) => (
               <div key={i} className="mb-3">
                 <div className="flex items-center gap-2.5 mb-1.5">
