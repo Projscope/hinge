@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react'
 import { createClient } from './supabase/client'
 import type { AppState, DailyGoal, NewDailyGoal, FocusGoal, MITGoal, TimeBlockGoal, LifeAreaGoal, OverflowItem, Streaks } from './types'
 import { localDateStr } from './dateUtils'
@@ -132,7 +132,7 @@ function mapStreaks(row: Record<string, unknown> | null | undefined): Streaks {
 
 // ── hook ──────────────────────────────────────────────────────────────────────
 
-export function useAppStore() {
+function useAppStoreBase() {
   const [state, setState] = useState<AppState>(defaultState)
   const [hydrated, setHydrated] = useState(false)
   const supabase = createClient()
@@ -486,4 +486,20 @@ export function useAppStore() {
     endDay,
     markWalkthroughSeen,
   }
+}
+
+// ── Shared context (single store instance for the whole app) ──────────────────
+
+type AppStoreValue = ReturnType<typeof useAppStoreBase>
+const AppStoreContext = createContext<AppStoreValue | null>(null)
+
+export function StoreProvider({ children }: { children: React.ReactNode }) {
+  const store = useAppStoreBase()
+  return React.createElement(AppStoreContext.Provider, { value: store }, children)
+}
+
+export function useAppStore(): AppStoreValue {
+  const ctx = useContext(AppStoreContext)
+  if (!ctx) throw new Error('useAppStore must be used within <StoreProvider>')
+  return ctx
 }

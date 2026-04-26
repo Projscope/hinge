@@ -5,7 +5,7 @@ import Sidebar from '@/components/layout/Sidebar'
 import RightPanel from '@/components/layout/RightPanel'
 import BottomNav from '@/components/layout/BottomNav'
 import WalkthroughModal from '@/components/onboarding/WalkthroughModal'
-import { useAppStore } from '@/lib/store'
+import { useAppStore, StoreProvider } from '@/lib/store'
 import { initNotifications } from '@/lib/notifications'
 import { updatePublicSnapshot } from '@/lib/publicSnapshot'
 import { getPublicProfile } from '@/lib/publicProfile'
@@ -20,6 +20,10 @@ function calcHitRate(history: { completed: boolean }[]): number {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  return <StoreProvider><AppShellInner>{children}</AppShellInner></StoreProvider>
+}
+
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const { streaks, history, today, plan, hydrated, walkthroughSeen, markWalkthroughSeen, username } = useAppStore()
   const hitRate = calcHitRate(history.slice(0, 30))
 
