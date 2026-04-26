@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from './supabase/client'
-import type { AppState, DailyGoal, FocusGoal, MITGoal, TimeBlockGoal, LifeAreaGoal, OverflowItem, Streaks } from './types'
+import type { AppState, DailyGoal, NewDailyGoal, FocusGoal, MITGoal, TimeBlockGoal, LifeAreaGoal, OverflowItem, Streaks } from './types'
 import { localDateStr } from './dateUtils'
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -215,12 +215,7 @@ export function useAppStore() {
   // ── actions ─────────────────────────────────────────────────────────────────
 
   const setTodayGoal = useCallback(
-    async (goal:
-      | Omit<FocusGoal,     'id' | 'completed' | 'createdAt'>
-      | Omit<MITGoal,       'id' | 'completed' | 'createdAt'>
-      | Omit<TimeBlockGoal, 'id' | 'completed' | 'createdAt'>
-      | Omit<LifeAreaGoal,  'id' | 'completed' | 'createdAt'>
-    ): Promise<boolean> => {
+    async (goal: NewDailyGoal): Promise<boolean> => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return false
 

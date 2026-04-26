@@ -110,15 +110,22 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
 
       // 2. Fetch streaks + goals in parallel
       const [streaksRes, goalsRes] = await Promise.all([
-        supabase.from('streaks').select('current, personal_best').eq('user_id', userId).maybeSingle(),
+        supabase.from('streaks').select('current, personal_best, last_active_date').eq('user_id', userId).maybeSingle(),
         supabase.from('daily_goals_view').select('id, date, main_goal, area_tag, completed').eq('user_id', userId).order('date', { ascending: false }).limit(200),
       ])
+
+      const rawCurrent = (streaksRes.data?.current as number) ?? 0
+      const lastActive = (streaksRes.data?.last_active_date as string | null) ?? null
+      const yday = new Date(); yday.setDate(yday.getDate() - 1)
+      const ydayStr = yday.toISOString().slice(0, 10)
+      const todayStr = new Date().toISOString().slice(0, 10)
+      const currentStreak = (lastActive === todayStr || lastActive === ydayStr) ? rawCurrent : 0
 
       setData({
         displayName: profileRow.display_name as string,
         username: profileRow.username as string,
         streaks: {
-          current: (streaksRes.data?.current as number) ?? 0,
+          current: currentStreak,
           personal_best: (streaksRes.data?.personal_best as number) ?? 0,
         },
         goals: (goalsRes.data ?? []) as DailyGoalRow[],

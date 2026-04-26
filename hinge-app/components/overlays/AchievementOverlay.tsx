@@ -89,7 +89,7 @@ export default function AchievementOverlay({ streakCount, personalBest, history,
   function handleQueueSubmit() {
     const text = queueText.trim()
     if (!text) return
-    addToQueue(text, goal.templateType === 'focus' ? (goal.areaTag ?? 'work') : 'work')
+    addToQueue(text, (goal.templateType === 'focus' ? goal.areaTag : undefined) ?? 'work')
     setQueueText('')
     setQueued(true)
   }

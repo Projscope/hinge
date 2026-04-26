@@ -40,11 +40,16 @@ async function getShareData(username: string) {
   if (!profile) return null
 
   const [streakRes, goalsRes] = await Promise.all([
-    supabase.from('streaks').select('current').eq('user_id', profile.user_id).maybeSingle(),
+    supabase.from('streaks').select('current, last_active_date').eq('user_id', profile.user_id).maybeSingle(),
     supabase.from('daily_goals_view').select('date, completed').eq('user_id', profile.user_id).order('date', { ascending: false }).limit(30),
   ])
 
-  const streak = streakRes.data?.current ?? 0
+  const rawStreak = streakRes.data?.current ?? 0
+  const lastActive = streakRes.data?.last_active_date as string | null ?? null
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().slice(0, 10)
+  const todayStr2 = new Date().toISOString().slice(0, 10)
+  const streak = (lastActive === todayStr2 || lastActive === yesterdayStr) ? rawStreak : 0
   const goals  = goalsRes.data ?? []
   const hitCount = goals.filter((g: { completed: boolean }) => g.completed).length
   const hitRate  = goals.length > 0 ? Math.round((hitCount / goals.length) * 100) : 0
@@ -72,12 +77,6 @@ async function getShareData(username: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params
 
-  // og:image URL is purely derived from username — always include it regardless
-  // of whether the DB call succeeds. This prevents Twitter from seeing a page
-  // with no og:image when generateMetadata times out or returns null.
-  const ogImage = storageOgUrl(username)
-
-  // Try to enrich title/description from DB, but fall back gracefully
   const data = await getShareData(username).catch(() => null)
   const title = data
     ? `${data.displayName} is on a ${data.streak}-day streak 🔥`
@@ -85,6 +84,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = data
     ? `${data.rankLabel} · ${data.hitRate}% hit rate. One goal per day. Every day.`
     : 'One goal per day. Every day.'
+
+  // Embed live data in the OG image URL so LinkedIn cache-busts when streak changes.
+  // /api/og/streak is an edge function — all params in URL, no DB calls, instant render.
+  const ogImage = data
+    ? `${BASE_URL}/api/og/streak?n=${encodeURIComponent(data.displayName)}&s=${data.streak}&r=${data.hitRate}&rl=${encodeURIComponent(data.rankLabel)}&ri=${encodeURIComponent(data.rankIcon)}&d=${data.dots}`
+    : storageOgUrl(username)
 
   return {
     title,
