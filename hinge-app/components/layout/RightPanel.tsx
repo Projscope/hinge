@@ -72,7 +72,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
       <div className="grid grid-cols-2 gap-2">
         <div className="bg-bg-3 border border-[var(--border)] rounded-[10px] px-3 py-2.5">
           <p className="font-serif text-[22px] text-ink leading-none">
-            {history.filter((g) => g.date.startsWith(now.toISOString().slice(0, 7))).length}
+            {history.filter((g) => g.date.startsWith(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`)).length}
           </p>
           <p className="text-[9px] text-ink-3 mt-0.5">This month</p>
         </div>
@@ -96,6 +96,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
       <SectionLabel>Goal quality</SectionLabel>
       {goalQualityStats ? (
         <div className="bg-bg-3 border border-[var(--border)] rounded-[10px] px-3 py-2.5">
+          <p className="text-[9px] text-ink-4 mb-2 uppercase tracking-[0.07em]">Hit rate by writing quality</p>
           {[
             { label: 'Specific', pct: goalQualityStats.specificHitRate, color: 'bg-teal-bright', textColor: 'text-teal-bright' },
             { label: 'Vague', pct: goalQualityStats.vagueHitRate, color: 'bg-[rgba(192,57,43,0.7)]', textColor: 'text-[#e26b5e]' },
@@ -105,7 +106,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
               <div className="flex-1 h-1 bg-[rgba(255,255,255,0.06)] rounded-full overflow-hidden">
                 <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
               </div>
-              <span className={`text-[11px] font-medium min-w-[28px] text-right ${textColor}`}>{pct}%</span>
+              <span className={`text-[11px] font-medium min-w-[36px] text-right ${textColor}`}>{pct}% hit</span>
             </div>
           ))}
           {goalQualityStats.multiplier && (
