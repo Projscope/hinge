@@ -69,7 +69,14 @@ export default function TodayPage() {
     if (!today) return false
     if (today.templateType === 'focus') return today.task1Done && today.task2Done
     if (today.templateType === 'mit') return today.task1Done && today.task2Done && today.task3Done
-    if (today.templateType === 'timeblocks') return today.block1Done && today.block2Done && today.block3Done
+    if (today.templateType === 'timeblocks') {
+      const filled = [
+        { intention: today.block1Intention, done: today.block1Done },
+        { intention: today.block2Intention, done: today.block2Done },
+        { intention: today.block3Intention, done: today.block3Done },
+      ].filter((b) => b.intention.trim().length > 0)
+      return filled.length > 0 && filled.every((b) => b.done)
+    }
     if (today.templateType === 'lifeareas') {
       return [today.workDone, today.homeDone, today.familyDone, today.healthDone, today.personalDone].filter(Boolean).length >= 3
     }
@@ -213,7 +220,7 @@ export default function TodayPage() {
             <div>
               <p className="text-[12px] font-medium text-teal-bright mb-0.5">
                 {today.templateType === 'focus' ? 'Both tasks done ✓'
-                  : today.templateType === 'mit' ? 'All 3 tasks done ✓'
+                  : today.templateType === 'mit' ? 'All tasks done ✓'
                   : today.templateType === 'timeblocks' ? 'All blocks done ✓'
                   : '3+ areas done ✓'}
               </p>
@@ -248,9 +255,15 @@ export default function TodayPage() {
         {today.templateType === 'timeblocks' && (
           <>
             <SectionTitle>Time blocks</SectionTitle>
-            <TaskCard label={today.block1Label} text={today.block1Intention} done={today.block1Done} onToggle={() => toggleTemplateItem(0)} disabled={dayEnded} />
-            <TaskCard label={today.block2Label} text={today.block2Intention} done={today.block2Done} onToggle={() => toggleTemplateItem(1)} disabled={dayEnded} />
-            <TaskCard label={today.block3Label} text={today.block3Intention} done={today.block3Done} onToggle={() => toggleTemplateItem(2)} disabled={dayEnded} />
+            {[
+              { label: today.block1Label, text: today.block1Intention, done: today.block1Done, idx: 0 },
+              { label: today.block2Label, text: today.block2Intention, done: today.block2Done, idx: 1 },
+              { label: today.block3Label, text: today.block3Intention, done: today.block3Done, idx: 2 },
+            ]
+              .filter((b) => b.text.trim().length > 0)
+              .map(({ label, text, done, idx }) => (
+                <TaskCard key={idx} label={label} text={text} done={done} onToggle={() => toggleTemplateItem(idx)} disabled={dayEnded} />
+              ))}
           </>
         )}
 
