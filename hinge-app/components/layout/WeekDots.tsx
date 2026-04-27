@@ -6,6 +6,7 @@ const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 interface WeekDotsProps {
   history: DailyGoal[]
   today: DailyGoal | null
+  dayEnded?: boolean
 }
 
 function getThisWeekDays(): string[] {
@@ -21,13 +22,18 @@ function getThisWeekDays(): string[] {
   })
 }
 
-export default function WeekDots({ history, today }: WeekDotsProps) {
+export default function WeekDots({ history, today, dayEnded = false }: WeekDotsProps) {
   const days = getThisWeekDays()
   const todayStr = localDateStr()
 
   const goalMap = new Map<string, boolean>()
   for (const g of history) goalMap.set(g.date, g.completed)
-  if (today) goalMap.set(today.date, today.completed)
+  // Only mark today as miss if the day has actually been ended; otherwise leave as in-progress
+  if (today) {
+    if (today.completed || dayEnded) {
+      goalMap.set(today.date, today.completed)
+    }
+  }
 
   const hits = days.filter((d) => goalMap.get(d) === true).length
   const daysWithGoal = days.filter((d) => goalMap.has(d) && d <= todayStr).length

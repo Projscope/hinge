@@ -24,7 +24,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 }
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
-  const { streaks, history, today, plan, hydrated, walkthroughSeen, markWalkthroughSeen, username } = useAppStore()
+  const { streaks, history, today, plan, hydrated, walkthroughSeen, markWalkthroughSeen, username, dayEnded } = useAppStore()
   const hitRate = calcHitRate(history.slice(0, 30))
 
   useEffect(() => {
@@ -111,7 +111,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
         {/* Right panel — desktop only */}
         <div className="hidden lg:contents">
-          <RightPanel streaks={streaks} history={history} today={today} plan={plan} hitRate={hitRate} username={username} />
+          <RightPanel streaks={streaks} history={history} today={today} plan={plan} hitRate={hitRate} username={username} dayEnded={dayEnded} />
         </div>
       </div>
 

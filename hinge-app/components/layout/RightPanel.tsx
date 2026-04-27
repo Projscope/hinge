@@ -14,6 +14,7 @@ interface RightPanelProps {
   plan: Plan
   hitRate: number
   username?: string | null
+  dayEnded?: boolean
 }
 
 function Divider() {
@@ -28,7 +29,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function RightPanel({ streaks, history, today, plan, hitRate, username }: RightPanelProps) {
+export default function RightPanel({ streaks, history, today, plan, hitRate, username, dayEnded = false }: RightPanelProps) {
 
   const now = new Date()
   const monthName = now.toLocaleDateString('en-US', { month: 'long' })
@@ -53,7 +54,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
 
       {/* This week */}
       <SectionLabel>This week</SectionLabel>
-      <WeekDots history={history} today={today} />
+      <WeekDots history={history} today={today} dayEnded={dayEnded} />
 
       <Divider />
 
@@ -125,7 +126,7 @@ export default function RightPanel({ streaks, history, today, plan, hitRate, use
 
       {/* Heatmap */}
       <SectionLabel>{monthName}</SectionLabel>
-      <Heatmap history={history} today={today} />
+      <Heatmap history={history} today={today} dayEnded={dayEnded} />
       <p className="text-[10px] text-ink-4 mt-1.5">🟢 achieved &nbsp;🔴 missed</p>
 
       <Divider />

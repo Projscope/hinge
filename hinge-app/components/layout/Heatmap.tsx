@@ -4,6 +4,7 @@ import { localDateStr } from '@/lib/dateUtils'
 interface HeatmapProps {
   history: DailyGoal[]
   today: DailyGoal | null
+  dayEnded?: boolean
 }
 
 function getDaysInMonth(year: number, month: number): string[] {
@@ -15,7 +16,7 @@ function getDaysInMonth(year: number, month: number): string[] {
   return days
 }
 
-export default function Heatmap({ history, today }: HeatmapProps) {
+export default function Heatmap({ history, today, dayEnded = false }: HeatmapProps) {
   const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth()
@@ -25,7 +26,12 @@ export default function Heatmap({ history, today }: HeatmapProps) {
 
   const goalMap = new Map<string, boolean>()
   for (const g of history) goalMap.set(g.date, g.completed)
-  if (today) goalMap.set(today.date, today.completed)
+  // Only mark today as miss if the day has actually been ended; otherwise leave as in-progress
+  if (today) {
+    if (today.completed || dayEnded) {
+      goalMap.set(today.date, today.completed)
+    }
+  }
 
   const monthName = now.toLocaleDateString('en-US', { month: 'long' })
 
