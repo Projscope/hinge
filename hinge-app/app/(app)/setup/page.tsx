@@ -87,6 +87,10 @@ export default function SetupPage() {
   // ── Save error ──────────────────────────────────────────────────────────────
   const [saveError, setSaveError] = useState<string | null>(null)
 
+  // ── Day theme queue picker (all templates) ──────────────────────────────────
+  const [allQueueItems, setAllQueueItems] = useState<QueueItem[]>([])
+  const [selectedDayIntentionQueueId, setSelectedDayIntentionQueueId] = useState<string | null>(null)
+
   // ── Queue form (goal-already-set view) ──────────────────────────────────────
   const [queueFormOpen, setQueueFormOpen] = useState(false)
   const [queueText, setQueueText] = useState('')
@@ -101,6 +105,7 @@ export default function SetupPage() {
   useEffect(() => {
     getWeeklyAnchor().then((anchor) => { if (anchor) setWeeklyAnchorText(anchor.text) })
     getPublicProfile().then((p) => { if (p?.displayName) setDisplayName(p.displayName) })
+    loadQueue().then(setAllQueueItems)
   }, [])
 
   const goalAlreadySet = hydrated && today?.date === todayDate()
@@ -135,8 +140,12 @@ export default function SetupPage() {
 
     let ok = false
 
+    // Remove day-theme queue item if one was chosen
+    if (selectedDayIntentionQueueId) await removeFromQueue(selectedDayIntentionQueueId)
+
     if (template === 'focus') {
-      if (selectedQueueItemId) await removeFromQueue(selectedQueueItemId)
+      // Only remove the focus main-goal queue item if it's a different item
+      if (selectedQueueItemId && selectedQueueItemId !== selectedDayIntentionQueueId) await removeFromQueue(selectedQueueItemId)
       ok = await setTodayGoal({
         date: todayStr,
         templateType: 'focus',
@@ -344,10 +353,38 @@ export default function SetupPage() {
           <input
             type="text"
             value={dayIntention}
-            onChange={(e) => setDayIntention(e.target.value)}
+            onChange={(e) => {
+              setDayIntention(e.target.value)
+              // Clear queue selection if user edits the field manually
+              if (selectedDayIntentionQueueId) setSelectedDayIntentionQueueId(null)
+            }}
             placeholder={template === 'focus' ? 'e.g. "Ship the auth refactor"' : 'e.g. "Recovery day" or "Deep work sprint"'}
             className="w-full bg-bg-4 border border-[var(--border2)] text-ink text-[13px] rounded-[10px] px-3.5 py-2.5 outline-none focus:border-gold placeholder:text-ink-4"
           />
+          {allQueueItems.length > 0 && (
+            <div className="mt-2">
+              <p className="text-[10px] text-ink-4 mb-1.5">From queue — tap to use as day theme:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allQueueItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setDayIntention(item.text)
+                      setSelectedDayIntentionQueueId(item.id)
+                    }}
+                    className={`text-[11px] px-2.5 py-1 rounded-full border transition-all ${
+                      selectedDayIntentionQueueId === item.id
+                        ? 'bg-[rgba(200,146,42,0.15)] border-[rgba(200,146,42,0.4)] text-gold'
+                        : 'bg-bg-4 border-[var(--border2)] text-ink-3 hover:border-[rgba(200,146,42,0.3)] hover:text-ink-2'
+                    }`}
+                  >
+                    {AREA_TAGS[item.areaTag].icon} {item.text}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <Divider />
