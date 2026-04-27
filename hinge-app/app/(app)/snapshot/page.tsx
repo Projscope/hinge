@@ -62,9 +62,14 @@ export default function SnapshotPage() {
       )
     }
     if (t.templateType === 'mit') {
+      const filledTasks = [
+        { text: t.task1Text, done: t.task1Done },
+        { text: t.task2Text, done: t.task2Done },
+        { text: t.task3Text, done: t.task3Done },
+      ].filter((item) => item.text.trim().length > 0)
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          {[{ text: t.task1Text, done: t.task1Done }, { text: t.task2Text, done: t.task2Done }, { text: t.task3Text, done: t.task3Done }].map((item, i) => (
+          {filledTasks.map((item, i) => (
             <p key={i} className={`text-[13px] flex items-center gap-2 ${item.done ? 'text-teal-bright' : 'text-ink-3'}`}>
               {item.done ? '✓' : '○'} {item.text}
             </p>
@@ -73,13 +78,14 @@ export default function SnapshotPage() {
       )
     }
     if (t.templateType === 'timeblocks') {
+      const filledBlocks = [
+        { label: t.block1Label, intention: t.block1Intention, done: t.block1Done },
+        { label: t.block2Label, intention: t.block2Intention, done: t.block2Done },
+        { label: t.block3Label, intention: t.block3Intention, done: t.block3Done },
+      ].filter((b) => b.intention.trim().length > 0)
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
-          {[
-            { label: t.block1Label, intention: t.block1Intention, done: t.block1Done },
-            { label: t.block2Label, intention: t.block2Intention, done: t.block2Done },
-            { label: t.block3Label, intention: t.block3Intention, done: t.block3Done },
-          ].map((b, i) => (
+          {filledBlocks.map((b, i) => (
             <p key={i} className={`text-[13px] flex items-center gap-2 ${b.done ? 'text-teal-bright' : 'text-ink-3'}`}>
               {b.done ? '✓' : '○'} <span className="text-ink-4 font-medium">{b.label}:</span> {b.intention}
             </p>
@@ -94,17 +100,17 @@ export default function SnapshotPage() {
         { key: 'family'   as const, intention: t.familyIntention,   done: t.familyDone },
         { key: 'health'   as const, intention: t.healthIntention,   done: t.healthDone },
         { key: 'personal' as const, intention: t.personalIntention, done: t.personalDone },
-      ]
+      ].filter((a) => a.intention.trim().length > 0)
       const doneCount = areas.filter((a) => a.done).length
       return (
         <div className="border-t border-[var(--border)] pt-2.5 flex flex-col gap-1.5">
           {areas.map((a) => (
             <p key={a.key} className={`text-[13px] flex items-center gap-2 ${a.done ? 'text-teal-bright' : 'text-ink-3'}`}>
-              {a.done ? '✓' : '○'} {AREA_TAGS[a.key].icon} {AREA_TAGS[a.key].label}: {a.intention || '—'}
+              {a.done ? '✓' : '○'} {AREA_TAGS[a.key].icon} {AREA_TAGS[a.key].label}: {a.intention}
             </p>
           ))}
           <p className="text-[11px] text-ink-4 pt-1">
-            {doneCount}/5 areas done · {doneCount >= 3 ? 'threshold met ✓' : `need ${3 - doneCount} more`}
+            {doneCount}/{areas.length} areas done · {doneCount >= 3 ? 'threshold met ✓' : `need ${3 - doneCount} more`}
           </p>
         </div>
       )
@@ -115,8 +121,14 @@ export default function SnapshotPage() {
   // Not-ready message per template
   function notReadyMessage() {
     if (today!.templateType === 'focus') return 'Both support tasks must be completed before you can mark the goal as achieved.'
-    if (today!.templateType === 'mit') return 'All 3 tasks must be completed to mark this day as a win.'
-    if (today!.templateType === 'timeblocks') return 'All 3 time blocks must be marked done before closing the day.'
+    if (today!.templateType === 'mit') {
+      const n = [today!.task1Text, today!.task2Text, today!.task3Text].filter((t) => t.trim().length > 0).length
+      return `All ${n} task${n === 1 ? '' : 's'} must be completed to mark this day as a win.`
+    }
+    if (today!.templateType === 'timeblocks') {
+      const n = [today!.block1Intention, today!.block2Intention, today!.block3Intention].filter((b) => b.trim().length > 0).length
+      return `All ${n} time block${n === 1 ? '' : 's'} must be marked done before closing the day.`
+    }
     if (today!.templateType === 'lifeareas') return 'At least 3 of 5 life areas must be done to mark this day as a win.'
     return ''
   }

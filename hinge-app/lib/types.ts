@@ -146,10 +146,22 @@ export function isGoalReadyToClose(goal: DailyGoal): boolean {
   switch (goal.templateType) {
     case 'focus':
       return goal.task1Done && goal.task2Done
-    case 'mit':
-      return goal.task1Done && goal.task2Done && goal.task3Done
-    case 'timeblocks':
-      return goal.block1Done && goal.block2Done && goal.block3Done
+    case 'mit': {
+      const filledMit = [
+        { text: goal.task1Text, done: goal.task1Done },
+        { text: goal.task2Text, done: goal.task2Done },
+        { text: goal.task3Text, done: goal.task3Done },
+      ].filter((t) => t.text.trim().length > 0)
+      return filledMit.length > 0 && filledMit.every((t) => t.done)
+    }
+    case 'timeblocks': {
+      const filledTb = [
+        { intention: goal.block1Intention, done: goal.block1Done },
+        { intention: goal.block2Intention, done: goal.block2Done },
+        { intention: goal.block3Intention, done: goal.block3Done },
+      ].filter((b) => b.intention.trim().length > 0)
+      return filledTb.length > 0 && filledTb.every((b) => b.done)
+    }
     case 'lifeareas': {
       const done = [goal.workDone, goal.homeDone, goal.familyDone, goal.healthDone, goal.personalDone].filter(Boolean).length
       return done >= 3
@@ -164,12 +176,22 @@ export function templateProgress(goal: DailyGoal): number {
       return Math.round((done / 2) * 100)
     }
     case 'mit': {
-      const done = [goal.task1Done, goal.task2Done, goal.task3Done].filter(Boolean).length
-      return Math.round((done / 3) * 100)
+      const mitTasks = [
+        { text: goal.task1Text, done: goal.task1Done },
+        { text: goal.task2Text, done: goal.task2Done },
+        { text: goal.task3Text, done: goal.task3Done },
+      ].filter((t) => t.text.trim().length > 0)
+      if (mitTasks.length === 0) return 0
+      return Math.round((mitTasks.filter((t) => t.done).length / mitTasks.length) * 100)
     }
     case 'timeblocks': {
-      const done = [goal.block1Done, goal.block2Done, goal.block3Done].filter(Boolean).length
-      return Math.round((done / 3) * 100)
+      const tbBlocks = [
+        { intention: goal.block1Intention, done: goal.block1Done },
+        { intention: goal.block2Intention, done: goal.block2Done },
+        { intention: goal.block3Intention, done: goal.block3Done },
+      ].filter((b) => b.intention.trim().length > 0)
+      if (tbBlocks.length === 0) return 0
+      return Math.round((tbBlocks.filter((b) => b.done).length / tbBlocks.length) * 100)
     }
     case 'lifeareas': {
       const done = [goal.workDone, goal.homeDone, goal.familyDone, goal.healthDone, goal.personalDone].filter(Boolean).length
